@@ -70,9 +70,9 @@ local function drawTxt(text, font, x, y, scale, r, g, b, a)
     SetTextColour(r, g, b, a)
     SetTextOutline()
     SetTextCentre(1)
-    SetTextEntry("STRING")
-    AddTextComponentString(text)
-    DrawText(x, y)
+    BeginTextCommandDisplayText("STRING")
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(x, y)
 end
 
 local function comma_value(amount)
@@ -104,8 +104,10 @@ local function setClosestShowroomVehicle()
     local current = nil
     local dist = nil
     local closestShop = insideShop
+
     for id in pairs(Config.Shops[closestShop]["ShowroomVehicles"]) do
-        local dist2 = #(pos -vector3(Config.Shops[closestShop]["ShowroomVehicles"][id].coords.x,Config.Shops[closestShop]["ShowroomVehicles"][id].coords.y,Config.Shops[closestShop]["ShowroomVehicles"][id].coords.z))
+        local dist2 = #(pos -vec3(Config.Shops[closestShop]["ShowroomVehicles"][id].coords.x,Config.Shops[closestShop]["ShowroomVehicles"][id].coords.y,Config.Shops[closestShop]["ShowroomVehicles"][id].coords.z))
+
         if current then
             if dist2 < dist then
                 current = id
@@ -116,48 +118,55 @@ local function setClosestShowroomVehicle()
             current = id
         end
     end
+
     if current ~= ClosestVehicle then
         ClosestVehicle = current
     end
 end
 
 local function createTestDriveReturn()
-    testDriveZone = BoxZone:Create(
-        Config.Shops[insideShop]["ReturnLocation"],
-        3.0,
-        5.0,
-        {
-            name = "box_zone_testdrive_return_" .. insideShop,
-        })
+    testDriveZone = lib.zones.box({
+        coords = Config.Shops[insideShop]["ReturnLocation"],
+        size = vec3(2, 2, 2),
+        rotation = 0,
+        onEnter = function(_)
+            if IsPedInAnyVehicle(cache.ped) then
+                SetVehicleForwardSpeed(cache.vehicle, 0)
 
-    testDriveZone:onPlayerInOut(function(isPointInside)
-        if isPointInside and IsPedInAnyVehicle(cache.ped) then
-            SetVehicleForwardSpeed(GetVehiclePedIsIn(cache.ped, false), 0)
-            lib.showContext('rettestdrive_header_menu')
-        else
+                lib.showContext('rettestdrive_header_menu')
+            end
+        end,
+        onExit = function(_)
             lib.hideContext()
         end
-    end)
+    })
 end
 
 local function startTestDriveTimer(testDriveTime, prevCoords)
     local gameTimer = GetGameTimer()
+
     CreateThread(function()
         while inTestDrive do
             if GetGameTimer() < gameTimer + tonumber(1000 * testDriveTime) then
                 local secondsLeft = GetGameTimer() - gameTimer
+
                 if secondsLeft >= tonumber(1000 * testDriveTime) - 20 then
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
+
                     testDriveVeh = 0
                     inTestDrive = false
+
                     SetEntityCoords(cache.ped, prevCoords)
+
                     lib.notify({
                         title = Lang:t('general.testdrive_complete'),
                         type = 'success'
                     })
                 end
+
                 drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(testDriveTime - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
             end
+
             Wait(0)
         end
     end)
@@ -166,18 +175,16 @@ end
 local function createVehZones(shopName, entity)
     if not Config.UsingTarget then
         for i = 1, #Config.Shops[shopName]['ShowroomVehicles'] do
-            zones[#zones + 1] = BoxZone:Create(
-                vector3(Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].x,Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].y,Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].z),
-                Config.Shops[shopName]['Zone']['size'],
-                Config.Shops[shopName]['Zone']['size'],
-                {
-                    name = "box_zone_" .. shopName .. "_" .. i,
-                    minZ = Config.Shops[shopName]['Zone']['minZ'],
-                    maxZ = Config.Shops[shopName]['Zone']['maxZ'],
-                    debugPoly = false,
-                })
+            zones[#zones + 1] = BoxZone:Create(vec3(Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].x,Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].y,Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].z), Config.Shops[shopName]['Zone']['size'], Config.Shops[shopName]['Zone']['size'], {
+                name = "box_zone_" .. shopName .. "_" .. i,
+                minZ = Config.Shops[shopName]['Zone']['minZ'],
+                maxZ = Config.Shops[shopName]['Zone']['maxZ']
+            })
         end
-        local combo = ComboZone:Create(zones, { name = "vehCombo", debugPoly = false })
+
+        local combo = ComboZone:Create(zones, {
+            name = "vehCombo"
+        })
         combo:onPlayerInOut(function(isPointInside)
             if isPointInside then
                 if PlayerData and PlayerData.job and(PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
@@ -344,8 +351,7 @@ function Init()
             offset = { 0.0, 0.0, 0.0 },
             scale = { 1.0, 1.0, 1.0 },
             minZ = Config.FinanceZone.z - 1,
-            maxZ = Config.FinanceZone.z + 1,
-            debugPoly = false,
+            maxZ = Config.FinanceZone.z + 1
         })
 
         financeZone:onPlayerInOut(function(isPointInside)
@@ -359,11 +365,8 @@ function Init()
     CreateThread(function()
         for k in pairs(Config.Shops) do
             for i = 1, #Config.Shops[k]['ShowroomVehicles'] do
-                local model = GetHashKey(Config.Shops[k]["ShowroomVehicles"][i].defaultVehicle)
-                RequestModel(model)
-                while not HasModelLoaded(model) do
-                    Wait(0)
-                end
+                local model = joaat(Config.Shops[k]["ShowroomVehicles"][i].defaultVehicle)
+                lib.requestModel(model)
                 local veh = CreateVehicle(model, Config.Shops[k]["ShowroomVehicles"][i].coords.x,
                     Config.Shops[k]["ShowroomVehicles"][i].coords.y, Config.Shops[k]["ShowroomVehicles"][i].coords.z,
                     false, false)
@@ -394,22 +397,30 @@ end)
 RegisterNetEvent('qb-vehicleshop:client:TestDrive', function()
     if not inTestDrive and ClosestVehicle ~= 0 then
         inTestDrive = true
+
         local prevCoords = GetEntityCoords(cache.ped)
+
         tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
+
         QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
             local veh = NetToVeh(netId)
-            exports['LegacyFuel']:SetFuel(veh, 100)
+
+            SetVehicleFuelLevel(veh, 100.0)
             SetVehicleNumberPlateText(veh, 'TESTDRIVE')
             SetEntityHeading(veh, Config.Shops[tempShop]["TestDriveSpawn"].w)
+
             TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
+
             testDriveVeh = netId
+
             lib.notify({
-                title = Lang:t('general.testdrive_timenoti',
-                    { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
+                title = Lang:t('general.testdrive_timenoti', {
+                    testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"]
+                }),
                 type = 'inform'
             })
-        end, Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
-            Config.Shops[tempShop]["TestDriveSpawn"], true)
+        end, Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
+
         createTestDriveReturn()
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, prevCoords)
     else
@@ -423,22 +434,31 @@ end)
 RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
     if not inTestDrive then
         inTestDrive = true
+
         local vehicle = data
         local prevCoords = GetEntityCoords(cache.ped)
+
         tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
+
         QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
             local veh = NetToVeh(netId)
-            exports['LegacyFuel']:SetFuel(veh, 100)
+
+            SetVehicleFuelLevel(veh, 100.0)
             SetVehicleNumberPlateText(veh, 'TESTDRIVE')
             SetEntityHeading(veh, Config.Shops[tempShop]["TestDriveSpawn"].w)
+
             TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
+
             testDriveVeh = netId
+
             lib.notify({
-                title = Lang:t('general.testdrive_timenoti',
-                    { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
+                title = Lang:t('general.testdrive_timenoti', {
+                    testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"]
+                }),
                 type = 'inform'
             })
         end, vehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
+
         createTestDriveReturn()
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, prevCoords)
     else
@@ -450,15 +470,17 @@ RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:TestDriveReturn', function()
-    local ped = cache.ped
-    local veh = GetVehiclePedIsIn(ped)
     local entity = NetworkGetEntityFromNetworkId(testDriveVeh)
-    if veh == entity then
+
+    if cache.vehicle == entity then
         testDriveVeh = 0
         inTestDrive = false
+
         DeleteEntity(veh)
+
         lib.hideContext()
-        testDriveZone:destroy()
+
+        testDriveZone:remove()
     else
         lib.notify({
             title = Lang:t('error.testdrive_return'),
@@ -601,7 +623,7 @@ end)
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
     if Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
-        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vector3(Config.Shops[shopName][
+        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vec3(Config.Shops[shopName][
             "ShowroomVehicles"][data.ClosestVehicle].coords.x,
             Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y,
             Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z))
@@ -611,11 +633,8 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
             Wait(50)
         end
         Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle = data.toVehicle
-        local model = GetHashKey(data.toVehicle)
-        RequestModel(model)
-        while not HasModelLoaded(model) do
-            Wait(50)
-        end
+        local model = joaat(data.toVehicle)
+        lib.requestModel(model)
         local veh = CreateVehicle(model, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.x,
             Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y,
             Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z, false, false)
@@ -635,11 +654,14 @@ end)
 
 RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
     tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
+
     QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
         local veh = NetToVeh(netId)
-        exports['LegacyFuel']:SetFuel(veh, 100)
+
+        SetVehicleFuelLevel(veh, 100.0)
         SetVehicleNumberPlateText(veh, plate)
         SetEntityHeading(veh, Config.Shops[tempShop]["VehicleSpawn"].w)
+
         TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
         TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", QBCore.Functions.GetVehicleProperties(veh))
     end, vehicle, Config.Shops[tempShop]["VehicleSpawn"], true)
@@ -648,10 +670,12 @@ end)
 RegisterNetEvent('qb-vehicleshop:client:getVehicles', function()
     QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
         local ownedVehicles = {}
+        
         for _, v in pairs(vehicles) do
             if v.balance ~= 0 then
                 local name = QBCore.Shared.Vehicles[v.vehicle]["name"]
                 local plate = v.plate:upper()
+
                 ownedVehicles[#ownedVehicles + 1] = {
                     title = name,
                     description = Lang:t('menus.veh_platetxt') .. plate,
@@ -773,11 +797,13 @@ CreateThread(function()
     for k, v in pairs(Config.Shops) do
         if v.showBlip then
             local Dealer = AddBlipForCoord(Config.Shops[k]["Location"])
+
             SetBlipSprite(Dealer, Config.Shops[k]["blipSprite"])
             SetBlipDisplay(Dealer, 4)
             SetBlipScale(Dealer, 0.70)
             SetBlipAsShortRange(Dealer, true)
             SetBlipColour(Dealer, Config.Shops[k]["blipColor"])
+
             BeginTextCommandSetBlipName("STRING")
             AddTextComponentSubstringPlayerName(Config.Shops[k]["ShopLabel"])
             EndTextCommandSetBlipName(Dealer)
