@@ -18,7 +18,7 @@ local Translations = {
         notown = "You don\'t own this vehicle",
         buyertoopoor = "The buyer doesn\'t have enough money",
         nofinanced = "You don't have any financed vehicles",
-        financed = "This vehicle is financed",
+        financed = "This vehicle is financed"
     },
     success = {
         purchased = "Congratulations on your purchase!",
@@ -26,7 +26,7 @@ local Translations = {
         gifted = "You gifted your vehicle",
         received_gift = "You were gifted a vehicle",
         soldfor = "You sold your vehicle for $",
-        boughtfor = "You bought a vehicle for $",
+        boughtfor = "You bought a vehicle for $"
     },
     menus = {
         vehHeader_header = "Vehicle Options",
@@ -54,17 +54,17 @@ local Translations = {
         swap_txt = "Change currently selected vehicle",
         financesubmit_downpayment = "Down Payment Amount - Min ",
         financesubmit_totalpayment = "Total Payments - Max ",
-        --Free Use
+        -- Free Use
         freeuse_test_txt = "Test drive currently selected vehicle",
         freeuse_buy_header = "Buy Vehicle",
         freeuse_buy_txt = "Purchase currently selected vehicle",
         freeuse_finance_txt = "Finance currently selected vehicle",
-        --Managed
+        -- Managed
         managed_test_txt = "Allow player for test drive",
         managed_sell_header = "Sell Vehicle",
         managed_sell_txt = "Sell vehicle to Player",
         managed_finance_txt = "Finance vehicle to Player",
-        submit_ID = "Server ID (#)",
+        submit_ID = "Server ID (#)"
     },
     general = {
         testdrive_timer = "Test Drive Time Remaining:",
@@ -74,7 +74,7 @@ local Translations = {
         paymentduein = "Your vehicle payment is due within %{time} minutes",
         command_transfervehicle = "Gift or sell your vehicle",
         command_transfervehicle_help = "ID of buyer",
-        command_transfervehicle_amount = "Sell amount (optionnal)",
+        command_transfervehicle_amount = "Sell amount (optionnal)"
     }
 }
 Lang = Locale:new({
