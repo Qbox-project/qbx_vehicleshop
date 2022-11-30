@@ -177,54 +177,42 @@ end
 
 local function createVehZones(shopName, entity)
     if not Config.UsingTarget then
-        for i = 1, #Config.Shops[shopName]['ShowroomVehicles'] do
-            zones[#zones + 1] = BoxZone:Create(vec3(Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].x,Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].y,Config.Shops[shopName]['ShowroomVehicles'][i]['coords'].z), Config.Shops[shopName]['Zone']['size'], Config.Shops[shopName]['Zone']['size'], {
-                name = "box_zone_" .. shopName .. "_" .. i,
-                minZ = Config.Shops[shopName]['Zone']['minZ'],
-                maxZ = Config.Shops[shopName]['Zone']['maxZ']
+        for _ = 1, #Config.Shops[shopName]['ShowroomVehicles'] do
+            lib.zones.box({
+                coords = Config.FinanceZone,
+                size = vec3(2, 2, 2),
+                rotation = 0.0,
+                onEnter = function(_)
+                    if PlayerData and PlayerData.job and(PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
+                        lib.showContext('veh_header_menu')
+                    end
+                end,
+                onExit = function(_)
+                    lib.hideContext()
+                end
             })
         end
-
-        local combo = ComboZone:Create(zones, {
-            name = "vehCombo"
-        })
-        combo:onPlayerInOut(function(isPointInside)
-            if isPointInside then
-                if PlayerData and PlayerData.job and(PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
-                    lib.showContext('veh_header_menu')
-                end
-            else
-                lib.hideContext()
-            end
-        end)
     else
-        local options = {
+        exports.ox_target:addEntity(entity, {
             {
                 name = 'vehicleshop:showVehicleOptions',
                 event = 'qb-vehicleshop:client:showVehOptions',
                 icon = "fas fa-car",
                 label = Lang:t('general.vehinteraction'),
-                canInteract = function()
-                    local closestShop = insideShop
-                    return closestShop and (Config.Shops[closestShop]['Job'] == 'none' or PlayerData.job.name == Config.Shops[closestShop]['Job'])
+                canInteract = function(_, _, _, _)
+                    return insideShop and (Config.Shops[insideShop]['Job'] == 'none' or PlayerData.job.name == Config.Shops[insideShop]['Job'])
                 end
             }
-        }
-
-        exports.ox_target:addEntity(entity, options)
+        })
     end
 end
 
 -- Zones
 function createFreeUseShop(shopShape, name)
-    local zone = PolyZone:Create(shopShape, {
-        name = name,
-        minZ = shopShape.minZ,
-        maxZ = shopShape.maxZ
-    })
-
-    zone:onPlayerInOut(function(isPointInside)
-        if isPointInside then
+    lib.zones.poly({
+        points = shopShape,
+        thickness = 2,
+        onEnter = function(_)
             insideShop = name
 
             CreateThread(function()
@@ -273,22 +261,19 @@ function createFreeUseShop(shopShape, name)
                     Wait(1000)
                 end
             end)
-        else
+        end,
+        onExit = function(_)
             insideShop = nil
             ClosestVehicle = 1
         end
-    end)
+    })
 end
 
 function createManagedShop(shopShape, name)
-    local zone = PolyZone:Create(shopShape, {
-        name = name,
-        minZ = shopShape.minZ,
-        maxZ = shopShape.maxZ
-    })
-
-    zone:onPlayerInOut(function(isPointInside)
-        if isPointInside then
+    lib.zones.poly({
+        points = shopShape,
+        thickness = 2,
+        onEnter = function(_)
             insideShop = name
 
             CreateThread(function()
@@ -335,21 +320,24 @@ function createManagedShop(shopShape, name)
                                 description = Lang:t('menus.swap_txt'),
                                 event = 'qb-vehicleshop:client:vehCategories',
                                 arrow = true
-                            },
+                            }
                         }
                     })
+
                     Wait(1000)
                 end
             end)
-        else
+        end,
+        onExit = function(_)
             insideShop = nil
             ClosestVehicle = 1
         end
-    end)
+    })
 end
 
 function Init()
     Initialized = true
+
     CreateThread(function()
         for name, shop in pairs(Config.Shops) do
             if shop['Type'] == 'free-use' then
@@ -359,31 +347,28 @@ function Init()
             end
         end
     end)
-    CreateThread(function()
-        local financeZone = BoxZone:Create(Config.FinanceZone, 2.0, 2.0, {
-            name = "vehicleshop_financeZone",
-            offset = { 0.0, 0.0, 0.0 },
-            scale = { 1.0, 1.0, 1.0 },
-            minZ = Config.FinanceZone.z - 1,
-            maxZ = Config.FinanceZone.z + 1
-        })
 
-        financeZone:onPlayerInOut(function(isPointInside)
-            if isPointInside then
+    CreateThread(function()
+        lib.zones.box({
+            coords = Config.FinanceZone,
+            size = vec3(2, 2, 2),
+            rotation = 0.0,
+            onEnter = function(_)
                 lib.showContext('fin_header_menu')
-            else
+            end,
+            onExit = function(_)
                 lib.hideContext()
             end
-        end)
+        })
     end)
+
     CreateThread(function()
         for k in pairs(Config.Shops) do
             for i = 1, #Config.Shops[k]['ShowroomVehicles'] do
-                local model = joaat(Config.Shops[k]["ShowroomVehicles"][i].defaultVehicle)
-                lib.requestModel(model)
-                local veh = CreateVehicle(model, Config.Shops[k]["ShowroomVehicles"][i].coords.x,
-                    Config.Shops[k]["ShowroomVehicles"][i].coords.y, Config.Shops[k]["ShowroomVehicles"][i].coords.z,
-                    false, false)
+                lib.requestModel(Config.Shops[k]["ShowroomVehicles"][i].defaultVehicle)
+
+                local veh = CreateVehicle(model, Config.Shops[k]["ShowroomVehicles"][i].coords.x, Config.Shops[k]["ShowroomVehicles"][i].coords.y, Config.Shops[k]["ShowroomVehicles"][i].coords.z, false, false)
+
                 SetModelAsNoLongerNeeded(model)
                 SetVehicleOnGroundProperly(veh)
                 SetEntityInvincible(veh, true)
@@ -392,9 +377,15 @@ function Init()
                 SetEntityHeading(veh, Config.Shops[k]["ShowroomVehicles"][i].coords.w)
                 FreezeEntityPosition(veh, true)
                 SetVehicleNumberPlateText(veh, 'BUY ME')
-                if Config.UsingTarget then createVehZones(k, veh) end
+
+                if Config.UsingTarget then
+                    createVehZones(k, veh)
+                end
             end
-            if not Config.UsingTarget then createVehZones(k) end
+
+            if not Config.UsingTarget then
+                createVehZones(k)
+            end
         end
     end)
 end
@@ -575,7 +566,6 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
         title = Lang:t('menus.categories_header'),
         options = vehMenu
     })
-
     lib.showContext('open_veh_cats')
 end)
 
@@ -583,11 +573,11 @@ RegisterNetEvent('qb-vehicleshop:client:openFinance', function(data)
     local dialog = lib.inputDialog(getVehBrand():upper() .. ' ' .. data.buyVehicle:upper() .. ' - $' .. data.price, {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
+            label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%'
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment') .. Config.MaximumPayments,
+            label = Lang:t('menus.financesubmit_totalpayment') .. Config.MaximumPayments
         }
     })
 
@@ -596,10 +586,11 @@ RegisterNetEvent('qb-vehicleshop:client:openFinance', function(data)
     local downPayment = tonumber(dialog[1])
     local paymentAmount = tonumber(dialog[2])
 
-    if not downPayment or not paymentAmount then return end
+    if not downPayment or not paymentAmount then
+        return
+    end
 
-    TriggerServerEvent('qb-vehicleshop:server:financeVehicle', downPayment, paymentAmount,
-        data.buyVehicle)
+    TriggerServerEvent('qb-vehicleshop:server:financeVehicle', downPayment, paymentAmount, data.buyVehicle)
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:openCustomFinance', function(data)
@@ -608,52 +599,64 @@ RegisterNetEvent('qb-vehicleshop:client:openCustomFinance', function(data)
     local dialog = lib.inputDialog(getVehBrand():upper() .. ' ' .. data.vehicle:upper() .. ' - $' .. data.price, {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
+            label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%'
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment') .. Config.MaximumPayments,
+            label = Lang:t('menus.financesubmit_totalpayment') .. Config.MaximumPayments
         },
         {
             type = 'number',
-            label = Lang:t('menus.submit_ID'),
+            label = Lang:t('menus.submit_ID')
         }
     })
 
-    if not dialog then return end
+    if not dialog then
+        return
+    end
 
     local downPayment = tonumber(dialog[1])
     local paymentAmount = tonumber(dialog[2])
     local playerid = tonumber(dialog[3])
 
-    if not downPayment or not paymentAmount or not playerid then return end
+    if not downPayment or not paymentAmount or not playerid then
+        return
+    end
 
     TriggerEvent('animations:client:EmoteCommandStart', { "c" })
-    TriggerServerEvent('qb-vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount,
-        data.vehicle, playerid)
+    TriggerServerEvent('qb-vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount, data.vehicle, playerid)
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
+
     if Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
-        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vec3(Config.Shops[shopName][
-            "ShowroomVehicles"][data.ClosestVehicle].coords.x,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z))
-        if closestVehicle == 0 then return end
-        if closestDistance < 5 then DeleteEntity(closestVehicle) end
+        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vec3(Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.x, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z))
+
+        if closestVehicle == 0 then
+            return
+        end
+
+        if closestDistance < 5 then
+            DeleteEntity(closestVehicle)
+        end
+
         while DoesEntityExist(closestVehicle) do
             Wait(50)
         end
+
         Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle = data.toVehicle
+
         local model = joaat(data.toVehicle)
+
         lib.requestModel(model)
-        local veh = CreateVehicle(model, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.x,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z, false, false)
+
+        local veh = CreateVehicle(model, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.x, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z, false, false)
+
         while not DoesEntityExist(veh) do
             Wait(50)
         end
+
         SetModelAsNoLongerNeeded(model)
         SetVehicleOnGroundProperly(veh)
         SetEntityInvincible(veh, true)
@@ -661,7 +664,10 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
         SetVehicleDoorsLocked(veh, 3)
         FreezeEntityPosition(veh, true)
         SetVehicleNumberPlateText(veh, 'BUY ME')
-        if Config.UsingTarget then createVehZones(shopName, veh) end
+
+        if Config.UsingTarget then
+            createVehZones(shopName, veh)
+        end
     end
 end)
 
