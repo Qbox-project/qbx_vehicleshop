@@ -181,7 +181,7 @@ local function startTestDriveTimer(testDriveTime, prevCoords)
 end
 
 local function createVehZones(shopName, entity)
-    if not Config.UsingTarget then
+    if not Config.UseTarget then
         for _ = 1, #Config.Shops[shopName].showroomVehicles do
             lib.zones.box({
                 coords = Config.FinanceZone,
@@ -202,7 +202,7 @@ local function createVehZones(shopName, entity)
             {
                 name = 'vehicleshop:showVehicleOptions',
                 event = 'qb-vehicleshop:client:showVehOptions',
-                icon = "fas fa-car",
+                icon = "fa-solid fa-car",
                 label = Lang:t('general.vehinteraction'),
                 canInteract = function(_, _, _, _)
                     return insideShop and (Config.Shops[insideShop].job and PlayerData.job.name == Config.Shops[insideShop].job or true)
@@ -383,12 +383,12 @@ function Init()
                 FreezeEntityPosition(veh, true)
                 SetVehicleNumberPlateText(veh, 'BUY ME')
 
-                if Config.UsingTarget then
+                if Config.UseTarget then
                     createVehZones(k, veh)
                 end
             end
 
-            if not Config.UsingTarget then
+            if not Config.UseTarget then
                 createVehZones(k)
             end
         end
@@ -669,7 +669,7 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
         FreezeEntityPosition(veh, true)
         SetVehicleNumberPlateText(veh, 'BUY ME')
 
-        if Config.UsingTarget then
+        if Config.UseTarget then
             createVehZones(shopName, veh)
         end
     end
