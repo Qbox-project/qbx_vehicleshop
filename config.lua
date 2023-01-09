@@ -165,8 +165,8 @@ Config.Shops = {
                 vector3(-754.21, -1371.49, 0),
                 vector3(-716.94, -1326.88, 0)
             },
-            ['size'] = vector3(8, 8, 6), -- size of the vehicles zones
-            ['debug'] = true
+            ['size'] = vector3(8, 8, 6), -- size of the vehicles zones (x, y, z)
+            ['debug'] = false
         },
         ['Job'] = 'none', -- Name of job or none
         ['ShopLabel'] = 'Marina Shop', -- Blip name
@@ -214,8 +214,8 @@ Config.Shops = {
                 vector3(-1703.49, -3158.02, 12.99),
                 vector3(-1646.03, -3190.84, 12.99)
             },
-            ['size'] = vector3(10, 10, 8), -- size of the vehicles zones
-            ['debug'] = true
+            ['size'] = vector3(10, 10, 8), -- size of the vehicles zones (x, y, z)
+            ['debug'] = false
         },
         ['Job'] = 'none', -- Name of job or none
         ['ShopLabel'] = 'Air Shop', -- Blip name
