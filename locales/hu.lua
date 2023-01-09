@@ -65,7 +65,7 @@ local Translations = {
         managed_sell_txt = "Kiválaszott jármű eladása",
         managed_finance_txt = "Kiválaszott jármű hitelezése a vásárlónak",
         submit_ID = "Idéglenes aktív személyiszám (#)",
-        keypress_showFinanceMenu = "[E] Hitelezési dokumentáció megnyitása",
+        keypress_showFinanceMenu = "[E] Hitelezési menü megnyitása",
         --Floating
         keypress_vehicleViewMenu = "[E] Jármű megnézése"
     },
