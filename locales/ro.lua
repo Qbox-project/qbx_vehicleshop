@@ -67,6 +67,9 @@ local Translations = {
         managed_sell_txt = "Vinde vehiculul jcatorului",
         managed_finance_txt = "Vinde vehiculul in rate unui jucator",
         submit_ID = "ID-ul serverului (#)",
+        keypress_showFinanceMenu = "[E] Open Finance Menu",
+        --Floating
+        keypress_vehicleViewMenu = "[E] View Vehicle"
     },
     general = {
         testdrive_timer = "Timp ramas pentru testare:",

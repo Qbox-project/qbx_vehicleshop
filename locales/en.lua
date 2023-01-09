@@ -65,6 +65,9 @@ local Translations = {
         managed_sell_txt = "Sell vehicle to Player",
         managed_finance_txt = "Finance vehicle to Player",
         submit_ID = "Server ID (#)",
+        keypress_showFinanceMenu = "[E] Open Finance Menu",
+        --Floating
+        keypress_vehicleViewMenu = "[E] View Vehicle"
     },
     general = {
         testdrive_timer = "Test Drive Time Remaining:",
