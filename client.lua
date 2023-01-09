@@ -14,17 +14,6 @@ lib.registerContext({
     }
 })
 
-lib.registerContext({ 
-    id = 'rettestdrive_header_menu',
-    title = Lang:t('menus.returnTestDrive_header'),
-    options = {
-        {
-            title = Lang:t('menus.finance_txt'),
-            event = 'qb-vehicleshop:client:TestDriveReturn'
-        }
-    }
-})
-
 local Initialized = false
 local testDriveVeh, inTestDrive = 0, false
 local ClosestVehicle = 1
