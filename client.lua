@@ -1,4 +1,3 @@
--- Variables
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
 local testDriveZone = nil
@@ -712,7 +711,6 @@ RegisterNetEvent('qb-vehicleshop:client:openIdMenu', function(data)
     end
 end)
 
--- Threads
 CreateThread(function()
     for k, v in pairs(Config.Shops) do
         if v.showBlip then
