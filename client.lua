@@ -295,7 +295,10 @@ function Init()
             rotation = 0,
             debug = false,
             onEnter = enteringFinancingZone,
-            inside = insideFinancingZone
+            inside = insideFinancingZone,
+            onExit = function()
+                lib.hideTextUI()
+            end
         })
     end)
 
