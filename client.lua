@@ -186,7 +186,7 @@ local function startTestDriveTimer(testDriveTime, shop)
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
                     testDriveVeh = 0
                     inTestDrive = false
-                    SetEntityCoords(cache.ped, Config.Shops[shop]['TestDriveReturnLocation'])
+                    SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation)
                     lib.notify({
                         title = Lang:t('general.testdrive_complete'),
                         type = 'success'
@@ -200,21 +200,21 @@ local function startTestDriveTimer(testDriveTime, shop)
 end
 
 local function enteringVehicleSellZone()
-    if PlayerData and PlayerData.job and (PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
-        lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
+    local job = Config.Shops[insideShop].Job
+    if not PlayerData or not PlayerData.job or (PlayerData.job.name ~= job and job ~= 'none') then
+        return
     end
+
+    lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
 end
 
 local function insideVehicleSellZone()
-    if IsControlJustPressed(0, 38) then
-        if PlayerData and PlayerData.job and (PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
-            openVehicleSellMenu()
-        end
+    local job = Config.Shops[insideShop].Job
+    if not IsControlJustPressed(0, 38) or not PlayerData or not PlayerData.job or (PlayerData.job.name ~= job and job ~= 'none') then
+        return
     end
-end
 
-local function exitingVehicleSellZone()
-    lib.hideTextUI()
+    openVehicleSellMenu()
 end
 
 local function createVehZones(shopName, entity)
@@ -223,26 +223,31 @@ local function createVehZones(shopName, entity)
             local vehData = Config.Shops[shopName]['ShowroomVehicles'][i]
             zones[#zones + 1] = lib.zones.box({
                 coords = vec3(vehData.coords.x, vehData.coords.y, vehData.coords.z),
-                size = Config.Shops[shopName]['Zone']['size'],
+                size = Config.Shops[shopName].Zone.size,
                 rotation = vehData.coords.w,
-                debug = Config.Shops[shopName]['Zone']['debug'],
+                debug = Config.Shops[shopName].Zone.debug,
                 onEnter = enteringVehicleSellZone,
                 inside = insideVehicleSellZone,
-                onExit = exitingVehicleSellZone
+                onExit = function()
+                    lib.hideTextUI()
+                end
             })
         end
     else
-        exports.ox_target:addLocalEntity(entity, { {
-            name = 'vehicleshop:showVehicleOptions',
-            icon = "fas fa-car",
-            label = Lang:t('general.vehinteraction'),
-            onSelect = function()
-                openVehicleSellMenu()
-            end
-        } })
+        exports.ox_target:addLocalEntity(entity, {
+            {
+                name = 'vehicleshop:showVehicleOptions',
+                icon = "fas fa-car",
+                label = Lang:t('general.vehinteraction'),
+                onSelect = function()
+                    openVehicleSellMenu()
+                end
+            }
+        })
     end
 end
 
+---@param self object
 local function enterShop(self)
     insideShop = self.name
     setClosestShowroomVehicle()
@@ -258,7 +263,7 @@ function createShop(shopShape, name)
         name = name,
         points = shopShape,
         thickness = 5,
-        debug = Config.Shops[name]['Zone']['debug'],
+        debug = Config.Shops[name].Zone.debug,
         onEnter = enterShop,
         onExit = exitShop
     })
@@ -272,10 +277,6 @@ local function insideFinancingZone()
     if IsControlJustPressed(0, 38) then
         lib.showContext('fin_header_menu')
     end
-end
-
-local function exitingFinancingZone()
-    lib.hideTextUI()
 end
 
 function Init()
@@ -294,8 +295,7 @@ function Init()
             rotation = 0,
             debug = false,
             onEnter = enteringFinancingZone,
-            inside = insideFinancingZone,
-            onExit = exitingFinancingZone
+            inside = insideFinancingZone
         })
     end)
 
