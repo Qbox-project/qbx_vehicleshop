@@ -95,31 +95,8 @@ local function setClosestShowroomVehicle()
     end
 end
 
-local function startTestDriveTimer(testDriveTime, shop)
-    local gameTimer = GetGameTimer()
-    CreateThread(function()
-        while inTestDrive do
-            if GetGameTimer() < gameTimer + tonumber(1000 * testDriveTime) then
-                local secondsLeft = GetGameTimer() - gameTimer
-                if secondsLeft >= tonumber(1000 * testDriveTime) - 20 then
-                    TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
-                    testDriveVeh = 0
-                    inTestDrive = false
-                    SetEntityCoords(cache.ped, Config.Shops[shop]['TestDriveReturnLocation'])
-                    lib.notify({
-                        title = Lang:t('general.testdrive_complete'),
-                        type = 'success'
-                    })
-                end
-                drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(testDriveTime - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
-            end
-            Wait(0)
-        end
-    end)
-end
-
-local function enteringVehicleSellZone()
-    setClosestShowroomVehicle()
+local function openVehicleSellMenu()
+    setClosestShowroomVehicle() --safety check
     if Config.Shops[insideShop]['Type'] == 'free-use' then
         lib.registerContext({
             id = 'veh_menu',
@@ -196,7 +173,33 @@ local function enteringVehicleSellZone()
             }
         })
     end
+    lib.showContext('veh_menu')
+end
 
+local function startTestDriveTimer(testDriveTime, shop)
+    local gameTimer = GetGameTimer()
+    CreateThread(function()
+        while inTestDrive do
+            if GetGameTimer() < gameTimer + tonumber(1000 * testDriveTime) then
+                local secondsLeft = GetGameTimer() - gameTimer
+                if secondsLeft >= tonumber(1000 * testDriveTime) - 20 then
+                    TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
+                    testDriveVeh = 0
+                    inTestDrive = false
+                    SetEntityCoords(cache.ped, Config.Shops[shop]['TestDriveReturnLocation'])
+                    lib.notify({
+                        title = Lang:t('general.testdrive_complete'),
+                        type = 'success'
+                    })
+                end
+                drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(testDriveTime - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
+            end
+            Wait(0)
+        end
+    end)
+end
+
+local function enteringVehicleSellZone()
     if PlayerData and PlayerData.job and (PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
         lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
     end
@@ -205,7 +208,7 @@ end
 local function insideVehicleSellZone()
     if IsControlJustPressed(0, 38) then
         if PlayerData and PlayerData.job and (PlayerData.job.name == Config.Shops[insideShop]['Job'] or Config.Shops[insideShop]['Job'] == 'none') then
-            lib.showContext('veh_menu')
+            openVehicleSellMenu()
         end
     end
 end
@@ -229,20 +232,14 @@ local function createVehZones(shopName, entity)
             })
         end
     else
-        local options = {
-            {
-                name = 'vehicleshop:showVehicleOptions',
-                event = 'qb-vehicleshop:client:showVehOptions',
-                icon = "fas fa-car",
-                label = Lang:t('general.vehinteraction'),
-                canInteract = function()
-                    local closestShop = insideShop
-                    return closestShop and (Config.Shops[closestShop]['Job'] == 'none' or PlayerData.job.name == Config.Shops[closestShop]['Job'])
-                end
-            }
-        }
-
-        exports.ox_target:addEntity(entity, options)
+        exports.ox_target:addLocalEntity(entity, { {
+            name = 'vehicleshop:showVehicleOptions',
+            icon = "fas fa-car",
+            label = Lang:t('general.vehinteraction'),
+            onSelect = function()
+                openVehicleSellMenu()
+            end
+        } })
     end
 end
 
@@ -330,11 +327,7 @@ end
 
 -- Events
 RegisterNetEvent('qb-vehicleshop:client:homeMenu', function()
-    lib.showContext('veh_menu')
-end)
-
-RegisterNetEvent('qb-vehicleshop:client:showVehOptions', function()
-    lib.showContext('veh_menu')
+    openVehicleSellMenu()
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:TestDrive', function()
