@@ -62,6 +62,9 @@ local Translations = {
         managed_sell_txt = "Prodej vozidlo hraci",
         managed_finance_txt = "Financovani vozidla",
         submit_ID = "Server ID (#)",
+        keypress_showFinanceMenu = "[E] Otvoriť ponuku Financie",
+        --Floating
+        keypress_vehicleViewMenu = "[E] Zobraziť vozidlo"
     },
     general = {
         testdrive_timer = "Kolik zbyva do konce testovaci jizdy:",
