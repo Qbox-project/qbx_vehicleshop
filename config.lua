@@ -23,6 +23,7 @@ Config.Shops = {
                 vector3(-31.292987823486, -1095.3717041016, 26.0)
             },
             ['size'] = vector3(3, 3, 4), -- size of the vehicles zones (x, y, z)
+            ['targetDistance'] = 2, -- Defines targeting distance. Only works if targeting is enabled
             ['debug'] = false
         },
         ['Job'] = 'none', -- Name of job or none
@@ -106,6 +107,7 @@ Config.Shops = {
                 vector3(-1252.9503173828, -345.85726928711, 36.91)
             },
             ['size'] = vector3(3, 3, 4), -- size of the vehicles zones (x, y, z)
+            ['targetDistance'] = 2, -- Defines targeting distance. Only works if targeting is enabled
             ['debug'] = false
         },
         ['Job'] = 'cardealer', -- Name of job or none
@@ -166,6 +168,7 @@ Config.Shops = {
                 vector3(-716.94, -1326.88, 0)
             },
             ['size'] = vector3(8, 8, 6), -- size of the vehicles zones (x, y, z)
+            ['targetDistance'] = 2, -- Defines targeting distance. Only works if targeting is enabled
             ['debug'] = false
         },
         ['Job'] = 'none', -- Name of job or none
@@ -215,6 +218,7 @@ Config.Shops = {
                 vector3(-1646.03, -3190.84, 12.99)
             },
             ['size'] = vector3(10, 10, 8), -- size of the vehicles zones (x, y, z)
+            ['targetDistance'] = 2, -- Defines targeting distance. Only works if targeting is enabled
             ['debug'] = false
         },
         ['Job'] = 'none', -- Name of job or none

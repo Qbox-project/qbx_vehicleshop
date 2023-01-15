@@ -239,6 +239,7 @@ local function createVehZones(shopName, entity)
                 name = 'vehicleshop:showVehicleOptions',
                 icon = "fas fa-car",
                 label = Lang:t('general.vehinteraction'),
+                distance = Config.Shops[shopName].Zone.targetDistance,
                 onSelect = function()
                     openVehicleSellMenu()
                 end
