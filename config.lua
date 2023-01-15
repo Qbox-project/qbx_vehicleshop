@@ -43,7 +43,7 @@ Config.Shops = {
             ['cycles'] = 'Bicycles'
         },
         ['TestDriveTimeLimit'] = 0.5, -- Time in minutes until the vehicle gets deleted
-        ['TestDriveReturnLocation'] = vector4(-39.04, -1110.82, 26.44, 334.74),
+        ['TestDriveReturnLocation'] = vector4(-39.04, -1110.82, 26.44, 334.74), -- Return position once test drive is finished. Set to front of the shop by default
         ['Location'] = vector3(-45.67, -1098.34, 26.42), -- Blip Location
         ['ReturnLocation'] = vector3(-44.74, -1082.58, 26.68), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(-56.79, -1109.85, 26.43, 71.5), -- Spawn location when vehicle is bought
@@ -118,7 +118,7 @@ Config.Shops = {
             ['sports'] = 'Sports'
         },
         ['TestDriveTimeLimit'] = 0.5,
-        ['TestDriveReturnLocation'] = vector4(-1261.56, -347.54, 36.83, 216.22),
+        ['TestDriveReturnLocation'] = vector4(-1261.56, -347.54, 36.83, 216.22), -- Return position once test drive is finished. Set to front of the shop by default
         ['Location'] = vector3(-1255.6, -361.16, 36.91),
         ['ReturnLocation'] = vector3(-1231.46, -349.86, 37.33),
         ['VehicleSpawn'] = vector4(-1231.46, -349.86, 37.33, 26.61),
@@ -177,7 +177,7 @@ Config.Shops = {
             ['boats'] = 'Boats'
         },
         ['TestDriveTimeLimit'] = 1.5, -- Time in minutes until the vehicle gets deleted
-        ['TestDriveReturnLocation'] = vector4(-733.19, -1313.45, 5.0, 226.37),
+        ['TestDriveReturnLocation'] = vector4(-733.19, -1313.45, 5.0, 226.37), -- Return position once test drive is finished. Set to front of the shop by default
         ['Location'] = vector3(-738.25, -1334.38, 1.6), -- Blip Location
         ['ReturnLocation'] = vector3(-714.34, -1343.31, 0.0), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(-727.87, -1353.1, -0.17, 137.09), -- Spawn location when vehicle is bought
@@ -227,7 +227,7 @@ Config.Shops = {
             ['planes'] = 'Planes'
         },
         ['TestDriveTimeLimit'] = 1.5, -- Time in minutes until the vehicle gets deleted
-        ['TestDriveReturnLocation'] = vector4(-1639.39, -3120.24, 13.94, 148.31),
+        ['TestDriveReturnLocation'] = vector4(-1639.39, -3120.24, 13.94, 148.31), -- Return position once test drive is finished. Set to front of the shop by default
         ['Location'] = vector3(-1652.76, -3143.4, 13.99), -- Blip Location
         ['ReturnLocation'] = vector3(-1628.44, -3104.7, 13.94), -- Location to return vehicle, only enables if the vehicleshop has a job owned
         ['VehicleSpawn'] = vector4(-1617.49, -3086.17, 13.94, 329.2), -- Spawn location when vehicle is bought
