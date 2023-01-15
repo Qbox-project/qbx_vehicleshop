@@ -350,7 +350,6 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function()
             })
         end, Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
             Config.Shops[tempShop]["TestDriveSpawn"], true)
-        --createTestDriveReturn()
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
     else
         lib.notify({
@@ -378,7 +377,6 @@ RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
                 type = 'inform'
             })
         end, vehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
-        --createTestDriveReturn()
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
     else
         lib.notify({
