@@ -1,6 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
-local testDriveZone = nil
 
 lib.registerContext({
     id = 'fin_header_menu',
@@ -398,7 +397,6 @@ RegisterNetEvent('qb-vehicleshop:client:TestDriveReturn', function()
         inTestDrive = false
         DeleteEntity(veh)
         lib.hideContext()
-        testDriveZone:destroy()
     else
         lib.notify({
             title = Lang:t('error.testdrive_return'),
