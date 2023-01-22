@@ -1,6 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
-local testDriveZone = nil
 
 lib.registerContext({
     id = 'fin_header_menu',
@@ -352,7 +351,6 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function()
             })
         end, Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
             Config.Shops[tempShop]["TestDriveSpawn"], true)
-        --createTestDriveReturn()
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
     else
         lib.notify({
@@ -380,7 +378,6 @@ RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
                 type = 'inform'
             })
         end, vehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
-        --createTestDriveReturn()
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
     else
         lib.notify({
@@ -399,7 +396,6 @@ RegisterNetEvent('qb-vehicleshop:client:TestDriveReturn', function()
         inTestDrive = false
         DeleteEntity(veh)
         lib.hideContext()
-        testDriveZone:destroy()
     else
         lib.notify({
             title = Lang:t('error.testdrive_return'),
