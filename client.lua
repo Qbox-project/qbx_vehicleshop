@@ -371,41 +371,20 @@ RegisterNetEvent('qb-vehicleshop:client:homeMenu', function()
     openVehicleSellMenu()
 end)
 
---- Starts a test drive
-RegisterNetEvent('qb-vehicleshop:client:TestDrive', function()
-    if not inTestDrive and ClosestVehicle ~= 0 then
-        inTestDrive = true
-        tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-        QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
-            local veh = NetToVeh(netId)
-            exports['LegacyFuel']:SetFuel(veh, 100)
-            SetVehicleNumberPlateText(veh, 'TESTDRIVE')
-            SetEntityHeading(veh, Config.Shops[tempShop]["TestDriveSpawn"].w)
-            TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
-            testDriveVeh = netId
-            lib.notify({
-                title = Lang:t('general.testdrive_timenoti',
-                    { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
-                type = 'inform'
-            })
-        end, Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
-            Config.Shops[tempShop]["TestDriveSpawn"], true)
-        startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
-    else
-        lib.notify({
-            title = Lang:t('error.testdrive_alreadyin'),
-            type = 'error'
-        })
-    end
-end)
-
---- Starts a test drive in a managed shop
----@param data any PLACEHOLDER USELESS EVENT
-RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
+--- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
+--- @param vehicle number | nil
+RegisterNetEvent('qb-vehicleshop:client:testDrive', function(vehicle)
     if not inTestDrive then
         inTestDrive = true
-        local vehicle = data
-        tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
+        tempShop = insideShop
+        local testDriveVehicle
+
+        if vehicle then
+            testDriveVehicle = vehicle
+        elseif ClosestVehicle ~= 0 then
+            testDriveVehicle = Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+        end
+
         QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
             local veh = NetToVeh(netId)
             exports['LegacyFuel']:SetFuel(veh, 100)
@@ -418,7 +397,7 @@ RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
                     { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
                 type = 'inform'
             })
-        end, vehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
+        end, testDriveVehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
     else
         lib.notify({
