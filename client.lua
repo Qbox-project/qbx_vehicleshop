@@ -530,6 +530,8 @@ RegisterNetEvent('qb-vehicleshop:client:openFinance', function(data)
         data.buyVehicle)
 end)
 
+--- ?
+---@params data table[]
 RegisterNetEvent('qb-vehicleshop:client:openCustomFinance', function(data)
     TriggerEvent('animations:client:EmoteCommandStart', { "tablet2" })
 
@@ -561,6 +563,8 @@ RegisterNetEvent('qb-vehicleshop:client:openCustomFinance', function(data)
         data.vehicle, playerid)
 end)
 
+--- Swaps the chosen vehicle with another one
+---@param data table<ClosestVehicle, toVehicle>
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
     if Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
@@ -596,6 +600,9 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     end
 end)
 
+--- Buys the selected vehicle
+---@param vehicle number
+---@param plate string
 RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
     tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
     QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
@@ -608,6 +615,7 @@ RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, p
     end, vehicle, Config.Shops[tempShop]["VehicleSpawn"], true)
 end)
 
+--- Gets the owned vehicles based on financing then opens a menu
 RegisterNetEvent('qb-vehicleshop:client:getVehicles', function()
     QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
         local ownedVehicles = {}
