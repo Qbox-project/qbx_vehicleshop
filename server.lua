@@ -207,7 +207,7 @@ RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
-    local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money['cash'], player.PlayerData.money['bank'])
+    local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if currencyType then
         vehicle = vehicle.buyVehicle
         local cid = player.PlayerData.citizenid
