@@ -375,10 +375,10 @@ end)
 --- @param vehicle number | nil
 RegisterNetEvent('qb-vehicleshop:client:testDrive', function(vehicle)
     if not inTestDrive then
+        local testDriveVehicle
         inTestDrive = true
         tempShop = insideShop
 
-        local testDriveVehicle
         if vehicle then
             testDriveVehicle = vehicle
         else
@@ -425,7 +425,7 @@ RegisterNetEvent('qb-vehicleshop:client:TestDriveReturn', function()
     end
 end)
 
---- Opens a menu with vehicle categories
+--- Opens a menu with list of vehicle categories
 RegisterNetEvent('qb-vehicleshop:client:vehCategories', function()
     local categoryMenu = {
         {
@@ -453,6 +453,8 @@ RegisterNetEvent('qb-vehicleshop:client:vehCategories', function()
     lib.showContext('vehicleCategories')
 end)
 
+--- Opens a menu with list of vehicles based on given category
+---@param data string[]
 RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
     local vehMenu = {
         {
@@ -503,6 +505,8 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
     lib.showContext('open_veh_cats')
 end)
 
+--- ?
+---@params data table[]
 RegisterNetEvent('qb-vehicleshop:client:openFinance', function(data)
     local dialog = lib.inputDialog(getVehBrand():upper() .. ' ' .. data.buyVehicle:upper() .. ' - $' .. data.price, {
         {
