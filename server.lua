@@ -191,7 +191,7 @@ end)
 ---@param price number
 ---@param cash number
 ---@param bank number
----@return string
+---@return string|nil
 local function findChargeableCurrencyType(price, cash, bank)
     if cash >= price then
         return 'cash'
