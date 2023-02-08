@@ -377,11 +377,11 @@ RegisterNetEvent('qb-vehicleshop:client:testDrive', function(vehicle)
     if not inTestDrive then
         inTestDrive = true
         tempShop = insideShop
-        local testDriveVehicle
 
+        local testDriveVehicle
         if vehicle then
             testDriveVehicle = vehicle
-        elseif ClosestVehicle ~= 0 then
+        else
             testDriveVehicle = Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
         end
 
