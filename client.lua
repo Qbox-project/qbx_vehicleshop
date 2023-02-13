@@ -18,6 +18,7 @@ local ClosestVehicle = 1
 local zones = {}
 local insideShop, tempShop = nil, nil
 
+--- Executes once player fully loads in
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
     local citizenid = PlayerData.citizenid
@@ -37,6 +38,16 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     PlayerData = {}
 end)
 
+--- Draws Text onto the screen during test drive
+---@param text string
+---@param font number
+---@param x number
+---@param y number
+---@param scale number 0.0-10.0
+---@param r number red 0-255
+---@param g number green 0-255
+---@param b number blue 0-255
+---@param a number alpha channel
 local function drawTxt(text, font, x, y, scale, r, g, b, a)
     SetTextFont(font)
     SetTextScale(scale, scale)
@@ -48,6 +59,9 @@ local function drawTxt(text, font, x, y, scale, r, g, b, a)
     DrawText(x, y)
 end
 
+--- Return formatted version of a value
+---@param amount number
+---@return string
 local function comma_value(amount)
     local formatted = amount
     local k
@@ -60,18 +74,25 @@ local function comma_value(amount)
     return formatted
 end
 
+--- Fetches the name of a vehicle from QB Shared
+---@return string
 local function getVehName()
     return QBCore.Shared.Vehicles[Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle]["name"]
 end
 
+--- Fetches the price of a vehicle from QB Shared then it formats it into a text
+---@return string
 local function getVehPrice()
     return comma_value(QBCore.Shared.Vehicles[Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle]["price"])
 end
 
+--- Fetches the brand of a vehicle from QB Shared
+---@return string
 local function getVehBrand()
     return QBCore.Shared.Vehicles[Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle]['brand']
 end
 
+--- Sets the closest vehicle as global variable based on which vehicleshop you are in
 local function setClosestShowroomVehicle()
     local pos = GetEntityCoords(cache.ped, true)
     local current = nil
@@ -94,6 +115,7 @@ local function setClosestShowroomVehicle()
     end
 end
 
+--- Opens the vehicle shop menu
 local function openVehicleSellMenu()
     setClosestShowroomVehicle() --safety check
     if Config.Shops[insideShop]['Type'] == 'free-use' then
@@ -175,13 +197,16 @@ local function openVehicleSellMenu()
     lib.showContext('veh_menu')
 end
 
-local function startTestDriveTimer(testDriveTime, shop)
+--- Starts the test drive timer based on time and shop
+---@param time number
+---@param shop string
+local function startTestDriveTimer(time, shop)
     local gameTimer = GetGameTimer()
     CreateThread(function()
         while inTestDrive do
-            if GetGameTimer() < gameTimer + tonumber(1000 * testDriveTime) then
+            if GetGameTimer() < gameTimer + tonumber(1000 * time) then
                 local secondsLeft = GetGameTimer() - gameTimer
-                if secondsLeft >= tonumber(1000 * testDriveTime) - 20 then
+                if secondsLeft >= tonumber(1000 * time) - 20 then
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
                     testDriveVeh = 0
                     inTestDrive = false
@@ -191,13 +216,14 @@ local function startTestDriveTimer(testDriveTime, shop)
                         type = 'success'
                     })
                 end
-                drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(testDriveTime - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
+                drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
             end
             Wait(0)
         end
     end)
 end
 
+--- Zoning function. Happens upon entering any of the sell zone.
 local function enteringVehicleSellZone()
     local job = Config.Shops[insideShop].Job
     if not PlayerData or not PlayerData.job or (PlayerData.job.name ~= job and job ~= 'none') then
@@ -207,6 +233,7 @@ local function enteringVehicleSellZone()
     lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
 end
 
+--- Zoning function. Happens once the player is inside of the zone
 local function insideVehicleSellZone()
     local job = Config.Shops[insideShop].Job
     if not IsControlJustPressed(0, 38) or not PlayerData or not PlayerData.job or (PlayerData.job.name ~= job and job ~= 'none') then
@@ -216,7 +243,10 @@ local function insideVehicleSellZone()
     openVehicleSellMenu()
 end
 
-local function createVehZones(shopName, entity)
+--- Creates vehcile zones based on a enviromental variable, wether you use target or zoneing. Entity parameter only used if enviromental variable set to targeting
+---@param shopName string
+---@param entity number
+local function createVehicleZones(shopName, entity)
     if not Config.UsingTarget then
         for i = 1, #Config.Shops[shopName]['ShowroomVehicles'] do
             local vehData = Config.Shops[shopName]['ShowroomVehicles'][i]
@@ -247,17 +277,22 @@ local function createVehZones(shopName, entity)
     end
 end
 
+--- Entering a vehicleshop zone
 ---@param self object
 local function enterShop(self)
     insideShop = self.name
     setClosestShowroomVehicle()
 end
 
+--- Exiting a vehicleshop zone
 local function exitShop()
     insideShop = nil
     ClosestVehicle = 1
 end
 
+--- Creates a shop
+---@param shopShape vector3[]
+---@param name string
 function createShop(shopShape, name)
     lib.zones.poly({
         name = name,
@@ -269,16 +304,19 @@ function createShop(shopShape, name)
     })
 end
 
+--- Entering Financing Zone
 local function enteringFinancingZone()
     lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
 end
 
+--- Runs once a player inside the Financing Zone. It does a key press check to open the Financing menu
 local function insideFinancingZone()
     if IsControlJustPressed(0, 38) then
         lib.showContext('fin_header_menu')
     end
 end
 
+--- Initial function to set things up. Creating vehicleshops defined in the config and spawns the sellable vehicles
 function Init()
     Initialized = true
 
@@ -321,50 +359,32 @@ function Init()
                 SetEntityHeading(veh, Config.Shops[k]["ShowroomVehicles"][i].coords.w)
                 FreezeEntityPosition(veh, true)
                 SetVehicleNumberPlateText(veh, 'BUY ME')
-                if Config.UsingTarget then createVehZones(k, veh) end
+                if Config.UsingTarget then createVehicleZones(k, veh) end
             end
-            if not Config.UsingTarget then createVehZones(k) end
+            if not Config.UsingTarget then createVehicleZones(k) end
         end
     end)
 end
 
--- Events
+--- Opens the vehicleshop menu
 RegisterNetEvent('qb-vehicleshop:client:homeMenu', function()
     openVehicleSellMenu()
 end)
 
-RegisterNetEvent('qb-vehicleshop:client:TestDrive', function()
-    if not inTestDrive and ClosestVehicle ~= 0 then
-        inTestDrive = true
-        tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-        QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
-            local veh = NetToVeh(netId)
-            exports['LegacyFuel']:SetFuel(veh, 100)
-            SetVehicleNumberPlateText(veh, 'TESTDRIVE')
-            SetEntityHeading(veh, Config.Shops[tempShop]["TestDriveSpawn"].w)
-            TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
-            testDriveVeh = netId
-            lib.notify({
-                title = Lang:t('general.testdrive_timenoti',
-                    { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
-                type = 'inform'
-            })
-        end, Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
-            Config.Shops[tempShop]["TestDriveSpawn"], true)
-        startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
-    else
-        lib.notify({
-            title = Lang:t('error.testdrive_alreadyin'),
-            type = 'error'
-        })
-    end
-end)
-
-RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
+--- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
+--- @param vehicle number | nil
+RegisterNetEvent('qb-vehicleshop:client:testDrive', function(vehicle)
     if not inTestDrive then
+        local testDriveVehicle
         inTestDrive = true
-        local vehicle = data
-        tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
+        tempShop = insideShop
+
+        if vehicle then
+            testDriveVehicle = vehicle
+        else
+            testDriveVehicle = Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+        end
+
         QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
             local veh = NetToVeh(netId)
             exports['LegacyFuel']:SetFuel(veh, 100)
@@ -377,7 +397,7 @@ RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
                     { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
                 type = 'inform'
             })
-        end, vehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
+        end, testDriveVehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
         startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
     else
         lib.notify({
@@ -387,6 +407,7 @@ RegisterNetEvent('qb-vehicleshop:client:customTestDrive', function(data)
     end
 end)
 
+--- Destroys the vehicle
 RegisterNetEvent('qb-vehicleshop:client:TestDriveReturn', function()
     local ped = cache.ped
     local veh = GetVehiclePedIsIn(ped)
@@ -404,6 +425,7 @@ RegisterNetEvent('qb-vehicleshop:client:TestDriveReturn', function()
     end
 end)
 
+--- Opens a menu with list of vehicle categories
 RegisterNetEvent('qb-vehicleshop:client:vehCategories', function()
     local categoryMenu = {
         {
@@ -431,6 +453,8 @@ RegisterNetEvent('qb-vehicleshop:client:vehCategories', function()
     lib.showContext('vehicleCategories')
 end)
 
+--- Opens a menu with list of vehicles based on given category
+---@param data string[]
 RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
     local vehMenu = {
         {
@@ -481,6 +505,8 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
     lib.showContext('open_veh_cats')
 end)
 
+--- ?
+---@params data table[]
 RegisterNetEvent('qb-vehicleshop:client:openFinance', function(data)
     local dialog = lib.inputDialog(getVehBrand():upper() .. ' ' .. data.buyVehicle:upper() .. ' - $' .. data.price, {
         {
@@ -504,6 +530,8 @@ RegisterNetEvent('qb-vehicleshop:client:openFinance', function(data)
         data.buyVehicle)
 end)
 
+--- ?
+---@params data table[]
 RegisterNetEvent('qb-vehicleshop:client:openCustomFinance', function(data)
     TriggerEvent('animations:client:EmoteCommandStart', { "tablet2" })
 
@@ -535,6 +563,8 @@ RegisterNetEvent('qb-vehicleshop:client:openCustomFinance', function(data)
         data.vehicle, playerid)
 end)
 
+--- Swaps the chosen vehicle with another one
+---@param data table<ClosestVehicle, toVehicle>
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
     if Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
@@ -566,10 +596,13 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
         SetVehicleDoorsLocked(veh, 3)
         FreezeEntityPosition(veh, true)
         SetVehicleNumberPlateText(veh, 'BUY ME')
-        if Config.UsingTarget then createVehZones(shopName, veh) end
+        if Config.UsingTarget then createVehicleZones(shopName, veh) end
     end
 end)
 
+--- Buys the selected vehicle
+---@param vehicle number
+---@param plate string
 RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
     tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
     QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
@@ -582,6 +615,7 @@ RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, p
     end, vehicle, Config.Shops[tempShop]["VehicleSpawn"], true)
 end)
 
+--- Gets the owned vehicles based on financing then opens a menu
 RegisterNetEvent('qb-vehicleshop:client:getVehicles', function()
     QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
         local ownedVehicles = {}
@@ -704,6 +738,7 @@ RegisterNetEvent('qb-vehicleshop:client:openIdMenu', function(data)
     end
 end)
 
+--- Thread to create blips
 CreateThread(function()
     for k, v in pairs(Config.Shops) do
         if v.showBlip then

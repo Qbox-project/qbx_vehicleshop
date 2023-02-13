@@ -127,7 +127,7 @@ RegisterNetEvent('qb-vehicleshop:server:customTestDrive', function(vehicle, play
         return
     end
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target))) < 3 then
-        TriggerClientEvent('qb-vehicleshop:client:customTestDrive', target, vehicle)
+        TriggerClientEvent('qb-vehicleshop:client:testDrive', target, vehicle)
     else
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.playertoofar'), 'error')
     end
