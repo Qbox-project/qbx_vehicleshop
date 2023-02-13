@@ -446,7 +446,7 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
                 for _, shop in pairs(QBCore.Shared.Vehicles[k]["shop"]) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
-                            title = v.name,
+                            title = v.brand..' '..v.name,
                             description = Lang:t('menus.veh_price') .. v.price,
                             serverEvent = 'qb-vehicleshop:server:swapVehicle',
                             args = {
@@ -459,7 +459,7 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
                 end
             elseif QBCore.Shared.Vehicles[k]["shop"] == insideShop then
                 vehMenu[#vehMenu + 1] = {
-                    title = v.name,
+                    title = v.brand..' '..v.name,
                     description = Lang:t('menus.veh_price') .. v.price,
                     serverEvent = 'qb-vehicleshop:server:swapVehicle',
                     args = {
