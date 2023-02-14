@@ -205,11 +205,11 @@ end
 -- Buy public vehicle outright
 RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
+    vehicle = vehicle.buyVehicle
     local player = QBCore.Functions.GetPlayer(src)
     local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if currencyType then
-        vehicle = vehicle.buyVehicle
         local cid = player.PlayerData.citizenid
         local plate = GeneratePlate()
         MySQL.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
