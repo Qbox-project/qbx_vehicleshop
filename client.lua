@@ -373,7 +373,7 @@ end)
 
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
 --- @param vehicle number | nil
-RegisterNetEvent('qb-vehicleshop:client:testDrive', function(vehicle)
+RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(vehicle)
     if not inTestDrive then
         local testDriveVehicle
         inTestDrive = true
