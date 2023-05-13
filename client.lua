@@ -13,10 +13,12 @@ lib.registerContext({
 })
 
 local Initialized = false
-local testDriveVeh, inTestDrive = 0, false
+local testDriveVeh = 0
+local inTestDrive = false
 local ClosestVehicle = 1
 local zones = {}
-local insideShop, tempShop = nil, nil
+local insideShop = nil
+local tempShop = nil
 
 --- Executes once player fully loads in
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
@@ -77,19 +79,19 @@ end
 --- Fetches the name of a vehicle from QB Shared
 ---@return string
 local function getVehName()
-    return QBCore.Shared.Vehicles[Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle]["name"]
+    return QBCore.Shared.Vehicles[Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle].name
 end
 
 --- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@return string
 local function getVehPrice()
-    return comma_value(QBCore.Shared.Vehicles[Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle]["price"])
+    return comma_value(QBCore.Shared.Vehicles[Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
 ---@return string
 local function getVehBrand()
-    return QBCore.Shared.Vehicles[Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle]['brand']
+    return QBCore.Shared.Vehicles[Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle].brand
 end
 
 --- Sets the closest vehicle as global variable based on which vehicleshop you are in
@@ -98,8 +100,8 @@ local function setClosestShowroomVehicle()
     local current = nil
     local dist = nil
     local closestShop = insideShop
-    for id in pairs(Config.Shops[closestShop]["ShowroomVehicles"]) do
-        local dist2 = #(pos -vector3(Config.Shops[closestShop]["ShowroomVehicles"][id].coords.x,Config.Shops[closestShop]["ShowroomVehicles"][id].coords.y,Config.Shops[closestShop]["ShowroomVehicles"][id].coords.z))
+    for id in pairs(Config.Shops[closestShop].ShowroomVehicles) do
+        local dist2 = #(pos -vector3(Config.Shops[closestShop].ShowroomVehicles[id].coords.x,Config.Shops[closestShop].ShowroomVehicles[id].coords.y,Config.Shops[closestShop].ShowroomVehicles[id].coords.z))
         if current then
             if dist2 < dist then
                 current = id
@@ -118,7 +120,7 @@ end
 --- Opens the vehicle shop menu
 local function openVehicleSellMenu()
     setClosestShowroomVehicle() --safety check
-    if Config.Shops[insideShop]['Type'] == 'free-use' then
+    if Config.Shops[insideShop].Type == 'free-use' then
         lib.registerContext({
             id = 'veh_menu',
             title = getVehBrand():upper() .. ' ' .. getVehName():upper() .. ' - $' .. getVehPrice(),
@@ -133,7 +135,7 @@ local function openVehicleSellMenu()
                     description = Lang:t('menus.freeuse_buy_txt'),
                     serverEvent = 'qb-vehicleshop:server:buyShowroomVehicle',
                     args = {
-                        buyVehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+                        buyVehicle = Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle
                     }
                 },
                 {
@@ -142,7 +144,7 @@ local function openVehicleSellMenu()
                     event = 'qb-vehicleshop:client:openFinance',
                     args = {
                         price = getVehPrice(),
-                        buyVehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+                        buyVehicle = Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle
                     }
                 },
                 {
@@ -163,7 +165,7 @@ local function openVehicleSellMenu()
                     description = Lang:t('menus.managed_test_txt'),
                     event = 'qb-vehicleshop:client:openIdMenu',
                     args = {
-                        vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
+                        vehicle = Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle,
                         type = 'testDrive'
                     }
                 },
@@ -172,7 +174,7 @@ local function openVehicleSellMenu()
                     description = Lang:t('menus.managed_sell_txt'),
                     event = 'qb-vehicleshop:client:openIdMenu',
                     args = {
-                        vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle,
+                        vehicle = Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle,
                         type = 'sellVehicle'
                     }
                 },
@@ -182,7 +184,7 @@ local function openVehicleSellMenu()
                     event = 'qb-vehicleshop:client:openCustomFinance',
                     args = {
                         price = getVehPrice(),
-                        vehicle = Config.Shops[insideShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+                        vehicle = Config.Shops[insideShop].ShowroomVehicles[ClosestVehicle].chosenVehicle
                     }
                 },
                 {
@@ -248,8 +250,8 @@ end
 ---@param entity number
 local function createVehicleZones(shopName, entity)
     if not Config.UsingTarget then
-        for i = 1, #Config.Shops[shopName]['ShowroomVehicles'] do
-            local vehData = Config.Shops[shopName]['ShowroomVehicles'][i]
+        for i = 1, #Config.Shops[shopName].ShowroomVehicles do
+            local vehData = Config.Shops[shopName].ShowroomVehicles[i]
             zones[#zones + 1] = lib.zones.box({
                 coords = vec3(vehData.coords.x, vehData.coords.y, vehData.coords.z),
                 size = Config.Shops[shopName].Zone.size,
@@ -322,7 +324,7 @@ function Init()
 
     CreateThread(function()
         for name, shop in pairs(Config.Shops) do
-            createShop(shop['Zone']['Shape'], name)
+            createShop(shop.Zone.Shape, name)
         end
     end)
 
@@ -342,21 +344,21 @@ function Init()
 
     CreateThread(function()
         for k in pairs(Config.Shops) do
-            for i = 1, #Config.Shops[k]['ShowroomVehicles'] do
-                local model = GetHashKey(Config.Shops[k]["ShowroomVehicles"][i].defaultVehicle)
+            for i = 1, #Config.Shops[k].ShowroomVehicles do
+                local model = GetHashKey(Config.Shops[k].ShowroomVehicles[i].defaultVehicle)
                 RequestModel(model)
                 while not HasModelLoaded(model) do
                     Wait(0)
                 end
-                local veh = CreateVehicle(model, Config.Shops[k]["ShowroomVehicles"][i].coords.x,
-                    Config.Shops[k]["ShowroomVehicles"][i].coords.y, Config.Shops[k]["ShowroomVehicles"][i].coords.z,
+                local veh = CreateVehicle(model, Config.Shops[k].ShowroomVehicles[i].coords.x,
+                    Config.Shops[k].ShowroomVehicles[i].coords.y, Config.Shops[k].ShowroomVehicles[i].coords.z,
                     false, false)
                 SetModelAsNoLongerNeeded(model)
                 SetVehicleOnGroundProperly(veh)
                 SetEntityInvincible(veh, true)
                 SetVehicleDirtLevel(veh, 0.0)
                 SetVehicleDoorsLocked(veh, 3)
-                SetEntityHeading(veh, Config.Shops[k]["ShowroomVehicles"][i].coords.w)
+                SetEntityHeading(veh, Config.Shops[k].ShowroomVehicles[i].coords.w)
                 FreezeEntityPosition(veh, true)
                 SetVehicleNumberPlateText(veh, 'BUY ME')
                 if Config.UsingTarget then createVehicleZones(k, veh) end
@@ -382,23 +384,23 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(vehicle)
         if vehicle then
             testDriveVehicle = vehicle
         else
-            testDriveVehicle = Config.Shops[tempShop]["ShowroomVehicles"][ClosestVehicle].chosenVehicle
+            testDriveVehicle = Config.Shops[tempShop].ShowroomVehicles[ClosestVehicle].chosenVehicle
         end
 
         QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
             local veh = NetToVeh(netId)
-            exports['LegacyFuel']:SetFuel(veh, 100)
+            exports.LegacyFuel:SetFuel(veh, 100)
             SetVehicleNumberPlateText(veh, 'TESTDRIVE')
-            SetEntityHeading(veh, Config.Shops[tempShop]["TestDriveSpawn"].w)
+            SetEntityHeading(veh, Config.Shops[tempShop].TestDriveSpawn.w)
             TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
             testDriveVeh = netId
             lib.notify({
                 title = Lang:t('general.testdrive_timenoti',
-                    { testdrivetime = Config.Shops[tempShop]["TestDriveTimeLimit"] }),
+                    { testdrivetime = Config.Shops[tempShop].TestDriveTimeLimit }),
                 type = 'inform'
             })
-        end, testDriveVehicle, Config.Shops[tempShop]["TestDriveSpawn"], true)
-        startTestDriveTimer(Config.Shops[tempShop]["TestDriveTimeLimit"] * 60, tempShop)
+        end, testDriveVehicle, Config.Shops[tempShop].TestDriveSpawn, true)
+        startTestDriveTimer(Config.Shops[tempShop].TestDriveTimeLimit * 60, tempShop)
     else
         lib.notify({
             title = Lang:t('error.testdrive_alreadyin'),
@@ -434,7 +436,7 @@ RegisterNetEvent('qb-vehicleshop:client:vehCategories', function()
             event = 'qb-vehicleshop:client:homeMenu'
         }
     }
-    for k, v in pairs(Config.Shops[insideShop]['Categories']) do
+    for k, v in pairs(Config.Shops[insideShop].Categories) do
         categoryMenu[#categoryMenu + 1] = {
             title = v,
             event = 'qb-vehicleshop:client:openVehCats',
@@ -465,9 +467,9 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
     }
 
     for k, v in pairs(QBCore.Shared.Vehicles) do
-        if QBCore.Shared.Vehicles[k]["category"] == data.catName then
-            if type(QBCore.Shared.Vehicles[k]["shop"]) == 'table' then
-                for _, shop in pairs(QBCore.Shared.Vehicles[k]["shop"]) do
+        if QBCore.Shared.Vehicles[k].category == data.catName then
+            if type(QBCore.Shared.Vehicles[k].shop) == 'table' then
+                for _, shop in pairs(QBCore.Shared.Vehicles[k].shop) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
@@ -481,7 +483,7 @@ RegisterNetEvent('qb-vehicleshop:client:openVehCats', function(data)
                         }
                     end
                 end
-            elseif QBCore.Shared.Vehicles[k]["shop"] == insideShop then
+            elseif QBCore.Shared.Vehicles[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
                     description = Lang:t('menus.veh_price') .. v.price,
@@ -567,32 +569,31 @@ end)
 ---@param data table<ClosestVehicle, toVehicle>
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
-    if Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
-        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vector3(Config.Shops[shopName][
-            "ShowroomVehicles"][data.ClosestVehicle].coords.x,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z))
+    if Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
+        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vector3(Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.x,
+            Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.y,
+            Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.z))
         if closestVehicle == 0 then return end
         if closestDistance < 5 then DeleteEntity(closestVehicle) end
         while DoesEntityExist(closestVehicle) do
             Wait(50)
         end
-        Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].chosenVehicle = data.toVehicle
+        Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
         local model = GetHashKey(data.toVehicle)
         RequestModel(model)
         while not HasModelLoaded(model) do
             Wait(50)
         end
-        local veh = CreateVehicle(model, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.x,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.y,
-            Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.z, false, false)
+        local veh = CreateVehicle(model, Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.x,
+            Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.y,
+            Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.z, false, false)
         while not DoesEntityExist(veh) do
             Wait(50)
         end
         SetModelAsNoLongerNeeded(model)
         SetVehicleOnGroundProperly(veh)
         SetEntityInvincible(veh, true)
-        SetEntityHeading(veh, Config.Shops[shopName]["ShowroomVehicles"][data.ClosestVehicle].coords.w)
+        SetEntityHeading(veh, Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.w)
         SetVehicleDoorsLocked(veh, 3)
         FreezeEntityPosition(veh, true)
         SetVehicleNumberPlateText(veh, 'BUY ME')
@@ -607,12 +608,12 @@ RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, p
     tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
     QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
         local veh = NetToVeh(netId)
-        exports['LegacyFuel']:SetFuel(veh, 100)
+        exports.LegacyFuel:SetFuel(veh, 100)
         SetVehicleNumberPlateText(veh, plate)
-        SetEntityHeading(veh, Config.Shops[tempShop]["VehicleSpawn"].w)
+        SetEntityHeading(veh, Config.Shops[tempShop].VehicleSpawn.w)
         TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
         TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", QBCore.Functions.GetVehicleProperties(veh))
-    end, vehicle, Config.Shops[tempShop]["VehicleSpawn"], true)
+    end, vehicle, Config.Shops[tempShop].VehicleSpawn, true)
 end)
 
 --- Gets the owned vehicles based on financing then opens a menu
@@ -621,7 +622,7 @@ RegisterNetEvent('qb-vehicleshop:client:getVehicles', function()
         local ownedVehicles = {}
         for _, v in pairs(vehicles) do
             if v.balance ~= 0 then
-                local name = QBCore.Shared.Vehicles[v.vehicle]["name"]
+                local name = QBCore.Shared.Vehicles[v.vehicle].name
                 local plate = v.plate:upper()
                 ownedVehicles[#ownedVehicles + 1] = {
                     title = name,
@@ -719,7 +720,7 @@ RegisterNetEvent('qb-vehicleshop:client:financePayment', function(data)
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:openIdMenu', function(data)
-    local dialog = lib.inputDialog(QBCore.Shared.Vehicles[data.vehicle]["name"], {
+    local dialog = lib.inputDialog(QBCore.Shared.Vehicles[data.vehicle].name, {
         {
             type = 'number',
             label = Lang:t('menus.submit_ID'),
@@ -742,14 +743,14 @@ end)
 CreateThread(function()
     for k, v in pairs(Config.Shops) do
         if v.showBlip then
-            local Dealer = AddBlipForCoord(Config.Shops[k]["Location"])
-            SetBlipSprite(Dealer, Config.Shops[k]["blipSprite"])
+            local Dealer = AddBlipForCoord(Config.Shops[k].Location)
+            SetBlipSprite(Dealer, Config.Shops[k].blipSprite)
             SetBlipDisplay(Dealer, 4)
             SetBlipScale(Dealer, 0.70)
             SetBlipAsShortRange(Dealer, true)
-            SetBlipColour(Dealer, Config.Shops[k]["blipColor"])
+            SetBlipColour(Dealer, Config.Shops[k].blipColor)
             BeginTextCommandSetBlipName("STRING")
-            AddTextComponentSubstringPlayerName(Config.Shops[k]["ShopLabel"])
+            AddTextComponentSubstringPlayerName(Config.Shops[k].ShopLabel)
             EndTextCommandSetBlipName(Dealer)
         end
     end
