@@ -137,8 +137,8 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financePayment', function(paymentAmount, vehData)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
-    local cash = player.PlayerData.money['cash']
-    local bank = player.PlayerData.money['bank']
+    local cash = player.PlayerData.money.cash
+    local bank = player.PlayerData.money.bank
     local plate = vehData.vehiclePlate
     paymentAmount = tonumber(paymentAmount)
     local minPayment = tonumber(vehData.paymentAmount)
@@ -168,8 +168,8 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financePaymentFull', function(data)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
-    local cash = player.PlayerData.money['cash']
-    local bank = player.PlayerData.money['bank']
+    local cash = player.PlayerData.money.cash
+    local bank = player.PlayerData.money.bank
     local vehBalance = data.vehBalance
     local vehPlate = data.vehPlate
     if player and vehBalance ~= 0 then
@@ -207,10 +207,10 @@ RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     vehicle = vehicle.buyVehicle
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
+    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if currencyType then
-        
+
         local cid = player.PlayerData.citizenid
         local plate = GeneratePlate()
         MySQL.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
@@ -235,7 +235,7 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
+    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
     local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice))
     downPayment = tonumber(downPayment)
     paymentAmount = tonumber(paymentAmount)
@@ -244,14 +244,14 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
     if downPayment < minDown then return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.downtoosmall'), 'error') end
     if paymentAmount > Config.MaximumPayments then return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.exceededmax'), 'error') end
 
-    local currencyType = findChargeableCurrencyType(downPayment, player.PlayerData.money['cash'], player.PlayerData.money['bank'])
+    local currencyType = findChargeableCurrencyType(downPayment, player.PlayerData.money.cash, player.PlayerData.money.bank)
 
     if currencyType then
         local plate = GeneratePlate()
         local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
         local cid = player.PlayerData.citizenid
         local timer = (Config.PaymentInterval * 60)
-        
+
         MySQL.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state, balance, paymentamount, paymentsleft, financetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', {
             pData.PlayerData.license,
             cid,
@@ -287,8 +287,8 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
 
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target.PlayerData.source))) < 3 then
         local vehicle = data
-        local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
-        local currencyType = findChargeableCurrencyType(vehiclePrice, target.PlayerData.money['cash'], target.PlayerData.money['bank'])
+        local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
+        local currencyType = findChargeableCurrencyType(vehiclePrice, target.PlayerData.money.cash, target.PlayerData.money.bank)
 
         if currencyType then
             local cid = target.PlayerData.citizenid
@@ -333,14 +333,14 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target.PlayerData.source))) < 3 then
         downPayment = tonumber(downPayment)
         paymentAmount = tonumber(paymentAmount)
-        local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
+        local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
         local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice))
 
         if downPayment > vehiclePrice then return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notworth'), 'error') end
         if downPayment < minDown then return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.downtoosmall'), 'error') end
         if paymentAmount > Config.MaximumPayments then return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.exceededmax'), 'error') end
 
-        local currencyType = findChargeableCurrencyType(downPayment, target.PlayerData.money['cash'], target.PlayerData.money['bank'])
+        local currencyType = findChargeableCurrencyType(downPayment, target.PlayerData.money.cash, target.PlayerData.money.bank)
 
         if currencyType then
             local cid = target.PlayerData.citizenid
@@ -348,7 +348,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
             local commission = round(vehiclePrice * Config.Commission)
             local plate = GeneratePlate()
             local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
-            
+
             MySQL.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state, balance, paymentamount, paymentsleft, financetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', {
                 target.PlayerData.license,
                 cid,
