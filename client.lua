@@ -67,12 +67,9 @@ end
 local function comma_value(amount)
     local formatted = amount
     local k
-    while true do
+    repeat
         formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if k == 0 then
-            break
-        end
-    end
+    until k == 0
     return formatted
 end
 
@@ -101,7 +98,7 @@ local function setClosestShowroomVehicle()
     local dist = nil
     local closestShop = insideShop
     for id in pairs(Config.Shops[closestShop].ShowroomVehicles) do
-        local dist2 = #(pos -vector3(Config.Shops[closestShop].ShowroomVehicles[id].coords.x,Config.Shops[closestShop].ShowroomVehicles[id].coords.y,Config.Shops[closestShop].ShowroomVehicles[id].coords.z))
+        local dist2 = #(pos - Config.Shops[closestShop].ShowroomVehicles[id].coords.xyz)
         if current then
             if dist2 < dist then
                 current = id
@@ -253,7 +250,7 @@ local function createVehicleZones(shopName, entity)
         for i = 1, #Config.Shops[shopName].ShowroomVehicles do
             local vehData = Config.Shops[shopName].ShowroomVehicles[i]
             zones[#zones + 1] = lib.zones.box({
-                coords = vec3(vehData.coords.x, vehData.coords.y, vehData.coords.z),
+                coords = vehData.coords.xyz,
                 size = Config.Shops[shopName].Zone.size,
                 rotation = vehData.coords.w,
                 debug = Config.Shops[shopName].Zone.debug,
@@ -570,9 +567,7 @@ end)
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
     if Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle ~= data.toVehicle then
-        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vector3(Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.x,
-            Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.y,
-            Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.z))
+        local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].coords.xyz)
         if closestVehicle == 0 then return end
         if closestDistance < 5 then DeleteEntity(closestVehicle) end
         while DoesEntityExist(closestVehicle) do
