@@ -152,8 +152,8 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financePayment', function(paymentAmount, vehData)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
-    local cash = player.PlayerData.money['cash']
-    local bank = player.PlayerData.money['bank']
+    local cash = player.PlayerData.money.cash
+    local bank = player.PlayerData.money.bank
     local plate = vehData.vehiclePlate
     paymentAmount = tonumber(paymentAmount)
     local minPayment = tonumber(vehData.paymentAmount)
@@ -186,8 +186,8 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financePaymentFull', function(data)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
-    local cash = player.PlayerData.money['cash']
-    local bank = player.PlayerData.money['bank']
+    local cash = player.PlayerData.money.cash
+    local bank = player.PlayerData.money.bank
     local vehBalance = data.vehBalance
     local vehPlate = data.vehPlate
 
@@ -227,7 +227,7 @@ RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     vehicle = vehicle.buyVehicle
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
+    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if not currencyType then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notenoughmoney'), 'error')
@@ -255,7 +255,7 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle]['price']
+    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
     local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice))
     downPayment = tonumber(downPayment)
     paymentAmount = tonumber(paymentAmount)
@@ -270,7 +270,7 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.exceededmax'), 'error')
     end
 
-    local currencyType = findChargeableCurrencyType(downPayment, player.PlayerData.money['cash'], player.PlayerData.money['bank'])
+    local currencyType = findChargeableCurrencyType(downPayment, player.PlayerData.money.cash, player.PlayerData.money.bank)
 
     if not currencyType then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notenoughmoney'), 'error')
