@@ -613,43 +613,44 @@ end)
 
 --- Gets the owned vehicles based on financing then opens a menu
 RegisterNetEvent('qb-vehicleshop:client:getVehicles', function()
-    QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
-        local ownedVehicles = {}
-        for _, v in pairs(vehicles) do
-            if v.balance ~= 0 then
-                local name = QBCore.Shared.Vehicles[v.vehicle].name
-                local plate = v.plate:upper()
-                ownedVehicles[#ownedVehicles + 1] = {
-                    title = name,
-                    description = Lang:t('menus.veh_platetxt') .. plate,
-                    icon = "fa-solid fa-car-side",
-                    event = 'qb-vehicleshop:client:getVehicleFinance',
-                    args = {
-                        vehiclePlate = plate,
-                        balance = v.balance,
-                        paymentsLeft = v.paymentsleft,
-                        paymentAmount = v.paymentamount
-                    }
+    local vehicles = lib.callback.await('qb-vehicleshop:server:GetVehicles', false)
+    if not vehicles then lib.notify({ title = Lang:t('error.nofinanced'), type = 'error', duration = 7500 }) return end
+
+    local ownedVehicles = {}
+    for _, v in pairs(vehicles) do
+        if v.balance ~= 0 then
+            local name = QBCore.Shared.Vehicles[v.vehicle].name
+            local plate = v.plate:upper()
+            ownedVehicles[#ownedVehicles + 1] = {
+                title = name,
+                description = Lang:t('menus.veh_platetxt') .. plate,
+                icon = "fa-solid fa-car-side",
+                event = 'qb-vehicleshop:client:getVehicleFinance',
+                args = {
+                    vehiclePlate = plate,
+                    balance = v.balance,
+                    paymentsLeft = v.paymentsleft,
+                    paymentAmount = v.paymentamount
                 }
-            end
+            }
         end
+    end
 
-        lib.registerContext({
-            id = 'owned_vehicles',
-            title = Lang:t('menus.owned_vehicles_header'),
-            options = ownedVehicles
+    lib.registerContext({
+        id = 'owned_vehicles',
+        title = Lang:t('menus.owned_vehicles_header'),
+        options = ownedVehicles
+    })
+
+    if #ownedVehicles > 0 then
+        lib.showContext('owned_vehicles')
+    else
+        lib.notify({
+            title = Lang:t('error.nofinanced'),
+            type = 'error',
+            duration = 7500
         })
-
-        if #ownedVehicles > 0 then
-            lib.showContext('owned_vehicles')
-        else
-            lib.notify({
-                title = Lang:t('error.nofinanced'),
-                type = 'error',
-                duration = 7500
-            })
-        end
-    end)
+    end
 end)
 
 RegisterNetEvent('qb-vehicleshop:client:getVehicleFinance', function(data)

@@ -105,14 +105,14 @@ local function comma_value(amount)
 end
 
 -- Callbacks
-QBCore.Functions.CreateCallback('qb-vehicleshop:server:getVehicles', function(source, cb)
-    local src = source
-    local player = QBCore.Functions.GetPlayer(src)
-    if not player then return end
-    local vehicles = MySQL.query.await('SELECT * FROM player_vehicles WHERE citizenid = ?', {player.PlayerData.citizenid})
-    if vehicles[1] then
-        cb(vehicles)
-    end
+
+--- Fetches all owned vehicles of the player
+---@return table | nil
+lib.callback.register('qb-vehicleshop:server:GetVehicles', function(source)
+    local citizenid = QBCore.Functions.GetPlayer(source).PlayerData.citizenid
+    if not citizenid then return end
+    local vehicles = MySQL.query.await('SELECT * FROM player_vehicles WHERE citizenid = ?', {citizenid})
+    return vehicles[1] and vehicles or nil
 end)
 
 -- Events
