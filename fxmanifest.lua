@@ -12,12 +12,16 @@ shared_script {
 }
 
 client_scripts {
-    'client.lua'
+    'client/client.lua'
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server.lua'
+}
+
+files {
+    'client/utils.lua'
 }
 
 lua54 'yes'
