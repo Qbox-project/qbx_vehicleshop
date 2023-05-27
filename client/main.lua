@@ -7,47 +7,11 @@ local TestDriveVeh = 0
 local InTestDrive = false
 local InsideShop = nil
 
---- Gets the owned vehicles based on financing then opens a menu
-local function getVehicles()
-    QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
-        local ownedVehicles = {}
-        for _, v in pairs(vehicles) do
-            if v.balance ~= 0 then
-                local name = QBCore.Shared.Vehicles[v.vehicle].name
-                local plate = v.plate:upper()
-                ownedVehicles[#ownedVehicles + 1] = {
-                    title = name,
-                    description = Lang:t('menus.veh_platetxt') .. plate,
-                    icon = "fa-solid fa-car-side",
-                    onSelect = function()
-                        GetVehicleFinance({
-                            vehiclePlate = plate,
-                            balance = v.balance,
-                            paymentsLeft = v.paymentsleft,
-                            paymentAmount = v.paymentamount
-                        })
-                    end
-                }
-            end
-        end
-
-        lib.registerContext({
-            id = 'owned_vehicles',
-            title = Lang:t('menus.owned_vehicles_header'),
-            options = ownedVehicles
-        })
-
-        if #ownedVehicles > 0 then
-            lib.showContext('owned_vehicles')
-        else
-            lib.notify({
-                title = Lang:t('error.nofinanced'),
-                type = 'error',
-                duration = 7500
-            })
-        end
-    end)
-end
+---@class VehicleFinance
+---@field vehiclePlate string
+---@field balance number
+---@field paymentsLeft integer
+---@field paymentAmount number
 
 ---@param data VehicleFinance
 local function financePayment(data)
@@ -65,20 +29,9 @@ local function financePayment(data)
     TriggerServerEvent('qb-vehicleshop:server:financePayment', paymentAmount, data)
 end
 
----@class VehicleFinance
----@field vehiclePlate string
----@field balance number
----@field paymentsLeft integer
----@field paymentAmount number
-
 ---@param data VehicleFinance
-function GetVehicleFinance(data)
+local function showVehicleFinanceMenu(data)
     local vehFinance = {
-        {
-            title = Lang:t('menus.goback_header'),
-            onSelect = getVehicles,
-            icon = "fa-solid fa-angle-left",
-        },
         {
             title = Lang:t('menus.veh_finance_balance'),
             description = Lang:t('menus.veh_finance_currency') .. utils.comma_value(data.balance)
@@ -110,10 +63,54 @@ function GetVehicleFinance(data)
     lib.registerContext({
         id = 'vehFinance',
         title = Lang:t('menus.financed_header'),
+        menu = 'owned_vehicles',
         options = vehFinance
     })
 
     lib.showContext('vehFinance')
+end
+
+--- Gets the owned vehicles based on financing then opens a menu
+local function showFinancedVehiclesMenu()
+    QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
+        local ownedVehicles = {}
+        for _, v in pairs(vehicles) do
+            if v.balance ~= 0 then
+                local name = QBCore.Shared.Vehicles[v.vehicle].name
+                local plate = v.plate:upper()
+                ownedVehicles[#ownedVehicles + 1] = {
+                    title = name,
+                    description = Lang:t('menus.veh_platetxt') .. plate,
+                    icon = "fa-solid fa-car-side",
+                    arrow = true,
+                    onSelect = function()
+                        showVehicleFinanceMenu({
+                            vehiclePlate = plate,
+                            balance = v.balance,
+                            paymentsLeft = v.paymentsleft,
+                            paymentAmount = v.paymentamount
+                        })
+                    end
+                }
+            end
+        end
+
+        if #ownedVehicles == 0 then
+            lib.notify({
+                title = Lang:t('error.nofinanced'),
+                type = 'error',
+                duration = 7500
+            })
+            return
+        end
+
+        lib.registerContext({
+            id = 'owned_vehicles',
+            title = Lang:t('menus.owned_vehicles_header'),
+            options = ownedVehicles
+        })
+        lib.showContext('owned_vehicles')
+    end)
 end
 
 lib.registerContext({
@@ -122,7 +119,7 @@ lib.registerContext({
     options = {
         {
             title = Lang:t('menus.finance_txt'),
-            onSelect = getVehicles
+            onSelect = showFinancedVehiclesMenu
         }
     }
 })
@@ -201,17 +198,10 @@ local function openFinance(closestShowroomVehicle, buyVehicle)
         buyVehicle)
 end
 
-
 --- Opens a menu with list of vehicles based on given category
 ---@param category string
-local function openVehCats(category)
-    local vehMenu = {
-        {
-            title = Lang:t('menus.goback_header'),
-            onSelect = OpenVehicleCategoryMenu,
-            icon = "fa-solid fa-angle-left",
-        }
-    }
+local function openVehCatsMenu(category)
+    local vehMenu = {}
     local closestVehicle = getClosestShowroomVehicle()
 
     for k, v in pairs(QBCore.Shared.Vehicles) do
@@ -249,6 +239,7 @@ local function openVehCats(category)
     lib.registerContext({
         id = 'open_veh_cats',
         title = Lang:t('menus.categories_header'),
+        menu = 'vehicleCategories',
         options = vehMenu
     })
 
@@ -256,20 +247,14 @@ local function openVehCats(category)
 end
 
 --- Opens a menu with list of vehicle categories
---- TODO: fix circular reference with openVehCats
-function OpenVehicleCategoryMenu()
-    local categoryMenu = {
-        {
-            title = Lang:t('menus.goback_header'),
-            icon = "fa-solid fa-angle-left",
-            event = 'qb-vehicleshop:client:homeMenu'
-        }
-    }
+local function openVehicleCategoryMenu()
+    local categoryMenu = {}
     for k, v in pairs(Config.Shops[InsideShop].Categories) do
         categoryMenu[#categoryMenu + 1] = {
             title = v,
+            arrow = true,
             onSelect = function()
-                openVehCats(k)
+                openVehCatsMenu(k)
             end
         }
     end
@@ -277,6 +262,7 @@ function OpenVehicleCategoryMenu()
     lib.registerContext({
         id = 'vehicleCategories',
         title = Lang:t('menus.categories_header'),
+        menu = 'veh_menu',
         options = categoryMenu
     })
 
@@ -349,77 +335,72 @@ end
 --- Opens the vehicle shop menu
 local function openVehicleSellMenu()
     local closestVehicle = getClosestShowroomVehicle()
+    local options
+    local swapOption = {
+        title = Lang:t('menus.swap_header'),
+        description = Lang:t('menus.swap_txt'),
+        onSelect = openVehicleCategoryMenu,
+        arrow = true
+    }
     if Config.Shops[InsideShop].Type == 'free-use' then
-        lib.registerContext({
-            id = 'veh_menu',
-            title = getVehBrand(closestVehicle):upper() .. ' ' .. getVehName(closestVehicle):upper() .. ' - $' .. getVehPrice(closestVehicle),
-            options = {
-                {
-                    title = Lang:t('menus.test_header'),
-                    description = Lang:t('menus.freeuse_test_txt'),
-                    event = 'qb-vehicleshop:client:TestDrive',
-                    args = {
-                        vehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
-                    }
-                },
-                {
-                    title = Lang:t('menus.freeuse_buy_header'),
-                    description = Lang:t('menus.freeuse_buy_txt'),
-                    serverEvent = 'qb-vehicleshop:server:buyShowroomVehicle',
-                    args = {
-                        buyVehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
-                    }
-                },
-                {
-                    title = Lang:t('menus.finance_header'),
-                    description = Lang:t('menus.freeuse_finance_txt'),
-                    onSelect = function()
-                        openFinance(closestVehicle, Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
-                    end
-                },
-                {
-                    title = Lang:t('menus.swap_header'),
-                    description = Lang:t('menus.swap_txt'),
-                    onSelect = OpenVehicleCategoryMenu,
-                    arrow = true
-                },
-            }
-        })
+        options = {
+            {
+                title = Lang:t('menus.test_header'),
+                description = Lang:t('menus.freeuse_test_txt'),
+                event = 'qb-vehicleshop:client:TestDrive',
+                args = {
+                    vehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
+                }
+            },
+            {
+                title = Lang:t('menus.freeuse_buy_header'),
+                description = Lang:t('menus.freeuse_buy_txt'),
+                serverEvent = 'qb-vehicleshop:server:buyShowroomVehicle',
+                args = {
+                    buyVehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
+                }
+            },
+            {
+                title = Lang:t('menus.finance_header'),
+                description = Lang:t('menus.freeuse_finance_txt'),
+                onSelect = function()
+                    openFinance(closestVehicle, Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
+                end
+            },
+            swapOption,
+        }
     else
-        lib.registerContext({
-            id = 'veh_menu',
-            title = getVehBrand(closestVehicle):upper() .. ' ' .. getVehName(closestVehicle):upper() .. ' - $' .. getVehPrice(closestVehicle),
-            options = {
-                {
-                    title = Lang:t('menus.test_header'),
-                    description = Lang:t('menus.managed_test_txt'),
-                    onSelect = function()
-                        startTestDrive(Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
-                    end,
-                },
-                {
-                    title = Lang:t('menus.managed_sell_header'),
-                    description = Lang:t('menus.managed_sell_txt'),
-                    onSelect = function()
-                        sellVehicle(Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
-                    end,
-                },
-                {
-                    title = Lang:t('menus.finance_header'),
-                    description = Lang:t('menus.managed_finance_txt'),
-                    onSelect = function()
-                        openCustomFinance(closestVehicle)
-                    end
-                },
-                {
-                    title = Lang:t('menus.swap_header'),
-                    description = Lang:t('menus.swap_txt'),
-                    onSelect = OpenVehicleCategoryMenu,
-                    arrow = true
-                },
-            }
-        })
+        options = {
+            {
+                title = Lang:t('menus.test_header'),
+                description = Lang:t('menus.managed_test_txt'),
+                onSelect = function()
+                    startTestDrive(Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
+                end,
+            },
+            {
+                title = Lang:t('menus.managed_sell_header'),
+                description = Lang:t('menus.managed_sell_txt'),
+                onSelect = function()
+                    sellVehicle(Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
+                end,
+            },
+            {
+                title = Lang:t('menus.finance_header'),
+                description = Lang:t('menus.managed_finance_txt'),
+                onSelect = function()
+                    openCustomFinance(closestVehicle)
+                end
+            },
+            swapOption,
+        }
     end
+
+    lib.registerContext({
+        id = 'veh_menu',
+        title = getVehBrand(closestVehicle):upper() .. ' ' .. getVehName(closestVehicle):upper() .. ' - $' .. getVehPrice(closestVehicle),
+        options = options
+    })
     lib.showContext('veh_menu')
 end
 
