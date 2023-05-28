@@ -103,15 +103,14 @@ local function comma_value(amount)
     return formatted
 end
 
----@param source number
----@return table? playerVehicle
-lib.callback.register('qb-vehicleshop:server:getVehicles', function(source)
+-- Callbacks
+QBCore.Functions.CreateCallback('qb-vehicleshop:server:getVehicles', function(source, cb)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     if not player then return end
     local vehicles = FetchVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     if vehicles[1] then
-        return vehicles
+        cb(vehicles)
     end
 end)
 
