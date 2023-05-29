@@ -126,10 +126,7 @@ end)
 -- Sync vehicle for other players
 ---@param data unknown
 RegisterNetEvent('qb-vehicleshop:server:swapVehicle', function(data)
-    local src = source
     TriggerClientEvent('qb-vehicleshop:client:swapVehicle', -1, data)
-    Wait(1500)-- let new car spawn
-    TriggerClientEvent('qb-vehicleshop:client:homeMenu', src)-- reopen main menu
 end)
 
 -- Send customer for test drive
