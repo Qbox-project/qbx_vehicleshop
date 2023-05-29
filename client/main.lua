@@ -206,8 +206,8 @@ local function openVehCatsMenu(category)
 
     for k, v in pairs(QBCore.Shared.Vehicles) do
         if QBCore.Shared.Vehicles[k].category == category then
-            if type(QBCore.Shared.Vehicles[k].shop) == 'table' then
-                for _, shop in pairs(QBCore.Shared.Vehicles[k].shop) do
+            if type(Config.Vehicles[k].shop) == 'table' then
+                for _, shop in pairs(Config.Vehicles[k].shop) do
                     if shop == InsideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
@@ -221,7 +221,7 @@ local function openVehCatsMenu(category)
                         }
                     end
                 end
-            elseif QBCore.Shared.Vehicles[k].shop == InsideShop then
+            elseif Config.Vehicles[k].shop == InsideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
                     description = Lang:t('menus.veh_price') .. v.price,
