@@ -72,45 +72,44 @@ end
 
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
-    QBCore.Functions.TriggerCallback('qb-vehicleshop:server:getVehicles', function(vehicles)
-        local ownedVehicles = {}
-        for _, v in pairs(vehicles) do
-            if v.balance ~= 0 then
-                local name = QBCore.Shared.Vehicles[v.vehicle].name
-                local plate = v.plate:upper()
-                ownedVehicles[#ownedVehicles + 1] = {
-                    title = name,
-                    description = Lang:t('menus.veh_platetxt') .. plate,
-                    icon = "fa-solid fa-car-side",
-                    arrow = true,
-                    onSelect = function()
-                        showVehicleFinanceMenu({
-                            vehiclePlate = plate,
-                            balance = v.balance,
-                            paymentsLeft = v.paymentsleft,
-                            paymentAmount = v.paymentamount
-                        })
-                    end
-                }
-            end
+    local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles')
+    local ownedVehicles = {}
+    for _, v in pairs(vehicles) do
+        if v.balance ~= 0 then
+            local name = QBCore.Shared.Vehicles[v.vehicle].name
+            local plate = v.plate:upper()
+            ownedVehicles[#ownedVehicles + 1] = {
+                title = name,
+                description = Lang:t('menus.veh_platetxt') .. plate,
+                icon = "fa-solid fa-car-side",
+                arrow = true,
+                onSelect = function()
+                    showVehicleFinanceMenu({
+                        vehiclePlate = plate,
+                        balance = v.balance,
+                        paymentsLeft = v.paymentsleft,
+                        paymentAmount = v.paymentamount
+                    })
+                end
+            }
         end
+    end
 
-        if #ownedVehicles == 0 then
-            lib.notify({
-                title = Lang:t('error.nofinanced'),
-                type = 'error',
-                duration = 7500
-            })
-            return
-        end
-
-        lib.registerContext({
-            id = 'owned_vehicles',
-            title = Lang:t('menus.owned_vehicles_header'),
-            options = ownedVehicles
+    if #ownedVehicles == 0 then
+        lib.notify({
+            title = Lang:t('error.nofinanced'),
+            type = 'error',
+            duration = 7500
         })
-        lib.showContext('owned_vehicles')
-    end)
+        return
+    end
+
+    lib.registerContext({
+        id = 'owned_vehicles',
+        title = Lang:t('menus.owned_vehicles_header'),
+        options = ownedVehicles
+    })
+    lib.showContext('owned_vehicles')
 end
 
 lib.registerContext({
