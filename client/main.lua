@@ -586,11 +586,6 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     init()
 end)
 
---- Opens the vehicleshop menu
-RegisterNetEvent('qb-vehicleshop:client:homeMenu', function()
-    openVehicleSellMenu()
-end)
-
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
 --- @param vehicle number
 RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(vehicle)
