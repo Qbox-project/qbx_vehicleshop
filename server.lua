@@ -11,7 +11,7 @@ end)
 -- Deduct stored game time from player on logout
 RegisterNetEvent('qb-vehicleshop:server:removePlayer', function(citizenid)
     if not financetimer[citizenid] then return end
-    
+
     local playTime = financetimer[citizenid]
     local financetime = FetchVehicleEntitiesByCitizenId(citizenid)
     for _, v in pairs(financetime) do
@@ -76,7 +76,7 @@ end
 ---@return integer newPayment
 ---@return integer numPaymentsLeft
 local function calculateNewFinance(paymentAmount, vehData)
-    local newBalance = tonumber(vehData.balance - paymentAmount)
+    local newBalance = tonumber(vehData.balance - paymentAmount) --[[@as number]]
     local minusPayment = vehData.paymentsLeft - 1
     local newPaymentsLeft = newBalance / minusPayment
     local newPayment = newBalance / newPaymentsLeft
@@ -94,7 +94,7 @@ end
 ---@param amount number
 ---@return string
 local function comma_value(amount)
-    local formatted = amount
+    local formatted = tostring(amount)
     local k
     repeat
         formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
@@ -103,6 +103,7 @@ local function comma_value(amount)
 end
 
 -- Callbacks
+
 lib.callback.register('qb-vehicleshop:server:getVehicles', function(source)
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
@@ -111,6 +112,17 @@ lib.callback.register('qb-vehicleshop:server:getVehicles', function(source)
     if vehicles[1] then
         return vehicles
     end
+end)
+
+lib.callback.register('qb-vehicleshop:server:spawnVehicle', function(source, model, coords, plate)
+    local netId = QBCore.Functions.CreateVehicle(source, model, coords, true)
+    if not netId or netId == 0 then return end
+    local veh = NetworkGetEntityFromNetworkId(netId)
+    if not veh or veh == 0 then return end
+
+    SetVehicleNumberPlateText(veh, plate)
+    TriggerClientEvent('vehiclekeys:client:SetOwner', source, plate)
+    return netId
 end)
 
 -- Events
@@ -129,9 +141,9 @@ RegisterNetEvent('qb-vehicleshop:server:swapVehicle', function(data)
 end)
 
 -- Send customer for test drive
-RegisterNetEvent('qb-vehicleshop:server:customTestDrive', function(vehicle, playerid)
+RegisterNetEvent('qb-vehicleshop:server:customTestDrive', function(vehicle, playerId)
     local src = source
-    local target = tonumber(playerid)
+    local target = tonumber(playerId) --[[@as number]]
     if not QBCore.Functions.GetPlayer(target) then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.Invalid_ID'), 'error')
         return
@@ -181,11 +193,11 @@ end
 RegisterNetEvent('qb-vehicleshop:server:financePayment', function(paymentAmount, vehData)
     local src = source
     local plate = vehData.vehiclePlate
-    paymentAmount = tonumber(paymentAmount)
-    local minPayment = tonumber(vehData.paymentAmount)
+    paymentAmount = tonumber(paymentAmount) --[[@as number]]
+    local minPayment = tonumber(vehData.paymentAmount) --[[@as number]]
     local timer = (Config.PaymentInterval * 60)
     local newBalance, newPaymentsLeft, newPayment = calculateNewFinance(paymentAmount, vehData)
-    
+
     if newBalance <= 0 then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.overpaid'), 'error')
         return
@@ -258,9 +270,9 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
-    local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice))
-    downPayment = tonumber(downPayment)
-    paymentAmount = tonumber(paymentAmount)
+    local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
+    downPayment = tonumber(downPayment) --[[@as number]]
+    paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
     if downPayment > vehiclePrice then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notworth'), 'error')
@@ -282,7 +294,7 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
     local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
     local cid = player.PlayerData.citizenid
     local timer = (Config.PaymentInterval * 60)
-    
+
     InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
             license = player.PlayerData.license,
@@ -303,7 +315,7 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
 end)
 
 ---@param src number
----@param target Player
+---@param target table
 ---@param price number
 ---@param downPayment number
 ---@return boolean success
@@ -369,10 +381,10 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.playertoofar'), 'error')
     end
 
-    downPayment = tonumber(downPayment)
-    paymentAmount = tonumber(paymentAmount)
+    downPayment = tonumber(downPayment) --[[@as number]]
+    paymentAmount = tonumber(paymentAmount) --[[@as number]]
     local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
-    local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice))
+    local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notworth'), 'error')
@@ -415,7 +427,7 @@ RegisterNetEvent('qb-vehicleshop:server:checkFinance', function()
     local player = QBCore.Functions.GetPlayer(src)
     local result = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     if not result[1] then return end
-    
+
     TriggerClientEvent('QBCore:Notify', src, Lang:t('general.paymentduein', {time = Config.PaymentWarning}))
     Wait(Config.PaymentWarning * 60000)
     local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
@@ -430,8 +442,8 @@ end)
 -- Transfer vehicle to player in passenger seat
 QBCore.Commands.Add('transfervehicle', Lang:t('general.command_transfervehicle'), {{name = 'ID', help = Lang:t('general.command_transfervehicle_help')}, {name = 'amount', help = Lang:t('general.command_transfervehicle_amount')}}, false, function(source, args)
     local src = source
-    local buyerId = tonumber(args[1])
-    local sellAmount = tonumber(args[2])
+    local buyerId = tonumber(args[1]) --[[@as number]]
+    local sellAmount = tonumber(args[2]) --[[@as number]]
     if buyerId == 0 then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.Invalid_ID'), 'error')
     end
