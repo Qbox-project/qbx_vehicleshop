@@ -18,7 +18,7 @@ function InsertVehicleEntity(request)
     })
 end
 
----@class VehicleFinance
+---@class VehicleFinanceServer
 ---@field balance number
 ---@field payment number
 ---@field paymentsLeft integer
@@ -26,7 +26,7 @@ end
 
 ---@class InsertVehicleEntityWithFinanceRequest
 ---@field insertVehicleEntityRequest InsertVehicleEntityRequest
----@field vehicleFinance VehicleFinance
+---@field vehicleFinance VehicleFinanceServer
 
 ---@param request InsertVehicleEntityWithFinanceRequest
 function InsertVehicleEntityWithFinance(request)
@@ -79,7 +79,7 @@ function UpdateVehicleEntityFinanceTime(time, plate)
     MySQL.update('UPDATE player_vehicles SET financetime = ? WHERE plate = ?', {time, plate})
 end
 
----@param vehicleFinance VehicleFinance
+---@param vehicleFinance VehicleFinanceServer
 ---@param plate string
 function UpdateVehicleFinance(vehicleFinance, plate)
     MySQL.update('UPDATE player_vehicles SET balance = ?, paymentamount = ?, paymentsleft = ?, financetime = ? WHERE plate = ?', {
@@ -108,5 +108,3 @@ end
 function DeleteVehicleEntity(plate)
     MySQL.query('DELETE FROM player_vehicles WHERE plate = ?', {plate})
 end
-
-
