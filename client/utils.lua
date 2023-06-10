@@ -4,7 +4,7 @@ local utils = {}
 ---@param amount number
 ---@return string
 function utils.comma_value(amount)
-    local formatted = amount
+    local formatted = tostring(amount)
     local k
     repeat
         formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
@@ -27,10 +27,10 @@ function utils.drawTxt(text, font, x, y, scale, r, g, b, a)
     SetTextScale(scale, scale)
     SetTextColour(r, g, b, a)
     SetTextOutline()
-    SetTextCentre(1)
-    SetTextEntry("STRING")
-    AddTextComponentString(text)
-    DrawText(x, y)
+    SetTextCentre(true)
+    BeginTextCommandDisplayText("STRING")
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(x, y)
 end
 
 return utils
