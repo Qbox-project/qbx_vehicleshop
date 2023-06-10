@@ -7,13 +7,13 @@ local TestDriveVeh = 0
 local InTestDrive = false
 local InsideShop = nil
 
----@class VehicleFinance
+---@class VehicleFinanceClient
 ---@field vehiclePlate string
 ---@field balance number
 ---@field paymentsLeft integer
 ---@field paymentAmount number
 
----@param data VehicleFinance
+---@param data VehicleFinanceClient
 local function financePayment(data)
     local dialog = lib.inputDialog(Lang:t('menus.veh_finance'), {
         {
@@ -29,7 +29,7 @@ local function financePayment(data)
     TriggerServerEvent('qb-vehicleshop:server:financePayment', paymentAmount, data)
 end
 
----@param data VehicleFinance
+---@param data VehicleFinanceClient
 local function showVehicleFinanceMenu(data)
     local vehFinance = {
         {
@@ -416,7 +416,7 @@ local function startTestDriveTimer(time, shop)
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', TestDriveVeh)
                     TestDriveVeh = 0
                     InTestDrive = false
-                    SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation)
+                    SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation.x, Config.Shops[shop].TestDriveReturnLocation.y, Config.Shops[shop].TestDriveReturnLocation.z, false, false, false, false)
                     lib.notify({
                         title = Lang:t('general.testdrive_complete'),
                         type = 'success'
@@ -484,7 +484,7 @@ local function createVehicleZone(shopName, coords)
 end
 
 --- Entering a vehicleshop zone
----@param self object
+---@param self table
 local function enterShop(self)
     InsideShop = self.name
 end
@@ -601,20 +601,13 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(vehicle)
     local testDriveVehicle = vehicle
     InTestDrive = true
     local tempShop = InsideShop
-
-    QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
-        local veh = NetToVeh(netId)
-        exports.LegacyFuel:SetFuel(veh, 100)
-        SetVehicleNumberPlateText(veh, 'TESTDRIVE')
-        SetEntityHeading(veh, Config.Shops[tempShop].TestDriveSpawn.w)
-        TriggerEvent('vehiclekeys:client:SetOwner', QBCore.Functions.GetPlate(veh))
-        TestDriveVeh = netId
-        lib.notify({
-            title = Lang:t('general.testdrive_timenoti',
-                { testdrivetime = Config.Shops[tempShop].TestDriveTimeLimit }),
-            type = 'inform'
-        })
-    end, testDriveVehicle, Config.Shops[tempShop].TestDriveSpawn, true)
+    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, testDriveVehicle, Config.Shops[tempShop].TestDriveSpawn, 'TESTDRIVE')
+    TestDriveVeh = netId
+    lib.notify({
+        title = Lang:t('general.testdrive_timenoti',
+            { testdrivetime = Config.Shops[tempShop].TestDriveTimeLimit }),
+        type = 'inform'
+    })
     startTestDriveTimer(Config.Shops[tempShop].TestDriveTimeLimit * 60, tempShop)
 end)
 
@@ -624,10 +617,10 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
     local dataClosestVehicle = Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle]
     if dataClosestVehicle.chosenVehicle == data.toVehicle then return end
-    
+
     local closestVehicle = lib.getClosestVehicle(dataClosestVehicle.coords.xyz, 5, false)
     if not closestVehicle then return end
-    
+
     DeleteEntity(closestVehicle)
     while DoesEntityExist(closestVehicle) do
         Wait(50)
@@ -642,28 +635,23 @@ end)
 ---@param plate string
 RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
     local tempShop = InsideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
-        local veh = NetToVeh(netId)
-        exports.LegacyFuel:SetFuel(veh, 100)
-        SetVehicleNumberPlateText(veh, plate)
-        SetEntityHeading(veh, Config.Shops[tempShop].VehicleSpawn.w)
-        TriggerEvent("vehiclekeys:client:SetOwner", QBCore.Functions.GetPlate(veh))
-        TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", QBCore.Functions.GetVehicleProperties(veh))
-    end, vehicle, Config.Shops[tempShop].VehicleSpawn, true)
+    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, vehicle, Config.Shops[tempShop].VehicleSpawn, plate)
+    local veh = NetToVeh(netId)
+    TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", QBCore.Functions.GetVehicleProperties(veh))
 end)
 
 --- Thread to create blips
 CreateThread(function()
-    for k, v in pairs(Config.Shops) do
+    for _, v in pairs(Config.Shops) do
         if v.showBlip then
-            local Dealer = AddBlipForCoord(Config.Shops[k].Location)
-            SetBlipSprite(Dealer, Config.Shops[k].blipSprite)
+            local Dealer = AddBlipForCoord(v.Location.x, v.Location.y, v.Location.z)
+            SetBlipSprite(Dealer, v.blipSprite)
             SetBlipDisplay(Dealer, 4)
             SetBlipScale(Dealer, 0.70)
             SetBlipAsShortRange(Dealer, true)
-            SetBlipColour(Dealer, Config.Shops[k].blipColor)
+            SetBlipColour(Dealer, v.blipColor)
             BeginTextCommandSetBlipName("STRING")
-            AddTextComponentSubstringPlayerName(Config.Shops[k].ShopLabel)
+            AddTextComponentSubstringPlayerName(v.ShopLabel)
             EndTextCommandSetBlipName(Dealer)
         end
     end
