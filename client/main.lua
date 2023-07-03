@@ -637,7 +637,9 @@ RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, p
     local tempShop = InsideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
     local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, vehicle, Config.Shops[tempShop].VehicleSpawn, plate)
     local veh = NetToVeh(netId)
-    TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", QBCore.Functions.GetVehicleProperties(veh))
+    local props = lib.getVehicleProperties(veh)
+    props.plate = plate
+    TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", props)
 end)
 
 --- Thread to create blips
