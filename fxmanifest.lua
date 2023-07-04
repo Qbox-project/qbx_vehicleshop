@@ -6,7 +6,8 @@ version '1.0.0'
 
 shared_script {
     'config.lua',
-    '@qb-core/shared/locale.lua',
+    '@qbx-core/shared/locale.lua',
+    '@qbx-core/import.lua',
     '@ox_lib/init.lua',
     'locales/en.lua' -- Change this to your preferred language
 }
@@ -23,6 +24,10 @@ server_scripts {
 
 files {
     'client/utils.lua'
+}
+
+modules {
+    'qbx-core:utils'
 }
 
 provide 'qb-vehicleshop'
