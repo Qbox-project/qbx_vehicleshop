@@ -586,8 +586,8 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
 end)
 
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
---- @param vehicle number
-RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(vehicle)
+--- @param args table
+RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
     if InTestDrive then
         lib.notify({
             title = Lang:t('error.testdrive_alreadyin'),
@@ -596,12 +596,11 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(vehicle)
         return
     end
 
-    if not vehicle then return end
+    if not args then return end
 
-    local testDriveVehicle = vehicle
     InTestDrive = true
     local tempShop = InsideShop
-    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, testDriveVehicle, Config.Shops[tempShop].TestDriveSpawn, 'TESTDRIVE')
+    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, args.vehicle, Config.Shops[tempShop].TestDriveSpawn, 'TEST ' .. RandomNumber(3))
     TestDriveVeh = netId
     lib.notify({
         title = Lang:t('general.testdrive_timenoti',
@@ -656,5 +655,11 @@ CreateThread(function()
             AddTextComponentSubstringPlayerName(v.ShopLabel)
             EndTextCommandSetBlipName(Dealer)
         end
+    end
+end)
+
+AddEventHandler('onResourceStart', function(resource)
+    if GetCurrentResourceName() == resource then
+        if LocalPlayer.state['isLoggedIn'] then init() end
     end
 end)
