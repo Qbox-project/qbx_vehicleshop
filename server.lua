@@ -86,7 +86,7 @@ end
 local function GeneratePlate()
     local plate
     repeat
-        plate = QBCore.Shared.RandomInt(1) .. QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(2)
+        plate = RandomNumber(1) .. RandomLetter(2) .. RandomNumber(3) .. RandomLetter(2)
     until not DoesVehicleEntityExist(plate)
     return plate:upper()
 end
@@ -129,7 +129,7 @@ end)
 
 -- Brute force vehicle deletion
 ---@param netId number
-RegisterNetEvent('qb-vehicleshop:server:deleteVehicle', function (netId)
+RegisterNetEvent('qb-vehicleshop:server:deleteVehicle', function(netId)
     local vehicle = NetworkGetEntityFromNetworkId(netId)
     DeleteEntity(vehicle)
 end)
