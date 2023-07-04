@@ -86,7 +86,7 @@ end
 local function GeneratePlate()
     local plate
     repeat
-        plate = RandomNumber(1) .. RandomLetter(2) .. RandomNumber(3) .. RandomLetter(2)
+        plate = GenerateRandomPlate('11AAA111')
     until not DoesVehicleEntityExist(plate)
     return plate:upper()
 end
