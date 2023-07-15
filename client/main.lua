@@ -350,24 +350,31 @@ local function openVehicleSellMenu()
                 args = {
                     vehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
                 }
-            },
-            {
+            }
+        }
+
+        if Config.EnableFreeUseBuy then
+            options[#options+1] = {
                 title = Lang:t('menus.freeuse_buy_header'),
                 description = Lang:t('menus.freeuse_buy_txt'),
                 serverEvent = 'qb-vehicleshop:server:buyShowroomVehicle',
                 args = {
                     buyVehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
                 }
-            },
-            {
+            }
+        end
+
+        if Config.EnableFinance then
+            options[#options+1] = {
                 title = Lang:t('menus.finance_header'),
                 description = Lang:t('menus.freeuse_finance_txt'),
                 onSelect = function()
                     openFinance(closestVehicle, Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
                 end
-            },
-            swapOption,
-        }
+            }
+        end
+
+        options[#options+1] = swapOption
     else
         options = {
             {
@@ -383,16 +390,20 @@ local function openVehicleSellMenu()
                 onSelect = function()
                     sellVehicle(Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
                 end,
-            },
-            {
+            }
+        }
+
+        if Config.EnableFinance then
+            options[#options+1] = {
                 title = Lang:t('menus.finance_header'),
                 description = Lang:t('menus.managed_finance_txt'),
                 onSelect = function()
                     openCustomFinance(closestVehicle)
                 end
-            },
-            swapOption,
-        }
+            }
+        end
+
+        options[#options+1] = swapOption
     end
 
     lib.registerContext({
