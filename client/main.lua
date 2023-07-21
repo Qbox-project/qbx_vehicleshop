@@ -175,7 +175,7 @@ end
 ---@param closestShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(closestShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(QBCore.Shared.Vehicles[buyVehicle]:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
+    local dialog = lib.inputDialog(QBCore.Shared.Vehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
             label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
@@ -270,7 +270,7 @@ end
 
 ---@param closestVehicle integer
 local function openCustomFinance(closestVehicle)
-    TriggerEvent('animations:client:EmoteCommandStart', { "tablet2" })
+    exports.scully_emotemenu:playEmoteByCommand('tablet2')
 
     local vehicle = Config.Shops[InsideShop].ShowroomVehicles[closestVehicle].chosenVehicle
     local dialog = lib.inputDialog(getVehBrand(closestVehicle):upper() .. ' ' .. vehicle:upper() .. ' - $' .. getVehPrice(closestVehicle), {
@@ -296,7 +296,7 @@ local function openCustomFinance(closestVehicle)
 
     if not downPayment or not paymentAmount or not playerid then return end
 
-    TriggerEvent('animations:client:EmoteCommandStart', { "c" })
+    exports.scully_emotemenu:cancelEmote()
     TriggerServerEvent('qb-vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount,
         vehicle, playerid)
 end
@@ -626,6 +626,9 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     end
 
     local veh = createShowroomVehicle(data.toVehicle, dataClosestVehicle.coords)
+
+    Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
+    
     if Config.UsingTarget then createVehicleTarget(shopName, veh) end
 end)
 
