@@ -80,7 +80,11 @@ local Translations = {
         command_transfervehicle_amount = "Eladási ár (opcionális)",
     }
 }
-Lang = Locale:new({
-    phrases = Translations,
-    warnOnMissing = true
-})
+
+if GetConvar('qb_locale', 'en') == 'hu' then
+    Lang = Locale:new({
+        phrases = Translations,
+        warnOnMissing = true,
+        fallbackLang = Lang,
+    })
+end
