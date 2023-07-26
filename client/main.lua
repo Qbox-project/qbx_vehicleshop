@@ -419,19 +419,21 @@ end
 ---@param shop string
 local function startTestDriveTimer(time, shop)
     local gameTimer = GetGameTimer()
+    local timeMs = tonumber(1000 * time)
+
     CreateThread(function()
         while InTestDrive do
-            if GetGameTimer() < gameTimer + tonumber(1000 * time) then
-                local secondsLeft = GetGameTimer() - gameTimer
-                if secondsLeft >= tonumber(1000 * time) - 20 then
+            local currentGameTime = GetGameTimer()
+            local secondsLeft = currentGameTime - gameTimer
+            if currentGameTime < gameTimer + timeMs then
+                print(timeMs)
+                if secondsLeft >= timeMs - 50 then
+                    print('yeah')
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', TestDriveVeh)
                     TestDriveVeh = 0
                     InTestDrive = false
                     SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation.x, Config.Shops[shop].TestDriveReturnLocation.y, Config.Shops[shop].TestDriveReturnLocation.z, false, false, false, false)
-                    lib.notify({
-                        title = Lang:t('general.testdrive_complete'),
-                        type = 'success'
-                    })
+                    lib.notify({ title = Lang:t('general.testdrive_complete'), type = 'success' })
                 end
                 utils.drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
             end
