@@ -426,7 +426,6 @@ local function startTestDriveTimer(time, shop)
             local currentGameTime = GetGameTimer()
             local secondsLeft = currentGameTime - gameTimer
             if currentGameTime < gameTimer + timeMs then
-                print(timeMs)
                 if secondsLeft >= timeMs - 50 then
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', TestDriveVeh)
                     TestDriveVeh = 0
