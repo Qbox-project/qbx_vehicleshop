@@ -19,7 +19,6 @@ local function financePayment(data)
         {
             type = 'number',
             label = Lang:t('menus.veh_finance_payment'),
-            placeholder = 1000
         }
     })
 
@@ -72,7 +71,7 @@ end
 
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
-    local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles')
+    local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles', false)
     local ownedVehicles = {}
     for _, v in pairs(vehicles) do
         if v.balance ~= 0 then
@@ -96,11 +95,7 @@ local function showFinancedVehiclesMenu()
     end
 
     if #ownedVehicles == 0 then
-        lib.notify({
-            title = Lang:t('error.nofinanced'),
-            type = 'error',
-            duration = 7500
-        })
+        QBCore.Functions.Notify(Lang:t('error.nofinanced'), 'error')
         return
     end
 
@@ -419,19 +414,19 @@ end
 ---@param shop string
 local function startTestDriveTimer(time, shop)
     local gameTimer = GetGameTimer()
+    local timeMs = time * 1000
+
     CreateThread(function()
         while InTestDrive do
-            if GetGameTimer() < gameTimer + tonumber(1000 * time) then
-                local secondsLeft = GetGameTimer() - gameTimer
-                if secondsLeft >= tonumber(1000 * time) - 20 then
+            local currentGameTime = GetGameTimer()
+            local secondsLeft = currentGameTime - gameTimer
+            if currentGameTime < gameTimer + timeMs then
+                if secondsLeft >= timeMs - 50 then
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', TestDriveVeh)
                     TestDriveVeh = 0
                     InTestDrive = false
                     SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation.x, Config.Shops[shop].TestDriveReturnLocation.y, Config.Shops[shop].TestDriveReturnLocation.z, false, false, false, false)
-                    lib.notify({
-                        title = Lang:t('general.testdrive_complete'),
-                        type = 'success'
-                    })
+                    QBCore.Functions.Notify(Lang:t('general.testdrive_complete'), 'success')
                 end
                 utils.drawTxt(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), 4, 0.5, 0.93, 0.50, 255, 255, 255, 180)
             end
@@ -590,8 +585,7 @@ end
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
     local citizenid = PlayerData.citizenid
-    local gameTime = GetGameTimer()
-    TriggerServerEvent('qb-vehicleshop:server:addPlayer', citizenid, gameTime)
+    TriggerServerEvent('qb-vehicleshop:server:addPlayer', citizenid)
     TriggerServerEvent('qb-vehicleshop:server:checkFinance')
     init()
 end)
@@ -600,10 +594,7 @@ end)
 --- @param args table
 RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
     if InTestDrive then
-        lib.notify({
-            title = Lang:t('error.testdrive_alreadyin'),
-            type = 'error'
-        })
+        QBCore.Functions.Notify(Lang:t('error.testdrive_alreadyin'), 'error')
         return
     end
 
@@ -613,11 +604,7 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
     local tempShop = InsideShop
     local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, args.vehicle, Config.Shops[tempShop].TestDriveSpawn, 'TEST ' .. RandomNumber(3))
     TestDriveVeh = netId
-    lib.notify({
-        title = Lang:t('general.testdrive_timenoti',
-            { testdrivetime = Config.Shops[tempShop].TestDriveTimeLimit }),
-        type = 'inform'
-    })
+    QBCore.Functions.Notify(Lang:t('general.testdrive_timenoti'), Config.Shops[tempShop].TestDriveTimeLimit, 'inform')
     startTestDriveTimer(Config.Shops[tempShop].TestDriveTimeLimit * 60, tempShop)
 end)
 

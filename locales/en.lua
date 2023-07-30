@@ -70,7 +70,7 @@ local Translations = {
         keypress_vehicleViewMenu = "[E] View Vehicle"
     },
     general = {
-        testdrive_timer = "Test Drive Time Remaining:",
+        testdrive_timer = "Test Drive Time Remaining: ",
         vehinteraction = "Vehicle Interaction",
         testdrive_timenoti = "You have %{testdrivetime} minutes remaining",
         testdrive_complete = "Vehicle test drive complete",

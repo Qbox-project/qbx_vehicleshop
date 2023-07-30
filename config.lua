@@ -46,11 +46,11 @@ Config.Shops = {
             cycles = 'Bicycles'
         },
         TestDriveTimeLimit = 0.5, -- Time in minutes until the vehicle gets deleted
-        TestDriveReturnLocation = vector4(-39.04, -1110.82, 26.44, 334.74), -- Return position once test drive is finished. Set to front of the shop by default
+        TestDriveReturnLocation = vector4(-24.84, -1086.55, 26.57, 70.5), -- Return position once test drive is finished
         Location = vector3(-45.67, -1098.34, 26.42), -- Blip Location
         ReturnLocation = vector3(-44.74, -1082.58, 26.68), -- Location to return vehicle, only enables if the vehicleshop has a job owned
-        VehicleSpawn = vector4(-56.79, -1109.85, 26.43, 71.5), -- Spawn location when vehicle is bought
-        TestDriveSpawn = vector4(-56.79, -1109.85, 26.43, 71.5), -- Spawn location for test drive
+        VehicleSpawn = vector4(-31.69, -1090.78, 26.42, 328.79), -- Spawn location when vehicle is bought
+        TestDriveSpawn = vector4(-7.84, -1081.35, 26.67, 121.83), -- Spawn location for test drive
         ShowroomVehicles = {
             [1] = {
                 coords = vector4(-45.65, -1093.66, 25.44, 69.5), -- where the vehicle will spawn on display
