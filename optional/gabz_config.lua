@@ -64,27 +64,27 @@ Config.Shops = {
 		TestDriveSpawn = vector4(-7.24, -1084.81, 26.87, 114.26), -- Spawn location for test drive
 		ShowroomVehicles = {
 			[1] = {
-				coords = vector4(-37.05, -1093.3, 27.0, 69.5), -- where the vehicle will spawn on display
+				coords = vector4(-37.05, -1093.3, 26.0, 69.5), -- where the vehicle will spawn on display
 				defaultVehicle = 'blista', -- Default display vehicle
 				chosenVehicle = 'blista', -- Same as default but is dynamically changed when swapping vehicles
 			},
 			[2] = {
-				coords = vector4(-42.35, -1101.35, 27.0, 294.5),
+				coords = vector4(-42.35, -1101.35, 26.0, 294.5),
 				defaultVehicle = 'schafter2',
 				chosenVehicle = 'schafter2'
 			},
 			[3] = {
-				coords = vector4(-47.5, -1092.0, 27.0, 66.5),
+				coords = vector4(-47.5, -1092.0, 26.0, 66.5),
 				defaultVehicle = 'comet2',
 				chosenVehicle = 'comet2'
 			},
 			[4] = {
-				coords = vector4(-54.65, -1096.85, 27.0, 254.5),
+				coords = vector4(-54.65, -1096.85, 26.0, 254.5),
 				defaultVehicle = 'vigero',
 				chosenVehicle = 'vigero'
 			},
 			[5] = {
-				coords = vector4(-49.9, -1083.75, 27.0, 165.0),
+				coords = vector4(-49.9, -1083.75, 26.0, 165.0),
 				defaultVehicle = 'intruder',
 				chosenVehicle = 'intruder'
 			},
