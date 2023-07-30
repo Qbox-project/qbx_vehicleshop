@@ -71,7 +71,7 @@ end
 
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
-    local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles', false)
+    local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles')
     local ownedVehicles = {}
     for _, v in pairs(vehicles) do
         if v.balance ~= 0 then
