@@ -601,7 +601,7 @@ Config.Vehicles = {
 		shop = 'pdm',
 	},
 	dukes2 = {
-		shop = 'dukes2',
+		shop = 'pdm',
 	},
 	dukes3 = {
 		shop = 'pdm',
