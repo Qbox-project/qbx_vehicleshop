@@ -495,7 +495,7 @@ Config.Vehicles = {
 		shop = 'pdm',
 	},
 	oppressor = {
-		shop = '',
+		shop = 'luxury',
 	},
 	pcj = {
 		shop = 'pdm',
@@ -601,7 +601,7 @@ Config.Vehicles = {
 		shop = 'pdm',
 	},
 	dukes2 = {
-		shop = '',
+		shop = 'dukes2',
 	},
 	dukes3 = {
 		shop = 'pdm',
@@ -691,7 +691,7 @@ Config.Vehicles = {
 		shop = 'pdm',
 	},
 	ruiner2 = {
-		shop = '',
+		shop = 'pdm',
 	},
 	sabregt = {
 		shop = 'pdm',
@@ -776,7 +776,7 @@ Config.Vehicles = {
 		shop = 'pdm',
 	},
 	caracara = {
-		shop = '',
+		shop = 'pdm',
 	},
 	caracara2 = {							--DLC
 		shop = 'pdm',
@@ -1531,7 +1531,7 @@ Config.Vehicles = {
 		shop = 'luxury',
 	},
 	voltic2 = {
-		shop = '',
+		shop = 'luxury',
 	},
 	xa21 = {
 		shop = 'luxury',
