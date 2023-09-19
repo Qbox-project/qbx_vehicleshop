@@ -113,14 +113,9 @@ lib.registerContext({
     }
 })
 
-RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
-    PlayerData.job = JobInfo
-end)
-
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     local citizenid = PlayerData.citizenid
     TriggerServerEvent('qb-vehicleshop:server:removePlayer', citizenid)
-    PlayerData = {}
 end)
 
 --- Fetches the name of a vehicle from QB Shared
