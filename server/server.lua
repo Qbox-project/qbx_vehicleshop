@@ -1,18 +1,17 @@
 -- Variables
-local QBCore = exports['qbx-core']:GetCoreObject()
-local financetimer = {}
+local financeTimer = {}
 
 -- Handlers
 -- Store game time for player when they load
 RegisterNetEvent('qb-vehicleshop:server:addPlayer', function(citizenid)
-    financetimer[citizenid] = os.time()
+    financeTimer[citizenid] = os.time()
 end)
 
 -- Deduct stored game time from player on logout
 RegisterNetEvent('qb-vehicleshop:server:removePlayer', function(citizenid)
-    if not financetimer[citizenid] then return end
+    if not financeTimer[citizenid] then return end
 
-    local playTime = financetimer[citizenid]
+    local playTime = financeTimer[citizenid]
     local financetime = FetchVehicleEntitiesByCitizenId(citizenid)
     for _, v in pairs(financetime) do
         if v.balance >= 1 then
@@ -21,7 +20,7 @@ RegisterNetEvent('qb-vehicleshop:server:removePlayer', function(citizenid)
             UpdateVehicleEntityFinanceTime(newTime, v.plate)
         end
     end
-    financetimer[citizenid] = nil
+    financeTimer[citizenid] = nil
 end)
 
 -- Deduct stored game time from player on quit because we can't get citizenid
@@ -32,26 +31,19 @@ AddEventHandler('playerDropped', function()
     local vehicles = FetchVehicleEntitiesByLicense(license)
     if not vehicles then return end
     for _, v in pairs(vehicles) do
-        local playTime = financetimer[v.citizenid]
+        local playTime = financeTimer[v.citizenid]
         if v.balance >= 1 and playTime then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
             if newTime < 0 then newTime = 0 end
             UpdateVehicleEntityFinanceTime(newTime, v.plate)
         end
     end
-    if vehicles[1] and financetimer[vehicles[1].citizenid] then
-        financetimer[vehicles[1].citizenid] = nil
+    if vehicles[1] and financeTimer[vehicles[1].citizenid] then
+        financeTimer[vehicles[1].citizenid] = nil
     end
 end)
 
 -- Functions
-
----Rounds both positive and negative numbers to the nearest whole number.
----@param x number
----@return integer
-local function round(x)
-    return x >= 0 and math.floor(x + 0.5) or math.ceil(x - 0.5)
-end
 
 ---@param vehiclePrice number
 ---@param downPayment number
@@ -61,7 +53,7 @@ end
 local function calculateFinance(vehiclePrice, downPayment, paymentamount)
     local balance = vehiclePrice - downPayment
     local vehPaymentAmount = balance / paymentamount
-    return round(balance), round(vehPaymentAmount)
+    return math.round(balance), math.round(vehPaymentAmount)
 end
 
 ---@class FinancedVehicle
@@ -80,7 +72,7 @@ local function calculateNewFinance(paymentAmount, vehData)
     local minusPayment = vehData.paymentsLeft - 1
     local newPaymentsLeft = newBalance / minusPayment
     local newPayment = newBalance / newPaymentsLeft
-    return round(newBalance), round(newPayment), newPaymentsLeft
+    return math.round(newBalance), math.round(newPayment), newPaymentsLeft
 end
 
 local function GeneratePlate()
@@ -89,17 +81,6 @@ local function GeneratePlate()
         plate = GenerateRandomPlate('11AAA111')
     until not DoesVehicleEntityExist(plate)
     return plate:upper()
-end
-
----@param amount number
----@return string
-local function comma_value(amount)
-    local formatted = tostring(amount)
-    local k
-    repeat
-        formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
-    until k == 0
-    return formatted
 end
 
 -- Callbacks
@@ -115,7 +96,7 @@ lib.callback.register('qb-vehicleshop:server:getVehicles', function(source)
 end)
 
 lib.callback.register('qb-vehicleshop:server:spawnVehicle', function(source, model, coords, plate)
-    local netId = QBCore.Functions.CreateVehicle(source, model, coords, true)
+    local netId = SpawnVehicle(source, model, coords, true)
     if not netId or netId == 0 then return end
     local veh = NetworkGetEntityFromNetworkId(netId)
     if not veh or veh == 0 then return end
@@ -204,7 +185,7 @@ RegisterNetEvent('qb-vehicleshop:server:financePayment', function(paymentAmount,
     end
 
     if paymentAmount < minPayment then
-        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.minimumallowed') .. comma_value(minPayment), 'error')
+        TriggerClientEvent('QBCore:Notify', src, Lang:t('error.minimumallowed') .. CommaValue(minPayment), 'error')
         return
     end
 
@@ -270,7 +251,7 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
     local src = source
     local player = QBCore.Functions.GetPlayer(src)
     local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
-    local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
+    local minDown = tonumber(math.round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
@@ -329,9 +310,9 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
 
     target.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 
-    local commission = round(price * Config.Commission)
+    local commission = math.round(price * Config.Commission)
     player.Functions.AddMoney('bank', price * Config.Commission)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('success.earned_commission', {amount = comma_value(commission)}), 'success')
+    TriggerClientEvent('QBCore:Notify', src, Lang:t('success.earned_commission', {amount = CommaValue(commission)}), 'success')
 
     exports['qbx-management']:AddMoney(player.PlayerData.job.name, price)
     TriggerClientEvent('QBCore:Notify', target.PlayerData.source, Lang:t('success.purchased'), 'success')
@@ -384,7 +365,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
     local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
-    local minDown = tonumber(round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
+    local minDown = tonumber(math.round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notworth'), 'error')
@@ -440,10 +421,10 @@ RegisterNetEvent('qb-vehicleshop:server:checkFinance', function()
 end)
 
 -- Transfer vehicle to player in passenger seat
-QBCore.Commands.Add('transfervehicle', Lang:t('general.command_transfervehicle'), {{name = 'ID', help = Lang:t('general.command_transfervehicle_help')}, {name = 'amount', help = Lang:t('general.command_transfervehicle_amount')}}, false, function(source, args)
+lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicle'), params = {{name = 'id', type = 'playerId', help = Lang:t('general.command_transfervehicle_help')}, {name = 'amount', type = 'number', help = Lang:t('general.command_transfervehicle_amount')}}}, function(source, args)
     local src = source
-    local buyerId = tonumber(args[1]) --[[@as number]]
-    local sellAmount = tonumber(args[2]) --[[@as number]]
+    local buyerId = args.id
+    local sellAmount = args.amount
     if buyerId == 0 then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.Invalid_ID'), 'error')
     end
@@ -498,7 +479,7 @@ QBCore.Commands.Add('transfervehicle', Lang:t('general.command_transfervehicle')
     UpdateVehicleEntityOwner(targetcid, targetlicense, plate)
     player.Functions.AddMoney(currencyType, sellAmount)
     target.Functions.RemoveMoney(currencyType, sellAmount)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t('success.soldfor') .. comma_value(sellAmount), 'success')
+    TriggerClientEvent('QBCore:Notify', src, Lang:t('success.soldfor') .. CommaValue(sellAmount), 'success')
     TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
-    TriggerClientEvent('QBCore:Notify', buyerId, Lang:t('success.boughtfor') .. comma_value(sellAmount), 'success')
+    TriggerClientEvent('QBCore:Notify', buyerId, Lang:t('success.boughtfor') .. CommaValue(sellAmount), 'success')
 end)

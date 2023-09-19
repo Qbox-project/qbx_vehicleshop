@@ -1,7 +1,8 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'https://github.com/Qbox-project/qbx-vehicleshop'
+description 'Vehicleshop for Qbox'
+repository 'https://github.com/Qbox-project/qbx-vehicleshop'
 version '1.0.0'
 
 shared_script {
@@ -21,10 +22,6 @@ server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
     'storage.lua',
-}
-
-files {
-    'client/utils.lua'
 }
 
 modules {
