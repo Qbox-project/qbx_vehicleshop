@@ -417,6 +417,7 @@ local function startTestDriveTimer(time, shop)
                     SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation.x, Config.Shops[shop].TestDriveReturnLocation.y, Config.Shops[shop].TestDriveReturnLocation.z, false, false, false, false)
                     QBCore.Functions.Notify(Lang:t('general.testdrive_complete'), 'success')
                 end
+            DrawText2D(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), vec2(0.5, 0.93))
             end
             Wait(0)
         end
