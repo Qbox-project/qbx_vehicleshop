@@ -7,8 +7,8 @@ version '1.0.0'
 
 shared_script {
     'config.lua',
-    '@qbx-core/shared/locale.lua',
-    '@qbx-core/import.lua',
+    '@qbx_core/shared/locale.lua',
+    '@qbx_core/import.lua',
     '@ox_lib/init.lua',
     'locales/en.lua',
     'locales/*.lua'
@@ -25,9 +25,9 @@ server_scripts {
 }
 
 modules {
-    'qbx-core:core',
-    'qbx-core:playerdata',
-    'qbx-core:utils'
+    'qbx_core:core',
+    'qbx_core:playerdata',
+    'qbx_core:utils'
 }
 
 provide 'qb-vehicleshop'
