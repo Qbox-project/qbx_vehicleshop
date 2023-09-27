@@ -6,10 +6,10 @@ repository 'https://github.com/Qbox-project/qbx-vehicleshop'
 version '1.0.0'
 
 shared_script {
-    'config.lua',
+    '@ox_lib/init.lua',
     '@qbx_core/shared/locale.lua',
     '@qbx_core/import.lua',
-    '@ox_lib/init.lua',
+    'config.lua',
     'locales/en.lua',
     'locales/*.lua'
 }
@@ -23,6 +23,7 @@ server_scripts {
     'server/main.lua',
     'storage.lua',
 }
+
 
 modules {
     'qbx_core:core',

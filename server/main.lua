@@ -87,7 +87,7 @@ end
 
 lib.callback.register('qb-vehicleshop:server:getVehicles', function(source)
     local src = source
-    local player = QBCore.Functions.GetPlayer(src)
+    local player = QBX.Functions.GetPlayer(src)
     if not player then return end
     local vehicles = FetchVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     if vehicles[1] then
@@ -125,7 +125,7 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:customTestDrive', function(vehicle, playerId)
     local src = source
     local target = tonumber(playerId) --[[@as number]]
-    if not QBCore.Functions.GetPlayer(target) then
+    if not QBX.Functions.GetPlayer(target) then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.Invalid_ID'), 'error')
         return
     end
@@ -156,7 +156,7 @@ end
 ---@param amount number
 ---@return boolean success if money was removed
 local function removeMoney(src, amount)
-    local player = QBCore.Functions.GetPlayer(src)
+    local player = QBX.Functions.GetPlayer(src)
     local cash = player.PlayerData.money.cash
     local bank = player.PlayerData.money.bank
 
@@ -224,9 +224,9 @@ end)
 -- Buy public vehicle outright
 RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
-    local player = QBCore.Functions.GetPlayer(src)
+    local player = QBX.Functions.GetPlayer(src)
     vehicle = vehicle.buyVehicle
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
+    local vehiclePrice = QBX.Shared.Vehicles[vehicle].price
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if not currencyType then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notenoughmoney'), 'error')
@@ -249,8 +249,8 @@ end)
 -- Finance public vehicle
 RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
     local src = source
-    local player = QBCore.Functions.GetPlayer(src)
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
+    local player = QBX.Functions.GetPlayer(src)
+    local vehiclePrice = QBX.Shared.Vehicles[vehicle].price
     local minDown = tonumber(math.round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
@@ -301,7 +301,7 @@ end)
 ---@param downPayment number
 ---@return boolean success
 local function sellShowroomVehicleTransact(src, target, price, downPayment)
-    local player = QBCore.Functions.GetPlayer(src)
+    local player = QBX.Functions.GetPlayer(src)
     local currencyType = findChargeableCurrencyType(downPayment, target.PlayerData.money.cash, target.PlayerData.money.bank)
     if not currencyType then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notenoughmoney'), 'error')
@@ -322,7 +322,7 @@ end
 -- Sell vehicle to customer
 RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, playerid)
     local src = source
-    local target = QBCore.Functions.GetPlayer(tonumber(playerid))
+    local target = QBX.Functions.GetPlayer(tonumber(playerid))
 
     if not target then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.Invalid_ID'), 'error')
@@ -333,7 +333,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
     end
 
     local vehicle = data
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
+    local vehiclePrice = QBX.Shared.Vehicles[vehicle].price
     local cid = target.PlayerData.citizenid
     local plate = GeneratePlate()
 
@@ -352,7 +352,7 @@ end)
 -- Finance vehicle to customer
 RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPayment, paymentAmount, vehicle, playerid)
     local src = source
-    local target = QBCore.Functions.GetPlayer(tonumber(playerid))
+    local target = QBX.Functions.GetPlayer(tonumber(playerid))
 
     if not target then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.Invalid_ID'), 'error')
@@ -364,7 +364,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
 
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
-    local vehiclePrice = QBCore.Shared.Vehicles[vehicle].price
+    local vehiclePrice = QBX.Shared.Vehicles[vehicle].price
     local minDown = tonumber(math.round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
@@ -405,7 +405,7 @@ end)
 -- Check if payment is due
 RegisterNetEvent('qb-vehicleshop:server:checkFinance', function()
     local src = source
-    local player = QBCore.Functions.GetPlayer(src)
+    local player = QBX.Functions.GetPlayer(src)
     local result = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     if not result[1] then return end
 
@@ -440,13 +440,13 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notinveh'), 'error')
     end
 
-    local plate = QBCore.Shared.Trim(GetVehicleNumberPlateText(vehicle))
+    local plate = QBX.Shared.Trim(GetVehicleNumberPlateText(vehicle))
     if not plate then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.vehinfo'), 'error')
     end
 
-    local player = QBCore.Functions.GetPlayer(src)
-    local target = QBCore.Functions.GetPlayer(buyerId)
+    local player = QBX.Functions.GetPlayer(src)
+    local target = QBX.Functions.GetPlayer(buyerId)
     local row = FetchVehicleEntityByPlate(plate)
     if Config.PreventFinanceSelling and row.balance > 0 then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.financed'), 'error')
