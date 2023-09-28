@@ -1,7 +1,7 @@
 local testDriveVeh = 0
 local inTestDrive = false
 local insideShop = nil
-local vehicles = exports.qbx_core:GetVehicles()
+local coreVehicles = exports.qbx_core:GetVehicles()
 
 ---@class VehicleFinanceClient
 ---@field vehiclePlate string
@@ -73,7 +73,7 @@ local function showFinancedVehiclesMenu()
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error') end
     for _, v in pairs(vehicles) do
         if v.balance ~= 0 then
-            local name = vehicles[v.vehicle].name
+            local name = coreVehicles[v.vehicle].name
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = name,
@@ -124,21 +124,21 @@ end)
 ---@param closestVehicle integer
 ---@return string
 local function getVehName(closestVehicle)
-    return vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].name
+    return coreVehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].name
 end
 
 --- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@param closestVehicle integer
 ---@return string
 local function getVehPrice(closestVehicle)
-    return CommaValue(vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].price)
+    return CommaValue(coreVehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehBrand(closestVehicle)
-    return vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].brand
+    return coreVehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].brand
 end
 
 --- based on which vehicleshop player is in
@@ -162,7 +162,7 @@ end
 ---@param closestShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(closestShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(vehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
+    local dialog = lib.inputDialog(coreVehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
             label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
@@ -189,8 +189,8 @@ local function openVehCatsMenu(category)
     local vehMenu = {}
     local closestVehicle = getClosestShowroomVehicle()
 
-    for k, v in pairs(vehicles) do
-        if vehicles[k].category == category then
+    for k, v in pairs(coreVehicles) do
+        if coreVehicles[k].category == category then
             if type(Config.Vehicles[k].shop) == 'table' then
                 for _, shop in pairs(Config.Vehicles[k].shop) do
                     if shop == insideShop then
@@ -291,7 +291,7 @@ end
 ---@param vehModel string
 ---@return number? playerId
 local function getPlayerIdInput(vehModel)
-    local dialog = lib.inputDialog(vehicles[vehModel].name, {
+    local dialog = lib.inputDialog(coreVehicles[vehModel].name, {
         {
             type = 'number',
             label = Lang:t('menus.submit_ID'),
@@ -424,7 +424,7 @@ local function startTestDriveTimer(time, shop)
             Wait(0)
         end
     end)
-end 
+end
 
 --- Zoning function. Happens upon entering any of the sell zone.
 local function enteringVehicleSellZone()

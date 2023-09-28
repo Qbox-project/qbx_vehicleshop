@@ -1,6 +1,6 @@
 -- Variables
 local financeTimer = {}
-local vehicles = exports.qbx_core:GetVehicles()
+local coreVehicles = exports.qbx_core:GetVehicles()
 
 -- Handlers
 -- Store game time for player when they load
@@ -227,7 +227,7 @@ RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     vehicle = vehicle.buyVehicle
-    local vehiclePrice = vehicles[vehicle].price
+    local vehiclePrice = coreVehicles[vehicle].price
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if not currencyType then
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.notenoughmoney'), 'error')
@@ -251,7 +251,7 @@ end)
 RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
-    local vehiclePrice = vehicles[vehicle].price
+    local vehiclePrice = coreVehicles[vehicle].price
     local minDown = tonumber(math.round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
@@ -334,7 +334,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
     end
 
     local vehicle = data
-    local vehiclePrice = vehicles[vehicle].price
+    local vehiclePrice = coreVehicles[vehicle].price
     local cid = target.PlayerData.citizenid
     local plate = GeneratePlate()
 
@@ -365,7 +365,7 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
 
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
-    local vehiclePrice = vehicles[vehicle].price
+    local vehiclePrice = coreVehicles[vehicle].price
     local minDown = tonumber(math.round((Config.MinimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
