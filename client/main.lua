@@ -1,6 +1,7 @@
 local testDriveVeh = 0
 local inTestDrive = false
 local insideShop = nil
+local vehicles = exports.qbx_core:GetVehicles()
 
 ---@class VehicleFinanceClient
 ---@field vehiclePlate string
@@ -69,10 +70,10 @@ local function showFinancedVehiclesMenu()
     local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles')
     local ownedVehicles = {}
 
-    if vehicles == nil or #vehicles == 0 then return QBX.Functions.Notify(Lang:t('error.nofinanced'), 'error') end
+    if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error') end
     for _, v in pairs(vehicles) do
         if v.balance ~= 0 then
-            local name = QBX.Shared.Vehicles[v.vehicle].name
+            local name = vehicles[v.vehicle].name
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = name,
@@ -92,7 +93,7 @@ local function showFinancedVehiclesMenu()
     end
 
     if #ownedVehicles == 0 then
-        return QBX.Functions.Notify(Lang:t('error.nofinanced'), 'error')
+        return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error')
     end
 
     lib.registerContext({
@@ -123,21 +124,21 @@ end)
 ---@param closestVehicle integer
 ---@return string
 local function getVehName(closestVehicle)
-    return QBX.Shared.Vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].name
+    return vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].name
 end
 
 --- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@param closestVehicle integer
 ---@return string
 local function getVehPrice(closestVehicle)
-    return CommaValue(QBX.Shared.Vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].price)
+    return CommaValue(vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehBrand(closestVehicle)
-    return QBX.Shared.Vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].brand
+    return vehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].brand
 end
 
 --- based on which vehicleshop player is in
@@ -161,7 +162,7 @@ end
 ---@param closestShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(closestShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(QBX.Shared.Vehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
+    local dialog = lib.inputDialog(vehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
             label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
@@ -188,8 +189,8 @@ local function openVehCatsMenu(category)
     local vehMenu = {}
     local closestVehicle = getClosestShowroomVehicle()
 
-    for k, v in pairs(QBX.Shared.Vehicles) do
-        if QBX.Shared.Vehicles[k].category == category then
+    for k, v in pairs(vehicles) do
+        if vehicles[k].category == category then
             if type(Config.Vehicles[k].shop) == 'table' then
                 for _, shop in pairs(Config.Vehicles[k].shop) do
                     if shop == insideShop then
@@ -290,7 +291,7 @@ end
 ---@param vehModel string
 ---@return number? playerId
 local function getPlayerIdInput(vehModel)
-    local dialog = lib.inputDialog(QBX.Shared.Vehicles[vehModel].name, {
+    local dialog = lib.inputDialog(vehicles[vehModel].name, {
         {
             type = 'number',
             label = Lang:t('menus.submit_ID'),
@@ -416,7 +417,7 @@ local function startTestDriveTimer(time, shop)
                     testDriveVeh = 0
                     inTestDrive = false
                     SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation.x, Config.Shops[shop].TestDriveReturnLocation.y, Config.Shops[shop].TestDriveReturnLocation.z, false, false, false, false)
-                    QBX.Functions.Notify(Lang:t('general.testdrive_complete'), 'success')
+                    exports.qbx_core:Notify(Lang:t('general.testdrive_complete'), 'success')
                 end
             DrawText2D(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), vec2(1.0, 0.93))
             end
@@ -582,7 +583,7 @@ end)
 --- @param args table
 RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
     if inTestDrive then
-        QBX.Functions.Notify(Lang:t('error.testdrive_alreadyin'), 'error')
+        exports.qbx_core:Notify(Lang:t('error.testdrive_alreadyin'), 'error')
         return
     end
 
@@ -592,7 +593,7 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
     local tempShop = insideShop
     local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, args.vehicle, Config.Shops[tempShop].TestDriveSpawn, 'TEST ' .. RandomNumber(3))
     testDriveVeh = netId
-    QBX.Functions.Notify(Lang:t('general.testdrive_timenoti'), Config.Shops[tempShop].TestDriveTimeLimit, 'inform')
+    exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), Config.Shops[tempShop].TestDriveTimeLimit, 'inform')
     startTestDriveTimer(Config.Shops[tempShop].TestDriveTimeLimit * 60, tempShop)
 end)
 
