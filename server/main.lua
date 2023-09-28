@@ -1,6 +1,6 @@
 -- Variables
 local financeTimer = {}
-local coreVehicles = exports.qbx_core:GetVehicles()
+local coreVehicles = exports.qbx_core:GetVehiclesByName()
 
 -- Handlers
 -- Store game time for player when they load
@@ -86,7 +86,7 @@ end
 
 -- Callbacks
 
-lib.callback.register('qb-vehicleshop:server:getVehicles', function(source)
+lib.callback.register('qb-vehicleshop:server:GetVehiclesByName', function(source)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end

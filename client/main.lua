@@ -1,7 +1,7 @@
 local testDriveVeh = 0
 local inTestDrive = false
 local insideShop = nil
-local coreVehicles = exports.qbx_core:GetVehicles()
+local coreVehicles = exports.qbx_core:GetVehiclesByName()
 
 ---@class VehicleFinanceClient
 ---@field vehiclePlate string
@@ -67,7 +67,7 @@ end
 
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
-    local vehicles = lib.callback.await('qb-vehicleshop:server:getVehicles')
+    local vehicles = lib.callback.await('qb-vehicleshop:server:GetVehiclesByName')
     local ownedVehicles = {}
 
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error') end
