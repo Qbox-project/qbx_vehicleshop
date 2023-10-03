@@ -27,7 +27,7 @@ end)
 -- Deduct stored game time from player on quit because we can't get citizenid
 AddEventHandler('playerDropped', function()
     local src = source
-    local license = exports.qbx_core:GetIdentifier(src, 'license2') or exports.qbx_core:GetIdentifier(src, 'license')
+    local license = GetPlayerIdentifierByType(src, 'license2') or GetPlayerIdentifierByType(src, 'license')
     if not license then return end
     local vehicles = FetchVehicleEntitiesByLicense(license)
     if not vehicles then return end
@@ -460,7 +460,7 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.playertoofar'), 'error')
     end
     local targetcid = target.PlayerData.citizenid
-    local targetlicense = exports.qbx_core:GetIdentifier(target.PlayerData.source, 'license')
+    local targetlicense = GetPlayerIdentifierByType(target.PlayerData.source, 'license')
     if not target then
         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.buyerinfo'), 'error')
     end
