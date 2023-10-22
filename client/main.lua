@@ -583,8 +583,8 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
 end)
 
 AddEventHandler('QBCore:Client:OnPlayerUnload', function()
-    for _, v in pairs(shopVehs) do
-        DeleteEntity(v)
+    for i = 1, #shopVehs do
+        DeleteEntity(shopVehs[i])
     end
     shopVehs = {}
 end)
