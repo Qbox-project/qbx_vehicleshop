@@ -563,7 +563,7 @@ local function init()
             for i = 1, #showroomVehicles do
                 local showroomVehicle = showroomVehicles[i]
                 local veh = createShowroomVehicle(showroomVehicle.defaultVehicle, showroomVehicle.coords)
-                table.insert(shopVehs, veh)
+                shopVehs[#shopVehs+1] = veh
                 if Config.UsingTarget then
                     createVehicleTarget(shopName, veh)
                 else
