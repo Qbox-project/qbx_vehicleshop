@@ -534,6 +534,8 @@ local function createShowroomVehicle(model, coords)
 end
 
 --- Initial function to set things up. Creating vehicleshops defined in the config and spawns the sellable vehicles
+local shopVehs = {}
+
 local function init()
     CreateThread(function()
         for name, shop in pairs(Config.Shops) do
@@ -561,6 +563,7 @@ local function init()
             for i = 1, #showroomVehicles do
                 local showroomVehicle = showroomVehicles[i]
                 local veh = createShowroomVehicle(showroomVehicle.defaultVehicle, showroomVehicle.coords)
+                table.insert(shopVehs, veh)
                 if Config.UsingTarget then
                     createVehicleTarget(shopName, veh)
                 else
@@ -577,6 +580,13 @@ AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     TriggerServerEvent('qb-vehicleshop:server:addPlayer', citizenid)
     TriggerServerEvent('qb-vehicleshop:server:checkFinance')
     init()
+end)
+
+AddEventHandler('QBCore:Client:OnPlayerUnload', function()
+    for _, v in pairs(shopVehs) do
+        DeleteEntity(v)
+    end
+    shopVehs = {}
 end)
 
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
@@ -615,7 +625,7 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local veh = createShowroomVehicle(data.toVehicle, dataClosestVehicle.coords)
 
     Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
-    
+
     if Config.UsingTarget then createVehicleTarget(shopName, veh) end
 end)
 
