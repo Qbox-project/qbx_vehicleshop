@@ -1,5 +1,5 @@
 Config = {}
-Config.UsingTarget = GetConvar('UseTarget', 'false') == 'true'
+Config.UseTarget = false
 Config.Commission = 0.10 -- Percent that goes to sales person from a full car sale 10%
 Config.EnableFinance = true -- allows financing new vehicles. Turning off does not affect already financed vehicles
 Config.EnableFreeUseBuy = true -- allows players to buy from NPC shops

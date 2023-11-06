@@ -564,7 +564,7 @@ local function init()
                 local showroomVehicle = showroomVehicles[i]
                 local veh = createShowroomVehicle(showroomVehicle.defaultVehicle, showroomVehicle.coords)
                 shopVehs[#shopVehs+1] = veh
-                if Config.UsingTarget then
+                if Config.UseTarget then
                     createVehicleTarget(shopName, veh)
                 else
                     createVehicleZone(shopName, showroomVehicle.coords)
@@ -626,7 +626,7 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
 
     Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
 
-    if Config.UsingTarget then createVehicleTarget(shopName, veh) end
+    if Config.UseTarget then createVehicleTarget(shopName, veh) end
 end)
 
 --- Buys the selected vehicle
