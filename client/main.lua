@@ -625,6 +625,7 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local veh = createShowroomVehicle(data.toVehicle, dataClosestVehicle.coords)
 
     Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
+    
     if Config.UseTarget then createVehicleTarget(shopName, veh) end
 end)
 
