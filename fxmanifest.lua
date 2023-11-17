@@ -7,27 +7,22 @@ version '1.0.0'
 
 shared_script {
     '@ox_lib/init.lua',
+    '@qbx_core/modules/utils.lua',
     '@qbx_core/shared/locale.lua',
-    '@qbx_core/import.lua',
-    'config.lua',
     'locales/en.lua',
-    'locales/*.lua'
+    'locales/*.lua',
+    'config.lua',
 }
 
 client_scripts {
-    'client/main.lua'
+    '@qbx_core/modules/playerdata.lua',
+    'client/main.lua',
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
     'server/storage.lua',
-}
-
-
-modules {
-    'qbx_core:playerdata',
-    'qbx_core:utils'
 }
 
 provide 'qb-vehicleshop'
