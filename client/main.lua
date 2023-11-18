@@ -23,7 +23,7 @@ local function financePayment(data)
     if not dialog then return end
 
     local paymentAmount = tonumber(dialog[1])
-    TriggerServerEvent('qb-vehicleshop:server:financePayment', paymentAmount, data)
+    TriggerServerEvent('qbx_vehicleshop:server:financePayment', paymentAmount, data)
 end
 
 ---@param data VehicleFinanceClient
@@ -31,7 +31,7 @@ local function showVehicleFinanceMenu(data)
     local vehFinance = {
         {
             title = Lang:t('menus.veh_finance_balance'),
-            description = Lang:t('menus.veh_finance_currency') .. CommaValue(data.balance)
+            description = Lang:t('menus.veh_finance_currency')..CommaValue(data.balance)
         },
         {
             title = Lang:t('menus.veh_finance_total'),
@@ -39,7 +39,7 @@ local function showVehicleFinanceMenu(data)
         },
         {
             title = Lang:t('menus.veh_finance_reccuring'),
-            description = Lang:t('menus.veh_finance_currency') .. CommaValue(data.paymentAmount)
+            description = Lang:t('menus.veh_finance_currency')..CommaValue(data.paymentAmount)
         },
         {
             title = Lang:t('menus.veh_finance_pay'),
@@ -49,7 +49,7 @@ local function showVehicleFinanceMenu(data)
         },
         {
             title = Lang:t('menus.veh_finance_payoff'),
-            serverEvent = 'qb-vehicleshop:server:financePaymentFull',
+            serverEvent = 'qbx_vehicleshop:server:financePaymentFull',
             args = {
                 vehBalance = data.balance,
                 vehPlate = data.vehiclePlate
@@ -69,7 +69,7 @@ end
 
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
-    local vehicles = lib.callback.await('qb-vehicleshop:server:GetVehiclesByName')
+    local vehicles = lib.callback.await('qbx_vehicleshop:server:GetVehiclesByName')
     local ownedVehicles = {}
 
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error') end
@@ -79,7 +79,7 @@ local function showFinancedVehiclesMenu()
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = name,
-                description = Lang:t('menus.veh_platetxt') .. plate,
+                description = Lang:t('menus.veh_platetxt')..plate,
                 icon = 'fa-solid fa-car-side',
                 arrow = true,
                 onSelect = function()
@@ -119,7 +119,7 @@ lib.registerContext({
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     local citizenid = QBX.PlayerData.citizenid
-    TriggerServerEvent('qb-vehicleshop:server:removePlayer', citizenid)
+    TriggerServerEvent('qbx_vehicleshop:server:removePlayer', citizenid)
 end)
 
 --- Fetches the name of a vehicle from QB Shared
@@ -164,14 +164,14 @@ end
 ---@param closestShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(closestShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(coreVehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
+    local dialog = lib.inputDialog(coreVehicles[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment') .. sharedConfig.finance.minimumDown .. '%',
+            label = Lang:t('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment') .. sharedConfig.finance.maximumPayments,
+            label = Lang:t('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
         }
     })
 
@@ -182,7 +182,7 @@ local function openFinance(closestShowroomVehicle, buyVehicle)
 
     if not downPayment or not paymentAmount then return end
 
-    TriggerServerEvent('qb-vehicleshop:server:financeVehicle', downPayment, paymentAmount, buyVehicle)
+    TriggerServerEvent('qbx_vehicleshop:server:financeVehicle', downPayment, paymentAmount, buyVehicle)
 end
 
 --- Opens a menu with list of vehicles based on given category
@@ -198,8 +198,8 @@ local function openVehCatsMenu(category)
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
-                            description = Lang:t('menus.veh_price') .. v.price,
-                            serverEvent = 'qb-vehicleshop:server:swapVehicle',
+                            description = Lang:t('menus.veh_price')..v.price,
+                            serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                             args = {
                                 toVehicle = v.model,
                                 ClosestVehicle = closestVehicle,
@@ -211,8 +211,8 @@ local function openVehCatsMenu(category)
             elseif config.vehicles[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
-                    description = Lang:t('menus.veh_price') .. v.price,
-                    serverEvent = 'qb-vehicleshop:server:swapVehicle',
+                    description = Lang:t('menus.veh_price')..v.price,
+                    serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                     args = {
                         toVehicle = v.model,
                         ClosestVehicle = closestVehicle,
@@ -261,14 +261,14 @@ local function openCustomFinance(closestVehicle)
     exports.scully_emotemenu:playEmoteByCommand('tablet2')
 
     local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
-    local dialog = lib.inputDialog(getVehBrand(closestVehicle):upper() .. ' ' .. vehicle:upper() .. ' - $' .. getVehPrice(closestVehicle), {
+    local dialog = lib.inputDialog(getVehBrand(closestVehicle):upper()..' '..vehicle:upper()..' - $'..getVehPrice(closestVehicle), {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment') .. sharedConfig.finance.minimumDown .. '%',
+            label = Lang:t('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment') .. sharedConfig.finance.maximumPayments,
+            label = Lang:t('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
         },
         {
             type = 'number',
@@ -285,7 +285,7 @@ local function openCustomFinance(closestVehicle)
     if not downPayment or not paymentAmount or not playerid then return end
 
     exports.scully_emotemenu:cancelEmote()
-    TriggerServerEvent('qb-vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount,
+    TriggerServerEvent('qbx_vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount,
         vehicle, playerid)
 end
 
@@ -310,13 +310,13 @@ end
 ---@param vehModel string
 local function startTestDrive(vehModel)
     local playerId = getPlayerIdInput(vehModel)
-    TriggerServerEvent('qb-vehicleshop:server:customTestDrive', vehModel, playerId)
+    TriggerServerEvent('qbx_vehicleshop:server:customTestDrive', vehModel, playerId)
 end
 
 ---@param vehModel string
 local function sellVehicle(vehModel)
     local playerId = getPlayerIdInput(vehModel)
-    TriggerServerEvent('qb-vehicleshop:server:sellShowroomVehicle', vehModel, playerId)
+    TriggerServerEvent('qbx_vehicleshop:server:sellShowroomVehicle', vehModel, playerId)
 end
 
 --- Opens the vehicle shop menu
@@ -334,7 +334,7 @@ local function openVehicleSellMenu()
             {
                 title = Lang:t('menus.test_header'),
                 description = Lang:t('menus.freeuse_test_txt'),
-                event = 'qb-vehicleshop:client:TestDrive',
+                event = 'qbx_vehicleshop:client:TestDrive',
                 args = {
                     vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
                 }
@@ -345,7 +345,7 @@ local function openVehicleSellMenu()
             options[#options + 1] = {
                 title = Lang:t('menus.freeuse_buy_header'),
                 description = Lang:t('menus.freeuse_buy_txt'),
-                serverEvent = 'qb-vehicleshop:server:buyShowroomVehicle',
+                serverEvent = 'qbx_vehicleshop:server:buyShowroomVehicle',
                 args = {
                     buyVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
                 }
@@ -396,7 +396,7 @@ local function openVehicleSellMenu()
 
     lib.registerContext({
         id = 'veh_menu',
-        title = getVehBrand(closestVehicle):upper() .. ' ' .. getVehName(closestVehicle):upper() .. ' - $' .. getVehPrice(closestVehicle),
+        title = getVehBrand(closestVehicle):upper()..' '..getVehName(closestVehicle):upper()..' - $'..getVehPrice(closestVehicle),
         options = options
     })
     lib.showContext('veh_menu')
@@ -415,13 +415,13 @@ local function startTestDriveTimer(time, shop)
             local secondsLeft = currentGameTime - gameTimer
             if currentGameTime < gameTimer + timeMs then
                 if secondsLeft >= timeMs - 50 then
-                    TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
+                    TriggerServerEvent('qbx_vehicleshop:server:deleteVehicle', testDriveVeh)
                     testDriveVeh = 0
                     inTestDrive = false
                     SetEntityCoords(cache.ped, config.shops[shop].testDriveReturnLocation.x, config.shops[shop].testDriveReturnLocation.y, config.shops[shop].testDriveReturnLocation.z, false, false, false, false)
                     exports.qbx_core:Notify(Lang:t('general.testdrive_complete'), 'success')
                 end
-            DrawText2D(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), vec2(1.0, 0.93))
+            DrawText2D(Lang:t('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), vec2(1.0, 0.93))
             end
             Wait(0)
         end
@@ -579,8 +579,8 @@ end
 --- Executes once player fully loads in
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     local citizenid = QBX.PlayerData.citizenid
-    TriggerServerEvent('qb-vehicleshop:server:addPlayer', citizenid)
-    TriggerServerEvent('qb-vehicleshop:server:checkFinance')
+    TriggerServerEvent('qbx_vehicleshop:server:addPlayer', citizenid)
+    TriggerServerEvent('qbx_vehicleshop:server:checkFinance')
     init()
 end)
 
@@ -593,7 +593,7 @@ end)
 
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
 --- @param args table
-RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
+RegisterNetEvent('qbx_vehicleshop:client:TestDrive', function(args)
     if inTestDrive then
         exports.qbx_core:Notify(Lang:t('error.testdrive_alreadyin'), 'error')
         return
@@ -603,7 +603,7 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
 
     inTestDrive = true
     local tempShop = insideShop
-    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, args.vehicle, config.shops[tempShop].testDriveSpawn, 'TEST ' .. RandomNumber(3))
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, config.shops[tempShop].testDriveSpawn, 'TEST '..RandomNumber(3))
     testDriveVeh = netId
     exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), config.shops[tempShop].testDriveTimeLimit, 'inform')
     startTestDriveTimer(config.shops[tempShop].testDriveTimeLimit * 60, tempShop)
@@ -611,7 +611,7 @@ end)
 
 --- Swaps the chosen vehicle with another one
 ---@param data {toVehicle: string, ClosestVehicle: integer, ClosestShop: string}
-RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
+RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
     local dataClosestVehicle = config.shops[shopName].showroomVehicles[data.ClosestVehicle]
     if dataClosestVehicle.chosenVehicle == data.toVehicle then return end
@@ -634,9 +634,9 @@ end)
 --- Buys the selected vehicle
 ---@param vehicle number
 ---@param plate string
-RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
+RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
     local tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate)
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate)
     local veh = NetToVeh(netId)
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
