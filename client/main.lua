@@ -1,3 +1,5 @@
+local config = require 'config.client'
+local sharedConfig = require 'config.shared'
 local testDriveVeh = 0
 local inTestDrive = false
 local insideShop = nil
@@ -78,7 +80,7 @@ local function showFinancedVehiclesMenu()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = name,
                 description = Lang:t('menus.veh_platetxt') .. plate,
-                icon = "fa-solid fa-car-side",
+                icon = 'fa-solid fa-car-side',
                 arrow = true,
                 onSelect = function()
                     showVehicleFinanceMenu({
@@ -124,21 +126,21 @@ end)
 ---@param closestVehicle integer
 ---@return string
 local function getVehName(closestVehicle)
-    return coreVehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].name
+    return coreVehicles[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].name
 end
 
 --- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@param closestVehicle integer
 ---@return string
 local function getVehPrice(closestVehicle)
-    return CommaValue(coreVehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].price)
+    return CommaValue(coreVehicles[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehBrand(closestVehicle)
-    return coreVehicles[Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle].brand
+    return coreVehicles[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].brand
 end
 
 --- based on which vehicleshop player is in
@@ -148,7 +150,7 @@ local function getClosestShowroomVehicle()
     local current = nil
     local dist = nil
     local closestShop = insideShop
-    local showroomVehicles = Config.Shops[closestShop].ShowroomVehicles
+    local showroomVehicles = config.shops[closestShop].showroomVehicles
     for id in pairs(showroomVehicles) do
         local dist2 = #(pos - showroomVehicles[id].coords.xyz)
         if not current or dist2 < dist then
@@ -165,11 +167,11 @@ local function openFinance(closestShowroomVehicle, buyVehicle)
     local dialog = lib.inputDialog(coreVehicles[buyVehicle].name:upper() .. ' ' .. buyVehicle:upper() .. ' - $' .. getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
+            label = Lang:t('menus.financesubmit_downpayment') .. sharedConfig.finance.minimumDown .. '%',
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment') .. Config.MaximumPayments,
+            label = Lang:t('menus.financesubmit_totalpayment') .. sharedConfig.finance.maximumPayments,
         }
     })
 
@@ -191,8 +193,8 @@ local function openVehCatsMenu(category)
 
     for k, v in pairs(coreVehicles) do
         if coreVehicles[k].category == category then
-            if type(Config.Vehicles[k].shop) == 'table' then
-                for _, shop in pairs(Config.Vehicles[k].shop) do
+            if type(config.vehicles[k].shop) == 'table' then
+                for _, shop in pairs(config.vehicles[k].shop) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
@@ -206,7 +208,7 @@ local function openVehCatsMenu(category)
                         }
                     end
                 end
-            elseif Config.Vehicles[k].shop == insideShop then
+            elseif config.vehicles[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
                     description = Lang:t('menus.veh_price') .. v.price,
@@ -234,7 +236,7 @@ end
 --- Opens a menu with list of vehicle categories
 local function openVehicleCategoryMenu()
     local categoryMenu = {}
-    for k, v in pairs(Config.Shops[insideShop].Categories) do
+    for k, v in pairs(config.shops[insideShop].categories) do
         categoryMenu[#categoryMenu + 1] = {
             title = v,
             arrow = true,
@@ -258,15 +260,15 @@ end
 local function openCustomFinance(closestVehicle)
     exports.scully_emotemenu:playEmoteByCommand('tablet2')
 
-    local vehicle = Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle
+    local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
     local dialog = lib.inputDialog(getVehBrand(closestVehicle):upper() .. ' ' .. vehicle:upper() .. ' - $' .. getVehPrice(closestVehicle), {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment') .. Config.MinimumDown .. '%',
+            label = Lang:t('menus.financesubmit_downpayment') .. sharedConfig.finance.minimumDown .. '%',
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment') .. Config.MaximumPayments,
+            label = Lang:t('menus.financesubmit_totalpayment') .. sharedConfig.finance.maximumPayments,
         },
         {
             type = 'number',
@@ -327,35 +329,35 @@ local function openVehicleSellMenu()
         onSelect = openVehicleCategoryMenu,
         arrow = true
     }
-    if Config.Shops[insideShop].Type == 'free-use' then
+    if config.shops[insideShop].type == 'free-use' then
         options = {
             {
                 title = Lang:t('menus.test_header'),
                 description = Lang:t('menus.freeuse_test_txt'),
                 event = 'qb-vehicleshop:client:TestDrive',
                 args = {
-                    vehicle = Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle
+                    vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
                 }
             }
         }
 
-        if Config.EnableFreeUseBuy then
+        if config.enableFreeUseBuy then
             options[#options + 1] = {
                 title = Lang:t('menus.freeuse_buy_header'),
                 description = Lang:t('menus.freeuse_buy_txt'),
                 serverEvent = 'qb-vehicleshop:server:buyShowroomVehicle',
                 args = {
-                    buyVehicle = Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle
+                    buyVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
                 }
             }
         end
 
-        if Config.EnableFinance then
+        if config.finance.enable then
             options[#options + 1] = {
                 title = Lang:t('menus.finance_header'),
                 description = Lang:t('menus.freeuse_finance_txt'),
                 onSelect = function()
-                    openFinance(closestVehicle, Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
+                    openFinance(closestVehicle, config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle)
                 end
             }
         end
@@ -367,19 +369,19 @@ local function openVehicleSellMenu()
                 title = Lang:t('menus.test_header'),
                 description = Lang:t('menus.managed_test_txt'),
                 onSelect = function()
-                    startTestDrive(Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
+                    startTestDrive(config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle)
                 end,
             },
             {
                 title = Lang:t('menus.managed_sell_header'),
                 description = Lang:t('menus.managed_sell_txt'),
                 onSelect = function()
-                    sellVehicle(Config.Shops[insideShop].ShowroomVehicles[closestVehicle].chosenVehicle)
+                    sellVehicle(config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle)
                 end,
             }
         }
 
-        if Config.EnableFinance then
+        if config.finance.enable then
             options[#options + 1] = {
                 title = Lang:t('menus.finance_header'),
                 description = Lang:t('menus.managed_finance_txt'),
@@ -416,7 +418,7 @@ local function startTestDriveTimer(time, shop)
                     TriggerServerEvent('qb-vehicleshop:server:deleteVehicle', testDriveVeh)
                     testDriveVeh = 0
                     inTestDrive = false
-                    SetEntityCoords(cache.ped, Config.Shops[shop].TestDriveReturnLocation.x, Config.Shops[shop].TestDriveReturnLocation.y, Config.Shops[shop].TestDriveReturnLocation.z, false, false, false, false)
+                    SetEntityCoords(cache.ped, config.shops[shop].testDriveReturnLocation.x, config.shops[shop].testDriveReturnLocation.y, config.shops[shop].testDriveReturnLocation.z, false, false, false, false)
                     exports.qbx_core:Notify(Lang:t('general.testdrive_complete'), 'success')
                 end
             DrawText2D(Lang:t('general.testdrive_timer') .. math.ceil(time - secondsLeft / 1000), vec2(1.0, 0.93))
@@ -428,7 +430,7 @@ end
 
 --- Zoning function. Happens upon entering any of the sell zone.
 local function enteringVehicleSellZone()
-    local job = Config.Shops[insideShop].Job
+    local job = config.shops[insideShop].job
     if not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then
         return
     end
@@ -438,7 +440,7 @@ end
 
 --- Zoning function. Happens once the player is inside of the zone
 local function insideVehicleSellZone()
-    local job = Config.Shops[insideShop].Job
+    local job = config.shops[insideShop].job
     if not IsControlJustPressed(0, 38) or not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then
         return
     end
@@ -449,13 +451,13 @@ end
 ---@param shopName string
 ---@param entity number vehicle
 local function createVehicleTarget(shopName, entity)
-    local shop = Config.Shops[shopName]
+    local shop = config.shops[shopName]
     exports.ox_target:addLocalEntity(entity, {
         {
             name = 'vehicleshop:showVehicleOptions',
-            icon = "fas fa-car",
+            icon = 'fas fa-car',
             label = Lang:t('general.vehinteraction'),
-            distance = shop.Zone.targetDistance,
+            distance = shop.zone.targetDistance,
             onSelect = function()
                 openVehicleSellMenu()
             end
@@ -466,12 +468,12 @@ end
 ---@param shopName string
 ---@param coords vector4
 local function createVehicleZone(shopName, coords)
-    local shop = Config.Shops[shopName]
+    local shop = config.shops[shopName]
     lib.zones.box({
         coords = coords.xyz,
-        size = shop.Zone.size,
+        size = shop.zone.size,
         rotation = coords.w,
-        debug = shop.Zone.debug,
+        debug = shop.zone.debug,
         onEnter = enteringVehicleSellZone,
         inside = insideVehicleSellZone,
         onExit = function()
@@ -499,18 +501,18 @@ local function createShop(shopShape, name)
         name = name,
         points = shopShape,
         thickness = 5,
-        debug = Config.Shops[name].Zone.debug,
+        debug = config.shops[name].zone.debug,
         onEnter = enterShop,
         onExit = exitShop
     })
 end
 
---- Entering Financing Zone
+--- Entering Financing zone
 local function enteringFinancingZone()
     lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
 end
 
---- Runs once a player inside the Financing Zone. It does a key press check to open the Financing menu
+--- Runs once a player inside the Financing zone. It does a key press check to open the Financing menu
 local function insideFinancingZone()
     if IsControlJustPressed(0, 38) then
         lib.showContext('fin_header_menu')
@@ -538,14 +540,14 @@ local shopVehs = {}
 
 local function init()
     CreateThread(function()
-        for name, shop in pairs(Config.Shops) do
-            createShop(shop.Zone.Shape, name)
+        for name, shop in pairs(config.shops) do
+            createShop(shop.zone.shape, name)
         end
     end)
 
     CreateThread(function()
         lib.zones.box({
-            coords = Config.FinanceZone,
+            coords = config.finance.zone,
             size = vec3(2, 2, 4),
             rotation = 0,
             debug = false,
@@ -558,13 +560,13 @@ local function init()
     end)
 
     CreateThread(function()
-        for shopName in pairs(Config.Shops) do
-            local showroomVehicles = Config.Shops[shopName].ShowroomVehicles
+        for shopName in pairs(config.shops) do
+            local showroomVehicles = config.shops[shopName].showroomVehicles
             for i = 1, #showroomVehicles do
                 local showroomVehicle = showroomVehicles[i]
                 local veh = createShowroomVehicle(showroomVehicle.defaultVehicle, showroomVehicle.coords)
                 shopVehs[#shopVehs+1] = veh
-                if Config.UseTarget then
+                if config.useTarget then
                     createVehicleTarget(shopName, veh)
                 else
                     createVehicleZone(shopName, showroomVehicle.coords)
@@ -601,17 +603,17 @@ RegisterNetEvent('qb-vehicleshop:client:TestDrive', function(args)
 
     inTestDrive = true
     local tempShop = insideShop
-    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, args.vehicle, Config.Shops[tempShop].TestDriveSpawn, 'TEST ' .. RandomNumber(3))
+    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, args.vehicle, config.shops[tempShop].testDriveSpawn, 'TEST ' .. RandomNumber(3))
     testDriveVeh = netId
-    exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), Config.Shops[tempShop].TestDriveTimeLimit, 'inform')
-    startTestDriveTimer(Config.Shops[tempShop].TestDriveTimeLimit * 60, tempShop)
+    exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), config.shops[tempShop].testDriveTimeLimit, 'inform')
+    startTestDriveTimer(config.shops[tempShop].testDriveTimeLimit * 60, tempShop)
 end)
 
 --- Swaps the chosen vehicle with another one
 ---@param data {toVehicle: string, ClosestVehicle: integer, ClosestShop: string}
 RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
-    local dataClosestVehicle = Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle]
+    local dataClosestVehicle = config.shops[shopName].showroomVehicles[data.ClosestVehicle]
     if dataClosestVehicle.chosenVehicle == data.toVehicle then return end
 
     local closestVehicle = lib.getClosestVehicle(dataClosestVehicle.coords.xyz, 5, false)
@@ -624,9 +626,9 @@ RegisterNetEvent('qb-vehicleshop:client:swapVehicle', function(data)
 
     local veh = createShowroomVehicle(data.toVehicle, dataClosestVehicle.coords)
 
-    Config.Shops[shopName].ShowroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
+    config.shops[shopName].showroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
 
-    if Config.UseTarget then createVehicleTarget(shopName, veh) end
+    if config.useTarget then createVehicleTarget(shopName, veh) end
 end)
 
 --- Buys the selected vehicle
@@ -634,25 +636,25 @@ end)
 ---@param plate string
 RegisterNetEvent('qb-vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
     local tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, vehicle, Config.Shops[tempShop].VehicleSpawn, plate)
+    local netId = lib.callback.await('qb-vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate)
     local veh = NetToVeh(netId)
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
-    TriggerServerEvent("qb-vehicletuning:server:SaveVehicleProps", props)
+    TriggerServerEvent('qb-vehicletuning:server:SaveVehicleProps', props)
 end)
 
 --- Thread to create blips
 CreateThread(function()
-    for _, v in pairs(Config.Shops) do
+    for _, v in pairs(config.shops) do
         if v.showBlip then
-            local dealer = AddBlipForCoord(v.Location.x, v.Location.y, v.Location.z)
+            local dealer = AddBlipForCoord(v.location.x, v.location.y, v.location.z)
             SetBlipSprite(dealer, v.blipSprite)
             SetBlipDisplay(dealer, 4)
             SetBlipScale(dealer, 0.70)
             SetBlipAsShortRange(dealer, true)
             SetBlipColour(dealer, v.blipColor)
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(v.ShopLabel)
+            AddTextComponentSubstringPlayerName(v.shopLabel)
             EndTextCommandSetBlipName(dealer)
         end
     end
