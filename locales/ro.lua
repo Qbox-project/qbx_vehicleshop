@@ -1,7 +1,3 @@
---[[
-Romanian base language translation for qb-vehicleshop
-Translation done by wanderrer (Martin Riggs#0807 on Discord)
-]]--
 local Translations = {
     error = {
         testdrive_alreadyin = "Testezi deja un vehicul",

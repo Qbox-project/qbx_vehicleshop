@@ -6,12 +6,12 @@ local coreVehicles = exports.qbx_core:GetVehiclesByName()
 
 -- Handlers
 -- Store game time for player when they load
-RegisterNetEvent('qb-vehicleshop:server:addPlayer', function(citizenid)
+RegisterNetEvent('qbx_vehicleshop:server:addPlayer', function(citizenid)
     financeTimer[citizenid] = os.time()
 end)
 
 -- Deduct stored game time from player on logout
-RegisterNetEvent('qb-vehicleshop:server:removePlayer', function(citizenid)
+RegisterNetEvent('qbx_vehicleshop:server:removePlayer', function(citizenid)
     if not financeTimer[citizenid] then return end
 
     local playTime = financeTimer[citizenid]
@@ -88,7 +88,7 @@ end
 
 -- Callbacks
 
-lib.callback.register('qb-vehicleshop:server:GetVehiclesByName', function(source)
+lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(source)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
@@ -98,7 +98,7 @@ lib.callback.register('qb-vehicleshop:server:GetVehiclesByName', function(source
     end
 end)
 
-lib.callback.register('qb-vehicleshop:server:spawnVehicle', function(source, model, coords, plate)
+lib.callback.register('qbx_vehicleshop:server:spawnVehicle', function(source, model, coords, plate)
     local netId = SpawnVehicle(source, model, coords, true)
     if not netId or netId == 0 then return end
     local veh = NetworkGetEntityFromNetworkId(netId)
@@ -113,19 +113,19 @@ end)
 
 -- Brute force vehicle deletion
 ---@param netId number
-RegisterNetEvent('qb-vehicleshop:server:deleteVehicle', function(netId)
+RegisterNetEvent('qbx_vehicleshop:server:deleteVehicle', function(netId)
     local vehicle = NetworkGetEntityFromNetworkId(netId)
     DeleteEntity(vehicle)
 end)
 
 -- Sync vehicle for other players
 ---@param data unknown
-RegisterNetEvent('qb-vehicleshop:server:swapVehicle', function(data)
-    TriggerClientEvent('qb-vehicleshop:client:swapVehicle', -1, data)
+RegisterNetEvent('qbx_vehicleshop:server:swapVehicle', function(data)
+    TriggerClientEvent('qbx_vehicleshop:client:swapVehicle', -1, data)
 end)
 
 -- Send customer for test drive
-RegisterNetEvent('qb-vehicleshop:server:customTestDrive', function(vehicle, playerId)
+RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, playerId)
     local src = source
     local target = tonumber(playerId) --[[@as number]]
     if not exports.qbx_core:GetPlayer(target) then
@@ -133,7 +133,7 @@ RegisterNetEvent('qb-vehicleshop:server:customTestDrive', function(vehicle, play
         return
     end
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target))) < 3 then
-        TriggerClientEvent('qb-vehicleshop:client:TestDrive', target, { vehicle = vehicle })
+        TriggerClientEvent('qbx_vehicleshop:client:TestDrive', target, { vehicle = vehicle })
     else
         exports.qbx_core:Notify(src, Lang:t('error.playertoofar'), 'error')
     end
@@ -174,7 +174,7 @@ local function removeMoney(src, amount)
 end
 
 -- Make a finance payment
-RegisterNetEvent('qb-vehicleshop:server:financePayment', function(paymentAmount, vehData)
+RegisterNetEvent('qbx_vehicleshop:server:financePayment', function(paymentAmount, vehData)
     local src = source
     local plate = vehData.vehiclePlate
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
@@ -188,7 +188,7 @@ RegisterNetEvent('qb-vehicleshop:server:financePayment', function(paymentAmount,
     end
 
     if paymentAmount < minPayment then
-        exports.qbx_core:Notify(src, Lang:t('error.minimumallowed') .. CommaValue(minPayment), 'error')
+        exports.qbx_core:Notify(src, Lang:t('error.minimumallowed')..CommaValue(minPayment), 'error')
         return
     end
 
@@ -204,7 +204,7 @@ end)
 
 
 -- Pay off vehice in full
-RegisterNetEvent('qb-vehicleshop:server:financePaymentFull', function(data)
+RegisterNetEvent('qbx_vehicleshop:server:financePaymentFull', function(data)
     local src = source
     local vehBalance = data.vehBalance
     local vehPlate = data.vehPlate
@@ -225,7 +225,7 @@ RegisterNetEvent('qb-vehicleshop:server:financePaymentFull', function(data)
 end)
 
 -- Buy public vehicle outright
-RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
+RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     vehicle = vehicle.buyVehicle
@@ -245,12 +245,12 @@ RegisterNetEvent('qb-vehicleshop:server:buyShowroomVehicle', function(vehicle)
         plate = plate,
     })
     exports.qbx_core:Notify(src, Lang:t('success.purchased'), 'success')
-    TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
+    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
     player.Functions.RemoveMoney(currencyType, vehiclePrice, 'vehicle-bought-in-showroom')
 end)
 
 -- Finance public vehicle
-RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
+RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     local vehiclePrice = coreVehicles[vehicle].price
@@ -294,7 +294,7 @@ RegisterNetEvent('qb-vehicleshop:server:financeVehicle', function(downPayment, p
         }
     })
     exports.qbx_core:Notify(src, Lang:t('success.purchased'), 'success')
-    TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
+    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
     player.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 end)
 
@@ -323,7 +323,7 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
 end
 
 -- Sell vehicle to customer
-RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, playerid)
+RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, playerid)
     local src = source
     local target = exports.qbx_core:GetPlayer(tonumber(playerid))
 
@@ -349,11 +349,11 @@ RegisterNetEvent('qb-vehicleshop:server:sellShowroomVehicle', function(data, pla
         plate = plate
     })
 
-    TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
+    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
 end)
 
 -- Finance vehicle to customer
-RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPayment, paymentAmount, vehicle, playerid)
+RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayment, paymentAmount, vehicle, playerid)
     local src = source
     local target = exports.qbx_core:GetPlayer(tonumber(playerid))
 
@@ -402,11 +402,11 @@ RegisterNetEvent('qb-vehicleshop:server:sellfinanceVehicle', function(downPaymen
         }
     })
 
-    TriggerClientEvent('qb-vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
+    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
 end)
 
 -- Check if payment is due
-RegisterNetEvent('qb-vehicleshop:server:checkFinance', function()
+RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     local result = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
@@ -482,7 +482,7 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
     UpdateVehicleEntityOwner(targetcid, targetlicense, plate)
     player.Functions.AddMoney(currencyType, sellAmount)
     target.Functions.RemoveMoney(currencyType, sellAmount)
-    exports.qbx_core:Notify(src, Lang:t('success.soldfor') .. CommaValue(sellAmount), 'success')
+    exports.qbx_core:Notify(src, Lang:t('success.soldfor')..CommaValue(sellAmount), 'success')
     TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
-    exports.qbx_core:Notify(buyerId, Lang:t('success.boughtfor') .. CommaValue(sellAmount), 'success')
+    exports.qbx_core:Notify(buyerId, Lang:t('success.boughtfor')..CommaValue(sellAmount), 'success')
 end)
