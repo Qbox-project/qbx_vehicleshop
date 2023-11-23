@@ -1,9 +1,9 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
+local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local testDriveVeh = 0
 local inTestDrive = false
 local insideShop = nil
-local coreVehicles = exports.qbx_core:GetVehiclesByName()
 
 ---@class VehicleFinanceClient
 ---@field vehiclePlate string
@@ -75,7 +75,7 @@ local function showFinancedVehiclesMenu()
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error') end
     for _, v in pairs(vehicles) do
         if v.balance ~= 0 then
-            local name = coreVehicles[v.vehicle].name
+            local name = VEHICLES[v.vehicle].name
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = name,
@@ -126,21 +126,21 @@ end)
 ---@param closestVehicle integer
 ---@return string
 local function getVehName(closestVehicle)
-    return coreVehicles[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].name
+    return VEHICLES[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].name
 end
 
 --- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@param closestVehicle integer
 ---@return string
 local function getVehPrice(closestVehicle)
-    return CommaValue(coreVehicles[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].price)
+    return CommaValue(VEHICLES[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehBrand(closestVehicle)
-    return coreVehicles[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].brand
+    return VEHICLES[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].brand
 end
 
 --- based on which vehicleshop player is in
@@ -164,7 +164,7 @@ end
 ---@param closestShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(closestShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(coreVehicles[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(closestShowroomVehicle), {
+    local dialog = lib.inputDialog(VEHICLES[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
             label = Lang:t('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
@@ -191,8 +191,8 @@ local function openVehCatsMenu(category)
     local vehMenu = {}
     local closestVehicle = getClosestShowroomVehicle()
 
-    for k, v in pairs(coreVehicles) do
-        if coreVehicles[k].category == category then
+    for k, v in pairs(VEHICLES) do
+        if VEHICLES[k].category == category then
             if type(config.vehicles[k].shop) == 'table' then
                 for _, shop in pairs(config.vehicles[k].shop) do
                     if shop == insideShop then
@@ -285,15 +285,14 @@ local function openCustomFinance(closestVehicle)
     if not downPayment or not paymentAmount or not playerid then return end
 
     exports.scully_emotemenu:cancelEmote()
-    TriggerServerEvent('qbx_vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount,
-        vehicle, playerid)
+    TriggerServerEvent('qbx_vehicleshop:server:sellfinanceVehicle', downPayment, paymentAmount, vehicle, playerid)
 end
 
 ---prompt client for playerId of another player
 ---@param vehModel string
 ---@return number? playerId
 local function getPlayerIdInput(vehModel)
-    local dialog = lib.inputDialog(coreVehicles[vehModel].name, {
+    local dialog = lib.inputDialog(VEHICLES[vehModel].name, {
         {
             type = 'number',
             label = Lang:t('menus.submit_ID'),
@@ -428,26 +427,6 @@ local function startTestDriveTimer(time, shop)
     end)
 end
 
---- Zoning function. Happens upon entering any of the sell zone.
-local function enteringVehicleSellZone()
-    local job = config.shops[insideShop].job
-    if not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then
-        return
-    end
-
-    lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
-end
-
---- Zoning function. Happens once the player is inside of the zone
-local function insideVehicleSellZone()
-    local job = config.shops[insideShop].job
-    if not IsControlJustPressed(0, 38) or not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then
-        return
-    end
-
-    openVehicleSellMenu()
-end
-
 ---@param shopName string
 ---@param entity number vehicle
 local function createVehicleTarget(shopName, entity)
@@ -473,24 +452,21 @@ local function createVehicleZone(shopName, coords)
         coords = coords.xyz,
         size = shop.zone.size,
         rotation = coords.w,
-        debug = shop.zone.debug,
-        onEnter = enteringVehicleSellZone,
-        inside = insideVehicleSellZone,
+        debug = config.debugPoly,
+        onEnter = function()
+            local job = config.shops[insideShop].job
+            if not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then return end
+            lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
+        end,
+        inside = function()
+            local job = config.shops[insideShop].job
+            if not IsControlJustPressed(0, 38) or not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then return end
+            openVehicleSellMenu()
+        end,
         onExit = function()
             lib.hideTextUI()
         end
     })
-end
-
---- Entering a vehicleshop zone
----@param self table
-local function enterShop(self)
-    insideShop = self.name
-end
-
---- Exiting a vehicleshop zone
-local function exitShop()
-    insideShop = nil
 end
 
 --- Creates a shop
@@ -501,22 +477,14 @@ local function createShop(shopShape, name)
         name = name,
         points = shopShape,
         thickness = 5,
-        debug = config.shops[name].zone.debug,
-        onEnter = enterShop,
-        onExit = exitShop
+        debug = config.debugPoly,
+        onEnter = function(self)
+            insideShop = self.name
+        end,
+        onExit = function()
+            insideShop = nil
+        end,
     })
-end
-
---- Entering Financing zone
-local function enteringFinancingZone()
-    lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
-end
-
---- Runs once a player inside the Financing zone. It does a key press check to open the Financing menu
-local function insideFinancingZone()
-    if IsControlJustPressed(0, 38) then
-        lib.showContext('fin_header_menu')
-    end
 end
 
 ---@param model string
@@ -550,9 +518,15 @@ local function init()
             coords = config.finance.zone,
             size = vec3(2, 2, 4),
             rotation = 0,
-            debug = false,
-            onEnter = enteringFinancingZone,
-            inside = insideFinancingZone,
+            debug = config.debugPoly,
+            onEnter = function()
+                lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
+            end,
+            inside = function()
+                if IsControlJustPressed(0, 38) then
+                    lib.showContext('fin_header_menu')
+                end
+            end,
             onExit = function()
                 lib.hideTextUI()
             end
@@ -646,15 +620,15 @@ end)
 --- Thread to create blips
 CreateThread(function()
     for _, v in pairs(config.shops) do
-        if v.showBlip then
-            local dealer = AddBlipForCoord(v.location.x, v.location.y, v.location.z)
-            SetBlipSprite(dealer, v.blipSprite)
+        if v.blip.show then
+            local dealer = AddBlipForCoord(v.blip.coords.x, v.blip.coords.y, v.blip.coords.z)
+            SetBlipSprite(dealer, v.blip.sprite)
             SetBlipDisplay(dealer, 4)
             SetBlipScale(dealer, 0.70)
             SetBlipAsShortRange(dealer, true)
-            SetBlipColour(dealer, v.blipColor)
+            SetBlipColour(dealer, v.blip.color)
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(v.shopLabel)
+            AddTextComponentSubstringPlayerName(v.blip.label)
             EndTextCommandSetBlipName(dealer)
         end
     end
