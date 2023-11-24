@@ -455,7 +455,7 @@ local function createVehicleZone(shopName, coords)
         debug = config.debugPoly,
         onEnter = function()
             local job = config.shops[insideShop].job
-            if not QBX.PlayerData or not QBX.PlayerData.job or (QBX.PlayerData.job.name ~= job and job ~= 'none') then return end
+            if QBX.PlayerData.job.name ~= job then return end
             lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
         end,
         inside = function()
