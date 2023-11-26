@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-description 'Vehicleshop for Qbox'
+description 'qbx_vehicleshop'
 repository 'https://github.com/Qbox-project/qbx_vehicleshop'
 version '1.0.0'
 
