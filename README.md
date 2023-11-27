@@ -53,15 +53,6 @@
 
 ![image](https://user-images.githubusercontent.com/57848836/138771627-faed7fcb-73c8-4b77-a33f-fffbb738ab03.png)
 
-### Dependencies:
-
-**[PolyZone](https://github.com/qbcore-framework/PolyZone)**
-
-* You need to create new PolyZones if you want to create a new dealership or move default locations to another area. After you create the new PolyZones, add them to the config.shops > [Shape]
-
-* Here's a Wiki on how to create new PolyZone:
-https://github.com/mkafrin/PolyZone/wiki/Using-the-creation-script
-
 # License notice
 Due to unfortunate events, we had to remove the commit history of this repository. closed-source code was introduced of which the original copyright holder hadn't given anyone permission to share and was illegally obtained. This doesn't mean that the original contributors lost their copyright rights and still are copyright holders. This includes but is not limited to.
 - legende11 | masonschafercodes | GhzGarage | Newtonzz | TheiLLeniumStudios | IdrisDose | r0adra93 | uShifty | Holidayy95 | erikmeyer08 | OlliePugh | roobr | gutsoo | Re1ease | TonybynMp4 | mjvanhaastert | Dwohakin | trclassic92 | ARSSANTO | TheiLLeniumStudios | BerkieBb | adweex | DannysRP | mNm-server | arsh939 | AbrahamMoody | buddizer | Z3rio | wanderrer | vosscat | LouieBandz514 | NoobySloth | merpindia | Belorico | Dhawgy | Sna-aaa | Brusein | PlanovskyJus | CptAllen | Evantually | amantu-qbit | MonkeyWhisper | Mobius1 | Demo4889 | DanteRedrum | steveski | DOSE-420 | nzkfc | izMystic | Aveeux
