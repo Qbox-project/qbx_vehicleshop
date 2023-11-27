@@ -126,21 +126,24 @@ end)
 ---@param closestVehicle integer
 ---@return string
 local function getVehName(closestVehicle)
-    return VEHICLES[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].name
+    local chosenVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
+    return VEHICLES[chosenVehicle].name
 end
 
 --- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@param closestVehicle integer
 ---@return string
 local function getVehPrice(closestVehicle)
-    return CommaValue(VEHICLES[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].price)
+    local chosenVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
+    return CommaValue(VEHICLES[chosenVehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehBrand(closestVehicle)
-    return VEHICLES[config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle].brand
+    local chosenVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
+    return VEHICLES[chosenVehicle].brand
 end
 
 --- based on which vehicleshop player is in
@@ -322,6 +325,7 @@ end
 local function openVehicleSellMenu()
     local closestVehicle = getClosestShowroomVehicle()
     local options
+    local chosenVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
     local swapOption = {
         title = Lang:t('menus.swap_header'),
         description = Lang:t('menus.swap_txt'),
@@ -335,7 +339,7 @@ local function openVehicleSellMenu()
                 description = Lang:t('menus.freeuse_test_txt'),
                 event = 'qbx_vehicleshop:client:testDrive',
                 args = {
-                    vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
+                    vehicle = chosenVehicle
                 }
             }
         }
@@ -346,7 +350,7 @@ local function openVehicleSellMenu()
                 description = Lang:t('menus.freeuse_buy_txt'),
                 serverEvent = 'qbx_vehicleshop:server:buyShowroomVehicle',
                 args = {
-                    buyVehicle = config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle
+                    buyVehicle = chosenVehicle
                 }
             }
         end
@@ -356,7 +360,7 @@ local function openVehicleSellMenu()
                 title = Lang:t('menus.finance_header'),
                 description = Lang:t('menus.freeuse_finance_txt'),
                 onSelect = function()
-                    openFinance(closestVehicle, config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle)
+                    openFinance(closestVehicle, chosenVehicle)
                 end
             }
         end
@@ -368,14 +372,14 @@ local function openVehicleSellMenu()
                 title = Lang:t('menus.test_header'),
                 description = Lang:t('menus.managed_test_txt'),
                 onSelect = function()
-                    startTestDrive(config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle)
+                    startTestDrive(chosenVehicle)
                 end,
             },
             {
                 title = Lang:t('menus.managed_sell_header'),
                 description = Lang:t('menus.managed_sell_txt'),
                 onSelect = function()
-                    sellVehicle(config.shops[insideShop].showroomVehicles[closestVehicle].chosenVehicle)
+                    sellVehicle(chosenVehicle)
                 end,
             }
         }
@@ -417,7 +421,8 @@ local function startTestDriveTimer(time, shop)
                     TriggerServerEvent('qbx_vehicleshop:server:deleteVehicle', testDriveVeh)
                     testDriveVeh = 0
                     inTestDrive = false
-                    SetEntityCoords(cache.ped, config.shops[shop].testDrive.returnCoords.x, config.shops[shop].testDrive.returnCoords.y, config.shops[shop].testDrive.returnCoords.z, false, false, false, false)
+                    local returnCoords = config.shops[shop].testDrive.returnCoords
+                    SetEntityCoords(cache.ped, returnCoords.x, returnCoords.y, returnCoords.z, false, false, false, false)
                     exports.qbx_core:Notify(Lang:t('general.testdrive_complete'), 'success')
                 end
             DrawText2D(Lang:t('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), vec2(1.0, 0.93))
@@ -576,10 +581,11 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
     if not args then return end
 
     inTestDrive = true
-    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, config.shops[insideShop].testDrive.spawnCoords, 'TEST '..RandomNumber(3))
+    local testDrive = config.shops[insideShop].testDrive
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, testDrive.spawnCoords, 'TEST '..RandomNumber(3))
     testDriveVeh = netId
-    exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), config.shops[insideShop].testDrive.limit, 'inform')
-    startTestDriveTimer(config.shops[insideShop].testDrive.limit * 60, insideShop)
+    exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), testDrive.limit, 'inform')
+    startTestDriveTimer(testDrive.limit * 60, insideShop)
 end)
 
 --- Swaps the chosen vehicle with another one
@@ -599,7 +605,7 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
 
     local veh = createShowroomVehicle(data.toVehicle, dataClosestVehicle.coords)
 
-    config.shops[shopName].showroomVehicles[data.ClosestVehicle].chosenVehicle = data.toVehicle
+    dataClosestVehicle.chosenVehicle = data.toVehicle
 
     if config.useTarget then createVehicleTarget(shopName, veh) end
 end)
