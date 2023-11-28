@@ -10,11 +10,56 @@ return {
     },
 
     shops = {
-        pdm = {
-            type = 'free-use', -- no player interaction is required to purchase a car
-            job = 'none', -- Name of job or none
+        --[[shop = { -- Needs to be unique
+            type = '', -- If 'free-use', no player-to-player interaction required to purchase. If 'managed', caresalesman required for purchase
+            job = '', -- If shop is 'free-use', remove this option. If shop is 'managed', put required job
             zone = {
-                shape = { --polygon that surrounds the shop
+                shape = { -- Polygon that surrounds the shop
+                    vec3(0.0, 0.0, 0.0),
+                    vec3(0.0, 0.0, 0.0),
+                    vec3(0.0, 0.0, 0.0),
+                    vec3(0.0, 0.0, 0.0),
+                },
+                size = vec3(0.0, 0.0, 0.0), -- Size of the vehicles zones (x, y, z)
+                targetDistance = 1, -- Defines targeting distance. Only works if useTarget is enabled
+            },
+            blip = {
+                label = '', -- Blip label
+                coords = vec3(0.0, 0.0, 0.0), -- Blip coordinates
+                show = true, -- Enables/disables the blip being shown
+                sprite = 0, -- Blip sprite
+                color = 0, -- Blip color
+            },
+            categories = { -- Categories available to browse
+                sedans = 'Sedans',
+                coupes = 'Coupes',
+                suvs = 'SUVs',
+                offroad = 'Offroad',
+            },
+            testDrive = {
+                limit = 0.0, -- Time in minutes allotted for the test drive
+                spawnCoords = vec4(0.0, 0.0, 0.0, 0.0), -- Spawn location for the test drive
+                returnCoords = vec4(0.0, 0.0, 0.0, 0.0), -- Return location if test drive is finished early
+            },
+            returnLocation = vec3(0.0, -1082.58, 26.68), -- Location to return vehicle only if the vehicleshop is managed
+            vehicleSpawn = vec4(0.0, 0.0, 0.0, 0.0), -- Spawn location when vehicle is purchased
+            showroomVehicles = {
+                [1] = {
+                    coords = vec4(0.0, 0.0, 0.0, 0.0), -- where the vehicle will spawn on display
+                    defaultVehicle = '', -- Model name of default display vehicle
+                    chosenVehicle = '', -- Same as default but is dynamically changed when swapping vehicles
+                },
+                [2] = {
+                    coords = vec4(0.0, 0.0, 0.0, 0.0), -- where the vehicle will spawn on display
+                    defaultVehicle = '', -- Model name of default display vehicle
+                    chosenVehicle = '', -- Same as default but is dynamically changed when swapping vehicles
+                },
+            },
+        },]]--
+        pdm = {
+            type = 'free-use',
+            zone = {
+                shape = {
                     vec3(-56.727394104004, -1086.2325439453, 26.0),
                     vec3(-60.612808227539, -1096.7795410156, 26.0),
                     vec3(-58.26834487915, -1100.572265625, 26.0),
@@ -24,8 +69,8 @@ return {
                     vec3(-33.342102050781, -1101.0377197266, 26.0),
                     vec3(-31.292987823486, -1095.3717041016, 26.0)
                 },
-                size = vec3(3, 3, 4), -- size of the vehicles zones (x, y, z)
-                targetDistance = 1, -- Defines targeting distance. Only works if targeting is enabled
+                size = vec3(3, 3, 4),
+                targetDistance = 1,
             },
             blip = {
                 label = 'Premium Deluxe Motorsport',
@@ -34,7 +79,7 @@ return {
                 sprite = 326,
                 color = 3,
             },
-            categories = { -- Categories available to browse
+            categories = {
                 sportsclassics = 'Sports Classics',
                 sedans = 'Sedans',
                 coupes = 'Coupes',
@@ -46,16 +91,18 @@ return {
                 vans = 'Vans',
                 cycles = 'Bicycles'
             },
-            testDriveTimeLimit = 0.5, -- Time in minutes until the vehicle gets deleted
-            testDriveReturnLocation = vec4(-24.84, -1086.55, 26.57, 70.5), -- Return position once test drive is finished
-            returnLocation = vec3(-44.74, -1082.58, 26.68), -- location to return vehicle, only enables if the vehicleshop has a job owned
-            vehicleSpawn = vec4(-31.69, -1090.78, 26.42, 328.79), -- Spawn location when vehicle is bought
-            testDriveSpawn = vec4(-7.84, -1081.35, 26.67, 121.83), -- Spawn location for test drive
+            testDrive = {
+                limit = 0.5,
+                spawnCoords = vec4(-7.84, -1081.35, 26.67, 121.83),
+                returnCoords = vec4(-24.84, -1086.55, 26.57, 70.5),
+            },
+            returnLocation = vec3(-44.74, -1082.58, 26.68),
+            vehicleSpawn = vec4(-31.69, -1090.78, 26.42, 328.79),
             showroomVehicles = {
                 [1] = {
-                    coords = vec4(-45.65, -1093.66, 25.44, 69.5), -- where the vehicle will spawn on display
-                    defaultVehicle = 'adder', -- Default display vehicle
-                    chosenVehicle = 'adder', -- Same as default but is dynamically changed when swapping vehicles
+                    coords = vec4(-45.65, -1093.66, 25.44, 69.5),
+                    defaultVehicle = 'adder',
+                    chosenVehicle = 'adder',
                 },
                 [2] = {
                     coords = vec4(-48.27, -1101.86, 25.44, 294.5),
@@ -96,8 +143,8 @@ return {
         },
 
         luxury = {
-            type = 'managed', -- meaning a real player has to sell the car
-            job = 'cardealer', -- Name of job or none
+            type = 'managed',
+            job = 'cardealer',
             zone = {
                 shape = {
                     vec3(-1260.6973876953, -349.21334838867, 36.91),
@@ -110,8 +157,8 @@ return {
                     vec3(-1249.8704833984, -352.03326416016, 36.91),
                     vec3(-1252.9503173828, -345.85726928711, 36.91)
                 },
-                size = vec3(3, 3, 4), -- size of the vehicles zones (x, y, z)
-                targetDistance = 1, -- Defines targeting distance. Only works if targeting is enabled
+                size = vec3(3, 3, 4),
+                targetDistance = 1,
             },
             blip = {
                 label = 'Luxury Vehicle Shop',
@@ -124,11 +171,13 @@ return {
                 super = 'Super',
                 sports = 'Sports'
             },
-            testDriveTimeLimit = 0.5,
-            testDriveReturnLocation = vec4(-1261.56, -347.54, 36.83, 216.22), -- Return position once test drive is finished. Set to front of the shop by default
+            testDrive = {
+                limit = 0.5,
+                spawnCoords = vec4(-1232.81, -347.99, 37.33, 23.28),
+                returnCoords = vec4(-1261.56, -347.54, 36.83, 216.22),
+            },
             returnLocation = vec3(-1231.46, -349.86, 37.33),
             vehicleSpawn = vec4(-1231.46, -349.86, 37.33, 26.61),
-            testDriveSpawn = vec4(-1232.81, -347.99, 37.33, 23.28), -- Spawn location for test drive
             showroomVehicles = {
                 [1] = {
                     coords = vec4(-1265.31, -354.44, 35.91, 205.08),
@@ -164,17 +213,16 @@ return {
         },
 
         boats = {
-            type = 'free-use', -- no player interaction is required to purchase a vehicle
-            job = 'none', -- Name of job or none
+            type = 'free-use',
             zone = {
-                shape = {--polygon that surrounds the shop
+                shape = {
                     vec3(-729.39, -1315.84, 0),
                     vec3(-766.81, -1360.11, 0),
                     vec3(-754.21, -1371.49, 0),
                     vec3(-716.94, -1326.88, 0)
                 },
-                size = vec3(8, 8, 6), -- size of the vehicles zones (x, y, z)
-                targetDistance = 5, -- Defines targeting distance. Only works if targeting is enabled
+                size = vec3(8, 8, 6),
+                targetDistance = 5,
             },
             blip = {
                 label = 'Marina Shop',
@@ -183,19 +231,21 @@ return {
                 sprite = 410,
                 color = 3,
             },
-            categories = {-- Categories available to browse
+            categories = {
                 boats = 'Boats'
             },
-            testDriveTimeLimit = 1.5, -- Time in minutes until the vehicle gets deleted
-            testDriveReturnLocation = vec4(-733.19, -1313.45, 5.0, 226.37), -- Return position once test drive is finished. Set to front of the shop by default
-            returnLocation = vec3(-714.34, -1343.31, 0.0), -- location to return vehicle, only enables if the vehicleshop has a job owned
-            vehicleSpawn = vec4(-727.87, -1353.1, -0.17, 137.09), -- Spawn location when vehicle is bought
-            testDriveSpawn = vec4(-722.23, -1351.98, 0.14, 135.33), -- Spawn location for test drive
+            testDrive = {
+                limit = 1.5,
+                spawnCoords = vec4(-722.23, -1351.98, 0.14, 135.33),
+                returnCoords = vec4(-733.19, -1313.45, 5.0, 226.37),
+            },
+            returnLocation = vec3(-714.34, -1343.31, 0.0),
+            vehicleSpawn = vec4(-727.87, -1353.1, -0.17, 137.09),
             showroomVehicles = {
                 [1] = {
-                    coords = vec4(-727.05, -1326.59, -0.50, 229.5), -- where the vehicle will spawn on display
-                    defaultVehicle = 'seashark', -- Default display vehicle
-                    chosenVehicle = 'seashark' -- Same as default but is dynamically changed when swapping vehicles
+                    coords = vec4(-727.05, -1326.59, -0.50, 229.5),
+                    defaultVehicle = 'seashark',
+                    chosenVehicle = 'seashark'
                 },
                 [2] = {
                     coords = vec4(-732.84, -1333.5, -0.50, 229.5),
@@ -216,17 +266,16 @@ return {
         },
 
         air = {
-            type = 'free-use', -- no player interaction is required to purchase a vehicle
-            job = 'none', -- Name of job or none
+            type = 'free-use',
             zone = {
-                shape = {--polygon that surrounds the shop
+                shape = {
                     vec3(-1607.58, -3141.7, 12.99),
                     vec3(-1672.54, -3103.87, 12.99),
                     vec3(-1703.49, -3158.02, 12.99),
                     vec3(-1646.03, -3190.84, 12.99)
                 },
-                size = vec3(10, 10, 8), -- size of the vehicles zones (x, y, z)
-                targetDistance = 5, -- Defines targeting distance. Only works if targeting is enabled
+                size = vec3(10, 10, 8),
+                targetDistance = 5,
             },
             blip = {
                 label = 'Air Shop',
@@ -235,20 +284,22 @@ return {
                 sprite = 251,
                 color = 3,
             },
-            categories = {-- Categories available to browse
+            categories = {
                 helicopters = 'Helicopters',
                 planes = 'Planes'
             },
-            testDriveTimeLimit = 1.5, -- Time in minutes until the vehicle gets deleted
-            testDriveReturnLocation = vec4(-1639.39, -3120.24, 13.94, 148.31), -- Return position once test drive is finished. Set to front of the shop by default
-            returnLocation = vec3(-1628.44, -3104.7, 13.94), -- location to return vehicle, only enables if the vehicleshop has a job owned
-            vehicleSpawn = vec4(-1617.49, -3086.17, 13.94, 329.2), -- Spawn location when vehicle is bought
-            testDriveSpawn = vec4(-1625.19, -3103.47, 13.94, 330.28), -- Spawn location for test drive
+            testDrive = {
+                limit = 1.5,
+                spawnCoords = vec4(-1625.19, -3103.47, 13.94, 330.28),
+                returnCoords = vec4(-1639.39, -3120.24, 13.94, 148.31),
+            },
+            returnLocation = vec3(-1628.44, -3104.7, 13.94),
+            vehicleSpawn = vec4(-1617.49, -3086.17, 13.94, 329.2),
             showroomVehicles = {
                 [1] = {
-                    coords = vec4(-1651.36, -3162.66, 12.99, 346.89), -- where the vehicle will spawn on display
-                    defaultVehicle = 'volatus', -- Default display vehicle
-                    chosenVehicle = 'volatus' -- Same as default but is dynamically changed when swapping vehicles
+                    coords = vec4(-1651.36, -3162.66, 12.99, 346.89),
+                    defaultVehicle = 'volatus',
+                    chosenVehicle = 'volatus'
                 },
                 [2] = {
                     coords = vec4(-1668.53, -3152.56, 12.99, 303.22),
@@ -297,13 +348,13 @@ return {
         issi3 = {
             shop = 'pdm',
         },
-        issi4 = {							--DLC
+        issi4 = {
             shop = 'pdm',
         },
-        issi5 = {							--DLC
+        issi5 = {
             shop = 'pdm',
         },
-        issi6 = {							--DLC
+        issi6 = {
             shop = 'pdm',
         },
         panto = {
@@ -321,6 +372,7 @@ return {
         weevil = {
             shop = 'pdm',
         },
+
         --- Coupes
         cogcabrio = {
             shop = 'pdm',
@@ -364,18 +416,19 @@ return {
         zion2 = {
             shop = 'pdm',
         },
-        previon = {			--DLC +set sv_enforceGameBuild 2372
+        previon = {
             shop = 'pdm',
         },
-        champion = {		--DLC +set sv_enforceGameBuild 2545
+        champion = {
             shop = 'pdm',
         },
-        ignus = { 	 	--DLC +set sv_enforceGameBuild 2545
+        ignus = {
             shop = 'pdm',
         },
-        zeno = { 	 	--DLC +set sv_enforceGameBuild 2545
+        zeno = {
             shop = 'pdm',
         },
+
         --- Cycles
         bmx = {
             shop = 'pdm',
@@ -398,6 +451,7 @@ return {
         tribike3 = {
             shop = 'pdm',
         },
+
         --- Motorcycles
         akuma = {
             shop = 'pdm',
@@ -435,13 +489,13 @@ return {
         defiler = {
             shop = 'pdm',
         },
-        deathbike = {							--DLC
+        deathbike = {
             shop = 'pdm',
         },
-        deathbike2 = {							--DLC
+        deathbike2 = {
             shop = 'pdm',
         },
-        deathbike3 = {							--DLC
+        deathbike3 = {
             shop = 'pdm',
         },
         diablous = {
@@ -555,12 +609,13 @@ return {
         manchez2 = {
             shop = 'pdm',
         },
-        shinobi = {		--DLC +set sv_enforceGameBuild 2545
+        shinobi = {
             shop = 'pdm',
         },
-        reever = {		--DLC +set sv_enforceGameBuild 2545
+        reever = {
             shop = 'pdm',
         },
+
         --- Muscle
         blade = {
             shop = 'pdm',
@@ -577,13 +632,13 @@ return {
         chino2 = {
             shop = 'pdm',
         },
-        clique = {							--DLC
+        clique = {
             shop = 'pdm',
         },
         coquette3 = {
             shop = 'pdm',
         },
-        deviant = {							--DLC
+        deviant = {
             shop = 'pdm',
         },
         dominator = {
@@ -595,13 +650,13 @@ return {
         dominator3 = {
             shop = 'pdm',
         },
-        dominator4 = {							--DLC
+        dominator4 = {
             shop = 'pdm',
         },
-        dominator7 = {							--DLC +set sv_enforceGameBuild 2372
+        dominator7 = {
             shop = 'pdm',
         },
-        dominator8 = {							--DLC +set sv_enforceGameBuild 2372
+        dominator8 = {
             shop = 'pdm',
         },
         dukes = {
@@ -631,10 +686,10 @@ return {
         gauntlet2 = {
             shop = 'pdm',
         },
-        gauntlet3 = {							--DLC
+        gauntlet3 = {
             shop = 'pdm',
         },
-        gauntlet4 = {							--DLC
+        gauntlet4 = {
             shop = 'pdm',
         },
         gauntlet5 = {
@@ -649,25 +704,25 @@ return {
         hustler = {
             shop = 'pdm',
         },
-        impaler = {							--DLC
+        impaler = {
             shop = 'pdm',
         },
-        impaler2 = {							--DLC
+        impaler2 = {
             shop = 'pdm',
         },
-        impaler3 = {							--DLC
+        impaler3 = {
             shop = 'pdm',
         },
-        impaler4 = {							--DLC
+        impaler4 = {
             shop = 'pdm',
         },
-        imperator = {							--DLC
+        imperator = {
             shop = 'pdm',
         },
-        imperator2 = {							--DLC
+        imperator2 = {
             shop = 'pdm',
         },
-        imperator3 = {							--DLC
+        imperator3 = {
             shop = 'pdm',
         },
         lurcher = {
@@ -682,7 +737,7 @@ return {
         nightshade = {
             shop = 'pdm',
         },
-        peyote2 = {							--DLC
+        peyote2 = {
             shop = 'pdm',
         },
         phoenix = {
@@ -724,10 +779,10 @@ return {
         tampa = {
             shop = 'pdm',
         },
-        tulip = {							--DLC
+        tulip = {
             shop = 'pdm',
         },
-        vamos = {							--DLC
+        vamos = {
             shop = 'pdm',
         },
         vigero = {
@@ -754,9 +809,10 @@ return {
         yosemite3 = {
             shop = 'pdm',
         },
-        buffalo4 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        buffalo4 = {
             shop = 'pdm',
         },
+
         --- Off-Road
         bfinjection = {
             shop = 'pdm',
@@ -785,7 +841,7 @@ return {
         caracara = {
             shop = 'pdm',
         },
-        caracara2 = {							--DLC
+        caracara2 = {
             shop = 'pdm',
         },
         dubsta3 = {
@@ -797,10 +853,10 @@ return {
         everon = {
             shop = 'pdm',
         },
-        freecrawler = {							--DLC
+        freecrawler = {
             shop = 'pdm',
         },
-        hellion = {							--DLC
+        hellion = {
             shop = 'pdm',
         },
         kalahari = {
@@ -845,6 +901,7 @@ return {
         winky = {
             shop = 'pdm',
         },
+
         --- SUVs
         baller = {
             shop = 'pdm',
@@ -906,7 +963,7 @@ return {
         mesa = {
             shop = 'pdm',
         },
-        novak = {							--DLC
+        novak = {
             shop = 'pdm',
         },
         patriot = {
@@ -930,15 +987,16 @@ return {
         serrano = {
             shop = 'pdm',
         },
-        toros = {							--DLC
+        toros = {
             shop = 'pdm',
         },
         xls = {
             shop = 'pdm',
         },
-        granger2 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        granger2 = {
             shop = 'pdm',
         },
+
         --- Sedans
         asea = {
             shop = 'pdm',
@@ -982,7 +1040,7 @@ return {
         regina = {
             shop = 'pdm',
         },
-        stafford = {							--DLC
+        stafford = {
             shop = 'pdm',
         },
         stanier = {
@@ -1009,33 +1067,34 @@ return {
         washington = {
             shop = 'pdm',
         },
-        tailgater2 = {							--DLC +set sv_enforceGameBuild 2372
+        tailgater2 = {
             shop = 'pdm',
         },
-        cinquemila = { 	 	--DLC +set sv_enforceGameBuild 2545
+        cinquemila = {
             shop = 'pdm',
         },
-        iwagen = { 	 	--DLC +set sv_enforceGameBuild 2545
+        iwagen = {
             shop = 'pdm',
         },
-        astron = { 	 	--DLC +set sv_enforceGameBuild 2545
+        astron = {
             shop = 'pdm',
         },
-        baller7 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        baller7 = {
             shop = 'pdm',
         },
-        comet7 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        comet7 = {
             shop = 'pdm',
         },
-        deity = { 	 	--DLC +set sv_enforceGameBuild 2545
+        deity = {
             shop = 'pdm',
         },
-        jubilee = { 	 	--DLC +set sv_enforceGameBuild 2545
+        jubilee = {
             shop = 'pdm',
         },
-        patriot3 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        patriot3 = {
             shop = 'pdm',
         },
+
         --- Sports
         alpha = {
             shop = 'luxury',
@@ -1082,13 +1141,13 @@ return {
         coquette4 = {
             shop = 'luxury',
         },
-        drafter = {							--DLC
+        drafter = {
             shop = 'luxury',
         },
-        deveste = {							--DLC
+        deveste = {
             shop = 'luxury',
         },
-        elegy = {							--DLC
+        elegy = {
             shop = 'luxury',
         },
         elegy2 = {
@@ -1115,13 +1174,13 @@ return {
         imorgon = {
             shop = 'luxury',
         },
-        issi7 = {							--DLC
+        issi7 = {
             shop = 'pdm',
         },
-        italigto = {							--DLC
+        italigto = {
             shop = 'luxury',
         },
-        jugular = {							--DLC
+        jugular = {
             shop = 'luxury',
         },
         jester = {
@@ -1142,7 +1201,7 @@ return {
         kuruma2 = {
             shop = 'luxury',
         },
-        locust = {							--DLC
+        locust = {
             shop = 'luxury',
         },
         lynx = {
@@ -1154,10 +1213,10 @@ return {
         massacro2 = {
             shop = 'luxury',
         },
-        neo = {							--DLC
+        neo = {
             shop = 'luxury',
         },
-        neon = {							--DLC
+        neon = {
             shop = 'luxury',
         },
         ninef = {
@@ -1169,7 +1228,7 @@ return {
         omnis = {
             shop = 'luxury',
         },
-        paragon = {							--DLC
+        paragon = {
             shop = 'luxury',
         },
         pariah = {
@@ -1205,7 +1264,7 @@ return {
         schafter4 = {
             shop = 'luxury',
         },
-        schlagen = {							--DLC
+        schlagen = {
             shop = 'luxury',
         },
         schwarzer = {
@@ -1250,47 +1309,48 @@ return {
         italirsx = {
             shop = 'luxury',
         },
-        zr350 = {							--DLC +set sv_enforceGameBuild 2372
+        zr350 = {
             shop = 'luxury',
         },
-        calico = {							--DLC +set sv_enforceGameBuild 2372
+        calico = {
             shop = 'luxury',
         },
-        futo2 = {							--DLC +set sv_enforceGameBuild 2372
+        futo2 = {
             shop = 'luxury',
         },
-        euros = {							--DLC +set sv_enforceGameBuild 2372
+        euros = {
             shop = 'luxury',
         },
-        jester4 = {							--DLC +set sv_enforceGameBuild 2372
+        jester4 = {
             shop = 'luxury',
         },
-        remus = {							--DLC +set sv_enforceGameBuild 2372
+        remus = {
             shop = 'luxury',
         },
-        comet6 = {							--DLC +set sv_enforceGameBuild 2372
+        comet6 = {
             shop = 'luxury',
         },
-        growler = {							--DLC +set sv_enforceGameBuild 2372
+        growler = {
             shop = 'luxury',
         },
-        vectre = {							--DLC +set sv_enforceGameBuild 2372
+        vectre = {
             shop = 'luxury',
         },
-        cypher = {							--DLC +set sv_enforceGameBuild 2372
+        cypher = {
             shop = 'luxury',
         },
-        sultan3 = {							--DLC +set sv_enforceGameBuild 2372
+        sultan3 = {
             shop = 'luxury',
         },
-        rt3000 = {							--DLC +set sv_enforceGameBuild 2372
+        rt3000 = {
             shop = 'luxury',
         },
+
         --- Sports Classic
         ardent = {
             shop = 'pdm',
         },
-        btype = {              --meme car that goes pretty fast
+        btype = {
             shop = 'pdm',
         },
         btype2 = {
@@ -1308,13 +1368,13 @@ return {
         deluxo = {
             shop = 'pdm',
         },
-        dynasty = {							--DLC
+        dynasty = {
             shop = 'pdm',
         },
         fagaloa = {
             shop = 'pdm',
         },
-        feltzer3 = {							--DLC
+        feltzer3 = {
             shop = 'pdm',
         },
         gt500 = {
@@ -1344,7 +1404,7 @@ return {
         monroe = {
             shop = 'pdm',
         },
-        nebula = {							--DLC
+        nebula = {
             shop = 'pdm',
         },
         peyote = {
@@ -1377,7 +1437,7 @@ return {
         stromberg = {
             shop = 'pdm',
         },
-        swinger = {							--DLC
+        swinger = {
             shop = 'pdm',
         },
         torero = {
@@ -1404,7 +1464,7 @@ return {
         ztype = {
             shop = 'pdm',
         },
-        zion3 = {							--DLC
+        zion3 = {
             shop = 'pdm',
         },
         cheburek = {
@@ -1413,6 +1473,7 @@ return {
         toreador = {
             shop = 'pdm',
         },
+
         --- Super
         adder = {
             shop = 'luxury',
@@ -1429,7 +1490,7 @@ return {
         cheetah = {
             shop = 'luxury',
         },
-        cyclone = {         --might be too overpowered
+        cyclone = {
             shop = 'luxury',
         },
         entity2 = {
@@ -1438,7 +1499,7 @@ return {
         entityxf = {
             shop = 'luxury',
         },
-        emerus = {							--DLC
+        emerus = {
             shop = 'luxury',
         },
         fmj = {
@@ -1459,7 +1520,7 @@ return {
         italigtb2 = {
             shop = 'luxury',
         },
-        krieger = {							--DLC
+        krieger = {
             shop = 'luxury',
         },
         le7b = {
@@ -1486,13 +1547,13 @@ return {
         reaper = {
             shop = 'luxury',
         },
-        s80 = {							--DLC
+        s80 = {
             shop = 'luxury',
         },
         sc1 = {
             shop = 'luxury',
         },
-        sheava = {							--DLC
+        sheava = {
             shop = 'luxury',
         },
         sultanrs = {
@@ -1510,7 +1571,7 @@ return {
         tezeract = {
             shop = 'luxury',
         },
-        thrax = {							--DLC
+        thrax = {
             shop = 'luxury',
         },
         tigon = {
@@ -1546,10 +1607,11 @@ return {
         zentorno = {
             shop = 'luxury',
         },
-        zorrusso = {							--DLC
+        zorrusso = {
             shop = 'luxury',
         },
-        -- Vans
+
+        --- Vans
         bison = {
             shop = 'pdm',
         },
@@ -1598,13 +1660,14 @@ return {
         youga2 = {
             shop = 'pdm',
         },
-        youga4 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        youga4 = {
             shop = 'pdm',
         },
-        mule5 = { 	 	--DLC +set sv_enforceGameBuild 2545
+        mule5 = {
             shop = 'pdm',
         },
-        -- Utility
+
+        --- Utility
         sadler = {
             shop = 'pdm',
         },
@@ -1614,10 +1677,11 @@ return {
         slamtruck = {
             shop = 'pdm',
         },
-        warrener2 = {							--DLC +set sv_enforceGameBuild 2372
+        warrener2 = {
             shop = 'pdm',
         },
-            -- Boats
+
+        --- Boats
         squalo = {
             shop = 'boats',
         },
@@ -1672,7 +1736,8 @@ return {
         toro2 = {
             shop = 'boats',
         },
-        -- helicopters
+
+        --- Helicopters
         buzzard2 = {
             shop = 'air',
         },
@@ -1712,7 +1777,8 @@ return {
         havok = {
             shop = 'air',
         },
-        -- Planes
+
+        --- Planes
         duster = {
             shop = 'air',
         },
@@ -1752,7 +1818,7 @@ return {
         nimbus = {
             shop = 'air',
         },
-        brioso3 = {          --DLC +set sv_enforceGameBuild 2699 (and below)
+        brioso3 = {
             shop = 'pdm',
         },
         conada = {
