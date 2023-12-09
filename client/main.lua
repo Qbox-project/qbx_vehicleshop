@@ -196,8 +196,8 @@ local function openVehCatsMenu(category)
 
     for k, v in pairs(VEHICLES) do
         if VEHICLES[k].category == category then
-            if type(config.vehicles[k].shop) == 'table' then
-                for _, shop in pairs(config.vehicles[k].shop) do
+            if type(VEHICLES[k].shop) == 'table' then
+                for _, shop in pairs(VEHICLES[k].shop) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
@@ -211,7 +211,7 @@ local function openVehCatsMenu(category)
                         }
                     end
                 end
-            elseif config.vehicles[k].shop == insideShop then
+            elseif VEHICLES[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
                     description = Lang:t('menus.veh_price')..v.price,
