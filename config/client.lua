@@ -89,7 +89,7 @@ return {
                 cycles = 'Bicycles'
             },
             testDrive = {
-                limit = 0.2,
+                limit = 5.0,
                 spawn = vec4(-7.84, -1081.35, 26.67, 121.83),
             },
             returnLocation = vec3(-44.74, -1082.58, 26.68),
