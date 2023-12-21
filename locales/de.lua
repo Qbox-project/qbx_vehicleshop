@@ -75,7 +75,8 @@ local Translations = {
         paymentduein = "Your vehicle payment is due within %{time} minutes",
         command_transfervehicle = "Gift or sell your vehicle",
         command_transfervehicle_help = "ID of buyer",
-        command_transfervehicle_amount = "Sell amount (optionnal)",
+        command_transfervehicle_amount = "Sell amount (optional)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     }
 }
 

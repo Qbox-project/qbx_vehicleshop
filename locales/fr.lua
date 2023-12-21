@@ -77,6 +77,7 @@ local Translations = {
         command_transfervehicle = "Donner / Vendre véhicule",
         command_transfervehicle_help = "ID du joueur",
         command_transfervehicle_amount = "Montant de vente (optionnel)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     },
 }
 

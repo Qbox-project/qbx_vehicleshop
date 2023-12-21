@@ -77,6 +77,7 @@ local Translations = {
         command_transfervehicle = "Ofera cadou sau vine vehiculul",
         command_transfervehicle_help = "ID-ul cumparatorului",
         command_transfervehicle_amount = "Suma de plata (optionnal)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     }
 }
 
