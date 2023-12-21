@@ -20,6 +20,7 @@ local Translations = {
         nofinanced = "Nu ai niciun vehicul cumparat in leasing",
         financed = "Acest vehicul este inca in leasing",
         buyerdeclined = "The player declined the transaction",
+        sale_timeout = "Wait a while before trading your vehicle",
     },
     success = {
         purchased = "Felicitari pentru achizitie!",

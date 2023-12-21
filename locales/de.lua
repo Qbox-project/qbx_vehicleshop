@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "The buyer doesn\'t have enough money",
         nofinanced = "You don't have any financed vehicles",
         buyerdeclined = "The player declined the transaction",
+        sale_timeout = "Wait a while before trading your vehicle",
     },
     success = {
         purchased = "Congratulations on your purchase!",

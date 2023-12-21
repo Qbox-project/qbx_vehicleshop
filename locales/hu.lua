@@ -20,6 +20,7 @@ local Translations = {
         nofinanced = "Nincsen hitelezett járműved",
         financed = "Ez a jármű hitelezett",
         buyerdeclined = "The player declined the transaction",
+        sale_timeout = "Wait a while before trading your vehicle",
     },
     success = {
         purchased = "Gratulálunk a vásárláshoz!",

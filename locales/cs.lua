@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "Kupujuci nema dostatek financi",
         nofinanced = "Nemas zadne vozidlo na splatky",
         buyerdeclined = "The player declined the transaction",
+        sale_timeout = "Wait a while before trading your vehicle",
     },
     success = {
         purchased = "Gratulujeme k vyberu! At slouzi!",
