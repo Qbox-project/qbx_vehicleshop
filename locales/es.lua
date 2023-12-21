@@ -77,6 +77,7 @@ local Translations = {
         command_transfervehicle = "Regalar o vender tu vehículo",
         command_transfervehicle_help = "ID del comprador",
         command_transfervehicle_amount = "Monto de venta (opcional)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     }
 }
 

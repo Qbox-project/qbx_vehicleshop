@@ -76,6 +76,7 @@ local Translations = {
         command_transfervehicle = "Daruj nebo prodej vozidlo",
         command_transfervehicle_help = "ID kupujiciho",
         command_transfervehicle_amount = "Prodejni castka (Na tobe)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     }
 }
 

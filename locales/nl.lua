@@ -77,6 +77,7 @@ local Translations = {
         command_transfervehicle = "Verkoop/Geef je voertuig weg",
         command_transfervehicle_help = "ID van koper",
         command_transfervehicle_amount = "Verkoop bedrag (optioneel)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     }
 }
 

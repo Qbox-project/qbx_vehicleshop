@@ -79,6 +79,7 @@ local Translations = {
         command_transfervehicle = "Jármű eladása vagy elajándékozása",
         command_transfervehicle_help = "Vásárló idéglenes aktív személyiszáma (ID)",
         command_transfervehicle_amount = "Eladási ár (opcionális)",
+        transfervehicle_confirm = "Confirm trade of %s %s for $ %s",
     }
 }
 
