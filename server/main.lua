@@ -469,7 +469,7 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
         return exports.qbx_core:Notify(src, Lang:t('error.buyerinfo'), 'error')
     end
     lib.callback('qbx_vehicleshop:client:confirmTrade', buyerId, function(approved)
-        if not approved then 
+        if not approved then
             exports.qbx_core:Notify(src, Lang:t('error.buyerdeclined'), 'error')
             return
         end
