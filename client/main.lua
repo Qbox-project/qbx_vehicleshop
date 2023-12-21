@@ -620,7 +620,7 @@ end)
 
 lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
     local input = lib.inputDialog((Lang:t('general.transfervehicle_confirm')):format(VEHICLES_HASH[vehicle].brand,VEHICLES_HASH[vehicle].name, CommaValue(sellAmount) or 0),{
-        { 
+        {
             type = 'checkbox',
             label = 'Confirm'
         },
