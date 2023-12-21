@@ -3,6 +3,7 @@ local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 local financeTimer = {}
 local coreVehicles = exports.qbx_core:GetVehiclesByName()
+local saleTimeout = {}
 
 -- Handlers
 -- Store game time for player when they load
@@ -430,6 +431,9 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
     local src = source
     local buyerId = args.id
     local sellAmount = args.amount or 0
+    if saleTimeout[src] then
+        return exports.qbx_core:Notify(src, Lang:t('error.sale_timeout'), 'error')
+    end
     if buyerId == 0 then
         return exports.qbx_core:Notify(src, Lang:t('error.Invalid_ID'), 'error')
     end
@@ -468,6 +472,12 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
     if not target then
         return exports.qbx_core:Notify(src, Lang:t('error.buyerinfo'), 'error')
     end
+
+    saleTimeout[src] = true
+    SetTimeout(config.saleTimeout, function()
+        saleTimeout[src] = false
+    end)
+
     lib.callback('qbx_vehicleshop:client:confirmTrade', buyerId, function(approved)
         if not approved then
             exports.qbx_core:Notify(src, Lang:t('error.buyerdeclined'), 'error')

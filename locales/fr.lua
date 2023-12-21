@@ -20,6 +20,7 @@ local Translations = {
         nofinanced = "Vous n\'avez aucun véhicule financés",
         financed = "Ce véhicule est financé",
         buyerdeclined = "The player declined the transaction",
+        sale_timeout = "Wait a while before trading your vehicle",
 },
     success = {
         purchased = "Félicitations sur votre achat!",
