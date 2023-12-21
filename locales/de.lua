@@ -18,6 +18,7 @@ local Translations = {
         notown = "You don\'t own this vehicle",
         buyertoopoor = "The buyer doesn\'t have enough money",
         nofinanced = "You don't have any financed vehicles",
+        buyerdeclined = "The player declined the transaction",
     },
     success = {
         purchased = "Congratulations on your purchase!",

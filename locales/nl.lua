@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "De koper heeft onvoldoende saldo",
         nofinanced = "Je hebt geen gefinancierde voertuigen",
         financed = "Dit voertuig is gefinancierd",
+        buyerdeclined = "The player declined the transaction",
     },
     success = {
         purchased = "Gefeliciteerd met je nieuwe voertuig!",

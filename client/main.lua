@@ -1,6 +1,7 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
+local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
 local inTestDrive = false
 local insideShop = nil
@@ -615,6 +616,17 @@ RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, 
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
     TriggerServerEvent('qb-vehicletuning:server:SaveVehicleProps', props)
+end)
+
+lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
+    local input = lib.inputDialog(('Confirm trade of %s %s for $ %s'):format(VEHICLES_HASH[vehicle].brand,VEHICLES_HASH[vehicle].name, CommaValue(sellAmount) or 0),{
+        { 
+            type = 'checkbox',
+            label = 'Confirm'
+        },
+    })
+    if not input then return false end
+    if input[1] == true then return true end
 end)
 
 --- Thread to create blips
