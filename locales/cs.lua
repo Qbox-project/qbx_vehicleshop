@@ -18,6 +18,7 @@ local Translations = {
         notown = "Nevlastnis toto vozidlo",
         buyertoopoor = "Kupujuci nema dostatek financi",
         nofinanced = "Nemas zadne vozidlo na splatky",
+        buyerdeclined = "The player declined the transaction",
     },
     success = {
         purchased = "Gratulujeme k vyberu! At slouzi!",

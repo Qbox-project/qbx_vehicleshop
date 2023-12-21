@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "A vásárlónak nem áll rendelkezésre elegendő fizető eszköze",
         nofinanced = "Nincsen hitelezett járműved",
         financed = "Ez a jármű hitelezett",
+        buyerdeclined = "The player declined the transaction",
     },
     success = {
         purchased = "Gratulálunk a vásárláshoz!",

@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "Cumparatorul nu are suficienti bani!",
         nofinanced = "Nu ai niciun vehicul cumparat in leasing",
         financed = "Acest vehicul este inca in leasing",
+        buyerdeclined = "The player declined the transaction",
     },
     success = {
         purchased = "Felicitari pentru achizitie!",

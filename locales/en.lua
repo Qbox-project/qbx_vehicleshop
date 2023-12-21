@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "The buyer doesn\'t have enough money",
         nofinanced = "You don't have any financed vehicles",
         financed = "This vehicle is financed",
+        buyerdeclined = "The player declined the transaction",
     },
     success = {
         purchased = "Congratulations on your purchase!",
@@ -77,7 +78,7 @@ local Translations = {
         paymentduein = "Your vehicle payment is due within %{time} minutes",
         command_transfervehicle = "Gift or sell your vehicle",
         command_transfervehicle_help = "ID of buyer",
-        command_transfervehicle_amount = "Sell amount (optionnal)",
+        command_transfervehicle_amount = "Sell amount (optional)",
     }
 }
 

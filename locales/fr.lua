@@ -19,6 +19,7 @@ local Translations = {
         buyertoopoor = "L\'acheteur n'a pas assez d'argent",
         nofinanced = "Vous n\'avez aucun véhicule financés",
         financed = "Ce véhicule est financé",
+        buyerdeclined = "The player declined the transaction",
 },
     success = {
         purchased = "Félicitations sur votre achat!",

@@ -424,10 +424,12 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
 end)
 
 -- Transfer vehicle to player in passenger seat
-lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicle'), params = {{name = 'id', type = 'playerId', help = Lang:t('general.command_transfervehicle_help')}, {name = 'amount', type = 'number', help = Lang:t('general.command_transfervehicle_amount')}}}, function(source, args)
+lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicle'), params = {
+    {name = 'id', type = 'playerId', help = Lang:t('general.command_transfervehicle_help')},
+    {name = 'amount', type = 'number', help = Lang:t('general.command_transfervehicle_amount'), optional = true}}}, function(source, args)
     local src = source
     local buyerId = args.id
-    local sellAmount = args.amount
+    local sellAmount = args.amount or 0
     if buyerId == 0 then
         return exports.qbx_core:Notify(src, Lang:t('error.Invalid_ID'), 'error')
     end
@@ -466,23 +468,24 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
     if not target then
         return exports.qbx_core:Notify(src, Lang:t('error.buyerinfo'), 'error')
     end
-    if not sellAmount then
+    lib.callback('qbx_vehicleshop:client:confirmTrade', buyerId, function(approved)
+        if not approved then 
+            exports.qbx_core:Notify(src, Lang:t('error.buyerdeclined'), 'error')
+            return
+        end
+        if sellAmount > 0 then
+            local currencyType = findChargeableCurrencyType(sellAmount, target.PlayerData.money.cash, target.PlayerData.money.bank)
+            if not currencyType then
+                return exports.qbx_core:Notify(src, Lang:t('error.buyertoopoor'), 'error')
+            end
+            player.Functions.AddMoney(currencyType, sellAmount)
+            target.Functions.RemoveMoney(currencyType, sellAmount)
+        end
         UpdateVehicleEntityOwner(targetcid, targetlicense, plate)
-        exports.qbx_core:Notify(src, Lang:t('success.gifted'), 'success')
         TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
-        exports.qbx_core:Notify(buyerId, Lang:t('success.received_gift'), 'success')
-        return
-    end
-
-    local currencyType = findChargeableCurrencyType(sellAmount, target.PlayerData.money.cash, target.PlayerData.money.bank)
-    if not currencyType then
-        return exports.qbx_core:Notify(src, Lang:t('error.buyertoopoor'), 'error')
-    end
-
-    UpdateVehicleEntityOwner(targetcid, targetlicense, plate)
-    player.Functions.AddMoney(currencyType, sellAmount)
-    target.Functions.RemoveMoney(currencyType, sellAmount)
-    exports.qbx_core:Notify(src, Lang:t('success.soldfor')..CommaValue(sellAmount), 'success')
-    TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
-    exports.qbx_core:Notify(buyerId, Lang:t('success.boughtfor')..CommaValue(sellAmount), 'success')
+        local sellerMessage = sellAmount > 0 and Lang:t('success.soldfor') .. CommaValue(sellAmount) or Lang:t('success.gifted')
+        local buyerMessage = sellAmount > 0 and Lang:t('success.boughtfor') .. CommaValue(sellAmount) or Lang:t('success.received_gift')
+        exports.qbx_core:Notify(src, sellerMessage, 'success')
+        exports.qbx_core:Notify(buyerId, buyerMessage, 'success')
+    end, GetEntityModel(vehicle), sellAmount)
 end)
