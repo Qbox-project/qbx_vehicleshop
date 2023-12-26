@@ -204,7 +204,7 @@ local function openVehCatsMenu(category)
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
-                            description = Lang:t('menus.veh_price')..v.price,
+                            description = Lang:t('menus.veh_price')..lib.math.groupdigits(v.price),
                             serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                             args = {
                                 toVehicle = v.model,
@@ -217,7 +217,7 @@ local function openVehCatsMenu(category)
             elseif config.vehicles[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
-                    description = Lang:t('menus.veh_price')..v.price,
+                    description = Lang:t('menus.veh_price')..lib.math.groupdigits(v.price),
                     serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                     args = {
                         toVehicle = v.model,
