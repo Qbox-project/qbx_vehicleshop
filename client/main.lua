@@ -199,7 +199,9 @@ local function openVehCatsMenu(category)
 
     for k, v in pairs(VEHICLES) do
         if VEHICLES[k].category == category then
-            if type(config.vehicles[k].shop) == 'table' then
+            if config.vehicles[k] == nil then
+                lib.print.debug('Vehicle not found in config.vehicles. Skipping: '..k)
+            elseif type(config.vehicles[k].shop) == 'table' then
                 for _, shop in pairs(config.vehicles[k].shop) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
