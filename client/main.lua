@@ -231,7 +231,7 @@ local function openVehCatsMenu(category)
 
     lib.registerContext({
         id = 'openVehCats',
-        title = Lang:t('menus.categories_header'),
+        title = config.shops[insideShop].categories[category],
         menu = 'vehicleCategories',
         options = vehMenu
     })
