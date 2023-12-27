@@ -2,7 +2,8 @@ return {
     useTarget = false,
     debugPoly = false,
     enableFreeUseBuy = true, -- Allows players to buy from NPC shops
-
+    requestModelTimeout = 5000, -- load model timeout for oxlib
+    
     finance = {
         enable = true, -- Enables the financing system. Turning this off does not affect already financed vehicles
         commissionRate = 0.05, -- Percent that goes to sales person from a finance sale 5%
