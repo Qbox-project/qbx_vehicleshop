@@ -373,13 +373,6 @@ local function openVehicleSellMenu()
     else
         options = {
             {
-                title = Lang:t('menus.test_header'),
-                description = Lang:t('menus.managed_test_txt'),
-                onSelect = function()
-                    startTestDrive(vehicle)
-                end,
-            },
-            {
                 title = Lang:t('menus.managed_sell_header'),
                 description = Lang:t('menus.managed_sell_txt'),
                 onSelect = function()
@@ -388,6 +381,16 @@ local function openVehicleSellMenu()
             }
         }
 
+        if config.enableTestDrive then
+            options[#options + 1] = {
+                title = Lang:t('menus.test_header'),
+                description = Lang:t('menus.managed_test_txt'),
+                onSelect = function()
+                    startTestDrive(vehicle)
+                end
+            }
+        end
+        
         if config.finance.enable then
             options[#options + 1] = {
                 title = Lang:t('menus.finance_header'),
