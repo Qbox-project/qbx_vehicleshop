@@ -516,23 +516,27 @@ local function init()
     end)
 
     CreateThread(function()
-        lib.zones.box({
-            coords = config.finance.zone,
-            size = vec3(2, 2, 4),
-            rotation = 0,
-            debug = config.debugPoly,
-            onEnter = function()
-                lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
-            end,
-            inside = function()
-                if IsControlJustPressed(0, 38) then
-                    showFinancedVehiclesMenu()
+            
+    CreateThread(function()
+        if config.finance.enable then
+            lib.zones.box({
+                coords = config.finance.zone,
+                size = vec3(2, 2, 4),
+                rotation = 0,
+                debug = config.debugPoly,
+                onEnter = function()
+                    lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
+                end,
+                inside = function()
+                    if IsControlJustPressed(0, 38) then
+                        showFinancedVehiclesMenu()
+                    end
+                end,
+                onExit = function()
+                    lib.hideTextUI()
                 end
-            end,
-            onExit = function()
-                lib.hideTextUI()
-            end
-        })
+            })
+        end
     end)
 
     CreateThread(function()
