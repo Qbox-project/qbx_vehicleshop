@@ -335,8 +335,10 @@ local function openVehicleSellMenu()
         arrow = true
     }
     if config.shops[insideShop].type == 'free-use' then
-        options = {
-            {
+        options = {}
+
+        if config.enableTestDrive then
+            options[#options + 1] = {
                 title = Lang:t('menus.test_header'),
                 description = Lang:t('menus.freeuse_test_txt'),
                 event = 'qbx_vehicleshop:client:testDrive',
@@ -344,7 +346,7 @@ local function openVehicleSellMenu()
                     vehicle = vehicle
                 }
             }
-        }
+        end
 
         if config.enableFreeUseBuy then
             options[#options + 1] = {
