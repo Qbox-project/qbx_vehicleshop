@@ -2,7 +2,7 @@ return {
     useTarget = false,
     debugPoly = false,
     enableFreeUseBuy = true, -- Allows players to buy from NPC shops
-    enableTestDrive = false,
+    enableTestDrive = true,
     
     finance = {
         enable = true, -- Enables the financing system. Turning this off does not affect already financed vehicles
