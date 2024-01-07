@@ -516,8 +516,6 @@ local function init()
     end)
 
     CreateThread(function()
-            
-    CreateThread(function()
         if config.finance.enable then
             lib.zones.box({
                 coords = config.finance.zone,
