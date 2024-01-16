@@ -199,7 +199,9 @@ local function openVehCatsMenu(category)
 
     for k, v in pairs(VEHICLES) do
         if VEHICLES[k].category == category then
-            if type(config.vehicles[k].shop) == 'table' then
+            if config.vehicles[k] == nil then
+                lib.print.debug('Vehicle not found in config.vehicles. Skipping: '..k)
+            elseif type(config.vehicles[k].shop) == 'table' then
                 for _, shop in pairs(config.vehicles[k].shop) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
@@ -333,8 +335,10 @@ local function openVehicleSellMenu()
         arrow = true
     }
     if config.shops[insideShop].type == 'free-use' then
-        options = {
-            {
+        options = {}
+
+        if config.enableTestDrive then
+            options[#options + 1] = {
                 title = Lang:t('menus.test_header'),
                 description = Lang:t('menus.freeuse_test_txt'),
                 event = 'qbx_vehicleshop:client:testDrive',
@@ -342,7 +346,7 @@ local function openVehicleSellMenu()
                     vehicle = vehicle
                 }
             }
-        }
+        end
 
         if config.enableFreeUseBuy then
             options[#options + 1] = {
@@ -369,13 +373,6 @@ local function openVehicleSellMenu()
     else
         options = {
             {
-                title = Lang:t('menus.test_header'),
-                description = Lang:t('menus.managed_test_txt'),
-                onSelect = function()
-                    startTestDrive(vehicle)
-                end,
-            },
-            {
                 title = Lang:t('menus.managed_sell_header'),
                 description = Lang:t('menus.managed_sell_txt'),
                 onSelect = function()
@@ -384,6 +381,16 @@ local function openVehicleSellMenu()
             }
         }
 
+        if config.enableTestDrive then
+            options[#options + 1] = {
+                title = Lang:t('menus.test_header'),
+                description = Lang:t('menus.managed_test_txt'),
+                onSelect = function()
+                    startTestDrive(vehicle)
+                end
+            }
+        end
+        
         if config.finance.enable then
             options[#options + 1] = {
                 title = Lang:t('menus.finance_header'),
@@ -514,23 +521,25 @@ local function init()
     end)
 
     CreateThread(function()
-        lib.zones.box({
-            coords = config.finance.zone,
-            size = vec3(2, 2, 4),
-            rotation = 0,
-            debug = config.debugPoly,
-            onEnter = function()
-                lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
-            end,
-            inside = function()
-                if IsControlJustPressed(0, 38) then
-                    showFinancedVehiclesMenu()
+        if config.finance.enable then
+            lib.zones.box({
+                coords = config.finance.zone,
+                size = vec3(2, 2, 4),
+                rotation = 0,
+                debug = config.debugPoly,
+                onEnter = function()
+                    lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
+                end,
+                inside = function()
+                    if IsControlJustPressed(0, 38) then
+                        showFinancedVehiclesMenu()
+                    end
+                end,
+                onExit = function()
+                    lib.hideTextUI()
                 end
-            end,
-            onExit = function()
-                lib.hideTextUI()
-            end
-        })
+            })
+        end
     end)
 
     CreateThread(function()
