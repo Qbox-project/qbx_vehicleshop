@@ -2,6 +2,7 @@ return {
     useTarget = false,
     debugPoly = false,
     enableFreeUseBuy = true, -- Allows players to buy from NPC shops
+    requestModelTimeout = 5000, -- load model timeout for oxlib
     enableTestDrive = true,
     
     finance = {
