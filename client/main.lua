@@ -604,7 +604,7 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     if not closestVehicle then return end
     
     if not IsModelInCdimage(data.toVehicle) then
-        print(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
+        lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
         return 
     end    
 
