@@ -602,6 +602,11 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
 
     local closestVehicle = lib.getClosestVehicle(dataClosestVehicle.coords.xyz, 5, false)
     if not closestVehicle then return end
+    
+    if not IsModelInCdimage(data.toVehicle) then
+        lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
+        return 
+    end    
 
     DeleteEntity(closestVehicle)
     while DoesEntityExist(closestVehicle) do
