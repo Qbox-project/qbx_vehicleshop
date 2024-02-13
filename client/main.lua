@@ -48,7 +48,7 @@ local function showVehicleFinanceMenu(data)
         {
             title = 'Finance Information',
             icon = 'circle-info',
-            description = string.format('Name: %s\nPlate: %s\nRemaining Balance: $%s\nRecurring Payment Amount: $%s\nPayments Left: %s', vehLabel, data.vehiclePlate, CommaValue(data.balance), CommaValue(data.paymentAmount), data.paymentsLeft),
+            description = string.format('Name: %s\nPlate: %s\nRemaining Balance: $%s\nRecurring Payment Amount: $%s\nPayments Left: %s', vehLabel, data.vehiclePlate, lib.math.groupdigits(data.balance), lib.math.groupdigits(data.paymentAmount), data.paymentsLeft),
             readOnly = true,
         },
         {
@@ -138,7 +138,7 @@ end
 ---@return string
 local function getVehPrice(closestVehicle)
     local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].vehicle
-    return CommaValue(VEHICLES[vehicle].price)
+    return lib.math.groupdigits(VEHICLES[vehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
@@ -390,7 +390,7 @@ local function openVehicleSellMenu()
                 end
             }
         end
-        
+
         if config.finance.enable then
             options[#options + 1] = {
                 title = Lang:t('menus.finance_header'),
@@ -428,7 +428,7 @@ local function startTestDriveTimer(time)
                 inTestDrive = false
                 exports.qbx_core:Notify(Lang:t('general.testdrive_complete'), 'success')
             end
-            DrawText2D(Lang:t('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), vec2(1.0, 1.38), 1.0, 1.0, 0.5)
+            qbx.drawText2d({ text = Lang:t('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), coords = vec2(1.0, 1.38), scale = 0.5})
             Wait(0)
         end
     end)
@@ -498,7 +498,7 @@ end
 ---@param coords vector4
 ---@return number vehicleEntity
 local function createShowroomVehicle(model, coords)
-    lib.requestModel(model, requestModelTimeout)
+    lib.requestModel(model, 1000)
     local veh = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, false, false)
     SetModelAsNoLongerNeeded(model)
     SetVehicleOnGroundProperly(veh)
@@ -586,7 +586,7 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
 
     inTestDrive = true
     local testDrive = config.shops[insideShop].testDrive
-    local plate = 'TEST'..RandomNumber(4)
+    local plate = 'TEST'..lib.string.random('1111')
     local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, testDrive.spawn, plate)
     testDriveVeh = netId
     exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), testDrive.limit, 'inform')
@@ -602,11 +602,11 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
 
     local closestVehicle = lib.getClosestVehicle(dataClosestVehicle.coords.xyz, 5, false)
     if not closestVehicle then return end
-    
+
     if not IsModelInCdimage(data.toVehicle) then
         lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
-        return 
-    end    
+        return
+    end
 
     DeleteEntity(closestVehicle)
     while DoesEntityExist(closestVehicle) do
@@ -633,7 +633,7 @@ RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, 
 end)
 
 lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
-    local input = lib.inputDialog((Lang:t('general.transfervehicle_confirm')):format(VEHICLES_HASH[vehicle].brand,VEHICLES_HASH[vehicle].name, CommaValue(sellAmount) or 0),{
+    local input = lib.inputDialog((Lang:t('general.transfervehicle_confirm')):format(VEHICLES_HASH[vehicle].brand,VEHICLES_HASH[vehicle].name, lib.math.groupdigits(sellAmount) or 0),{
         {
             type = 'checkbox',
             label = 'Confirm'
