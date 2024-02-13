@@ -19,7 +19,7 @@
         "buyertoopoor": "Kupujuci nema dostatek financi",
         "nofinanced": "Nemas zadne vozidlo na splatky",
         "buyerdeclined": "The player declined the transaction",
-        "sale_timeout": "Wait a while before trading your vehicle",
+        "sale_timeout": "Wait a while before trading your vehicle"
     },
     "success": {
         "purchased": "Gratulujeme k vyberu! At slouzi!",
@@ -27,7 +27,7 @@
         "gifted": "Daroval jsi vozidlo",
         "received_gift": "Dostal jsi dar v podobe vozidla",
         "soldfor": "Prodal jsi vozidlo za CZK",
-        "boughtfor": "Koupil jsi vozidlo za CZK",
+        "boughtfor": "Koupil jsi vozidlo za CZK"
     },
     "menus": {
         "vehHeader_header": "Moznosti vozidla",
@@ -53,19 +53,16 @@
         "swap_txt": "Podivej se na jine vozidla",
         "financesubmit_downpayment": "Castka zalohy - Min ",
         "financesubmit_totalpayment": "Celkova castka - Max ",
-        --Free Use
         "freeuse_test_txt": "Vyzkousej momentalne vybrane vozidlo!",
         "freeuse_buy_header": "Koupit vozidlo",
         "freeuse_buy_txt": "Koupit momentalne vybrane vozidlo",
         "freeuse_finance_txt": "Financuj momentalne vybrane vozidlo",
-        --Managed
         "managed_test_txt": "Povolit hraci testovaci jizdu",
         "managed_sell_header": "Prodej vozidlo",
         "managed_sell_txt": "Prodej vozidlo hraci",
         "managed_finance_txt": "Financovani vozidla",
         "submit_ID": "Server ID (#)",
         "keypress_showFinanceMenu": "[E] Otvoriť ponuku Financie",
-        --Floating
         "keypress_vehicleViewMenu": "[E] Zobraziť vozidlo"
     },
     "general": {
@@ -77,14 +74,6 @@
         "command_transfervehicle": "Daruj nebo prodej vozidlo",
         "command_transfervehicle_help": "ID kupujiciho",
         "command_transfervehicle_amount": "Prodejni castka (Na tobe)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
     }
 }
-
-if GetConvar('qb_locale', 'en') == 'cs' then
-    "Lang": Locale:new({
-        "phrases": Translations,
-        "warnOnMissing": true,
-        "fallbackLang": Lang,
-    })
-end

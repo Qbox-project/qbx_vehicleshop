@@ -20,7 +20,7 @@
         "nofinanced": "Vous n'avez aucun véhicule financés",
         "financed": "Ce véhicule est financé",
         "buyerdeclined": "The player declined the transaction",
-        "sale_timeout": "Wait a while before trading your vehicle",
+        "sale_timeout": "Wait a while before trading your vehicle"
 },
     "success": {
         "purchased": "Félicitations sur votre achat!",
@@ -28,7 +28,7 @@
         "gifted": "Vous avez donné votre véhicule",
         "received_gift": "Vous avez été donné un véhicule",
         "soldfor": "Vous avez vendu votre véhicule pour $",
-        "boughtfor": "Vous avez acheté un véhicule pour $",
+        "boughtfor": "Vous avez acheté un véhicule pour $"
     },
     "menus": {
         "vehHeader_header": "Options véhicule",
@@ -54,19 +54,16 @@
         "swap_txt": "Changer le véhicule actuel",
         "financesubmit_downpayment": "Montant paiements - Min ",
         "financesubmit_totalpayment": "Paiements totaux - Max ",
-        --Free Use
         "freeuse_test_txt": "Tester le véhicule actuel",
         "freeuse_buy_header": "Acheter véhicule",
         "freeuse_buy_txt": "Acheter ce véhicule",
         "freeuse_finance_txt": "Financer ce véhicule",
-        --Managed
         "managed_test_txt": "Faire tester le véhicule",
         "managed_sell_header": "Vendre véhicule",
         "managed_sell_txt": "Vendre ce véhicule à quelqu'un",
         "managed_finance_txt": "Faire financer ce véhicule",
         "submit_ID": "ID du joueur (#)",
         "keypress_showFinanceMenu": "[E] Ouvrir le menu Finance",
-        --Floating
         "keypress_vehicleViewMenu": "[E] Voir le véhicule"
     },
     "general": {
@@ -78,14 +75,6 @@
         "command_transfervehicle": "Donner / Vendre véhicule",
         "command_transfervehicle_help": "ID du joueur",
         "command_transfervehicle_amount": "Montant de vente (optionnel)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
-    },
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
+    }
 }
-
-if GetConvar('qb_locale', 'en') == 'fr' then
-    "Lang": Locale:new({
-        "phrases": Translations,
-        "warnOnMissing": true,
-        "fallbackLang": Lang,
-    })
-end

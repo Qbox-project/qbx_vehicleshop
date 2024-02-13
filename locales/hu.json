@@ -5,12 +5,12 @@
         "Invalid_ID": "Érvénytelen Játékos ID",
         "playertoofar": "A játékos nincs elég közel hozzád",
         "notenoughmoney": "Nincs elegendő pénzed",
-        "minimumallowed": "Minimum befizetés $", --Minimum payment allowed is $ hogy a kurva anyámba mondod ezt magyarul geci
+        "minimumallowed": "Minimum befizetés $",
         "overpaid": "Túlfizettél",
         "alreadypaid": "A jármű már kivan fizetve",
         "notworth": "Nem ér annyit a jármű",
         "downtoosmall": "Az előleg összege túl kicsi",
-        "exceededmax": "Túl lépte a maximális kifizetési összeget", -- hibás
+        "exceededmax": "Túl lépte a maximális kifizetési összeget",
         "repossessed": "A te %s rendszámú járműved visszafoglalásra került",
         "buyerinfo": "Nem sikerült megszerezni a vásárló adatait",
         "notinveh": "Eladáshoz a járműben kell tartózkodnod",
@@ -20,7 +20,7 @@
         "nofinanced": "Nincsen hitelezett járműved",
         "financed": "Ez a jármű hitelezett",
         "buyerdeclined": "The player declined the transaction",
-        "sale_timeout": "Wait a while before trading your vehicle",
+        "sale_timeout": "Wait a while before trading your vehicle"
     },
     "success": {
         "purchased": "Gratulálunk a vásárláshoz!",
@@ -28,7 +28,7 @@
         "gifted": "Elajándékoztad a járműved",
         "received_gift": "Ajándékba kaptál egy járművet",
         "soldfor": "Eladtad a járműved $",
-        "boughtfor": "Vásároltál egy járművet $",
+        "boughtfor": "Vásároltál egy járművet $"
     },
     "menus": {
         "vehHeader_header": "Jármű lehetőségek",
@@ -56,19 +56,16 @@
         "swap_txt": "Az aktuálisan kiválaszott jármű cseréje",
         "financesubmit_downpayment": "Az előleg legalább - Min ",
         "financesubmit_totalpayment": "Teljes kifizetés - Max ",
-        --Free Use
         "freeuse_test_txt": "Jelenlegi jármű teszt vezetése",
         "freeuse_buy_header": "Jármű megvásárlása",
         "freeuse_buy_txt": "Kiválaszott jármű megvétele",
         "freeuse_finance_txt": "Kiválaszott jármű hitelezése",
-        --Managed
         "managed_test_txt": "Vásárló tesztvezetésének engedélyezése",
         "managed_sell_header": "Jármű eladás",
         "managed_sell_txt": "Kiválaszott jármű eladása",
         "managed_finance_txt": "Kiválaszott jármű hitelezése a vásárlónak",
         "submit_ID": "Idéglenes aktív személyiszám (#)",
         "keypress_showFinanceMenu": "[E] Hitelezési menü megnyitása",
-        --Floating
         "keypress_vehicleViewMenu": "[E] Jármű megnézése"
     },
     "general": {
@@ -80,14 +77,6 @@
         "command_transfervehicle": "Jármű eladása vagy elajándékozása",
         "command_transfervehicle_help": "Vásárló idéglenes aktív személyiszáma (ID)",
         "command_transfervehicle_amount": "Eladási ár (opcionális)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
     }
 }
-
-if GetConvar('qb_locale', 'en') == 'hu' then
-    "Lang": Locale:new({
-        "phrases": Translations,
-        "warnOnMissing": true,
-        "fallbackLang": Lang,
-    })
-end

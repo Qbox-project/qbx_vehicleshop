@@ -20,7 +20,7 @@
         "nofinanced": "No tienes ningún vehículo financiado",
         "financed": "Este vehículo es financiado",
         "buyerdeclined": "The player declined the transaction",
-        "sale_timeout": "Wait a while before trading your vehicle",
+        "sale_timeout": "Wait a while before trading your vehicle"
     },
     "success": {
         "purchased": "¡Felicidades por tu compra!",
@@ -28,7 +28,7 @@
         "gifted": "Has regalado tu vehículo",
         "received_gift": "Te han regalado un vehículo",
         "soldfor": "Has vendido tu vehículo por $",
-        "boughtfor": "Has comprado un vehículo por $",
+        "boughtfor": "Has comprado un vehículo por $"
     },
     "menus": {
         "vehHeader_header": "Opciones de vehículo",
@@ -54,19 +54,16 @@
         "swap_txt": "Cambiar el vehículo seleccionado por otro",
         "financesubmit_downpayment": "Monto de pago inicial - Min ",
         "financesubmit_totalpayment": "Total de pagos - Max ",
-        --Free Use
         "freeuse_test_txt": "Ir a prueba de manejo con vehículo seleccionado",
         "freeuse_buy_header": "Comprar vehículo",
         "freeuse_buy_txt": "Comprar vehículo seleccionado",
         "freeuse_finance_txt": "Financiar vehículo seleccionado",
-        --Managed
         "managed_test_txt": "Permitir realizar prueba de manejo a jugador",
         "managed_sell_header": "Vender vehículo",
         "managed_sell_txt": "Vender vehículo a jugador",
         "managed_finance_txt": "Financiar vehículo a jugador",
         "submit_ID": "ID de servidor (#)",
         "keypress_showFinanceMenu": "[E] Abrir Menú Finanzas",
-        --Floating
         "keypress_vehicleViewMenu": "[E] Ver vehículo"
     },
     "general": {
@@ -78,14 +75,6 @@
         "command_transfervehicle": "Regalar o vender tu vehículo",
         "command_transfervehicle_help": "ID del comprador",
         "command_transfervehicle_amount": "Monto de venta (opcional)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
     }
 }
-
-if GetConvar('qb_locale', 'en') == 'es' then
-    "Lang": Locale:new({
-        "phrases": Translations,
-        "warnOnMissing": true,
-        "fallbackLang": Lang,
-    })
-end
