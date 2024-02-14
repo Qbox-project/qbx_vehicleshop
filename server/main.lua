@@ -57,7 +57,7 @@ end)
 local function calculateFinance(vehiclePrice, downPayment, paymentamount)
     local balance = vehiclePrice - downPayment
     local vehPaymentAmount = balance / paymentamount
-    return math.round(balance), math.round(vehPaymentAmount)
+    return qbx.math.round(balance), qbx.math.round(vehPaymentAmount)
 end
 
 ---@class FinancedVehicle
@@ -76,13 +76,13 @@ local function calculateNewFinance(paymentAmount, vehData)
     local minusPayment = vehData.paymentsLeft - 1
     local newPaymentsLeft = newBalance / minusPayment
     local newPayment = newBalance / newPaymentsLeft
-    return math.round(newBalance), math.round(newPayment), newPaymentsLeft
+    return qbx.math.round(newBalance), qbx.math.round(newPayment), newPaymentsLeft
 end
 
 local function generatePlate()
     local plate
     repeat
-        plate = GenerateRandomPlate('11AAA111')
+        plate = qbx.generateRandomPlate('11AAA111')
     until not DoesVehicleEntityExist(plate)
     return plate:upper()
 end
@@ -100,7 +100,7 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
 end)
 
 lib.callback.register('qbx_vehicleshop:server:spawnVehicle', function(source, model, coords, plate)
-    local netId = SpawnVehicle(source, model, coords, true)
+    local netId = qbx.spawnVehicle({model = model, spawnSource = coords, warp = GetPlayerPed(source)})
     if not netId or netId == 0 then return end
     local veh = NetworkGetEntityFromNetworkId(netId)
     if not veh or veh == 0 then return end
@@ -130,13 +130,13 @@ RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, pla
     local src = source
     local target = tonumber(playerId) --[[@as number]]
     if not exports.qbx_core:GetPlayer(target) then
-        exports.qbx_core:Notify(src, Lang:t('error.Invalid_ID'), 'error')
+        exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
         return
     end
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target))) < 3 then
         TriggerClientEvent('qbx_vehicleshop:client:testDrive', target, { vehicle = vehicle })
     else
-        exports.qbx_core:Notify(src, Lang:t('error.playertoofar'), 'error')
+        exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
     end
 end)
 
@@ -166,7 +166,7 @@ local function removeMoney(src, amount)
 
     local currencyType = findChargeableCurrencyType(amount, cash, bank)
     if not currencyType then
-        exports.qbx_core:Notify(src, Lang:t('error.notenoughmoney'), 'error')
+        exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
         return false
     end
 
@@ -184,12 +184,12 @@ RegisterNetEvent('qbx_vehicleshop:server:financePayment', function(paymentAmount
     local newBalance, newPaymentsLeft, newPayment = calculateNewFinance(paymentAmount, vehData)
 
     if newBalance <= 0 then
-        exports.qbx_core:Notify(src, Lang:t('error.overpaid'), 'error')
+        exports.qbx_core:Notify(src, locale('error.overpaid'), 'error')
         return
     end
 
     if paymentAmount < minPayment then
-        exports.qbx_core:Notify(src, Lang:t('error.minimumallowed')..CommaValue(minPayment), 'error')
+        exports.qbx_core:Notify(src, locale('error.minimumallowed')..lib.math.groupdigits(minPayment), 'error')
         return
     end
 
@@ -211,7 +211,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financePaymentFull', function(data)
     local vehPlate = data.vehPlate
 
     if vehBalance == 0 then
-        exports.qbx_core:Notify(src, Lang:t('error.alreadypaid'), 'error')
+        exports.qbx_core:Notify(src, locale('error.alreadypaid'), 'error')
         return
     end
 
@@ -233,7 +233,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local vehiclePrice = coreVehicles[vehicle].price
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if not currencyType then
-        exports.qbx_core:Notify(src, Lang:t('error.notenoughmoney'), 'error')
+        exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
         return
     end
 
@@ -245,7 +245,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
         model = vehicle,
         plate = plate,
     })
-    exports.qbx_core:Notify(src, Lang:t('success.purchased'), 'success')
+    exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
     TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
     player.Functions.RemoveMoney(currencyType, vehiclePrice, 'vehicle-bought-in-showroom')
 end)
@@ -255,24 +255,24 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     local vehiclePrice = coreVehicles[vehicle].price
-    local minDown = tonumber(math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
+    local minDown = tonumber(qbx.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
     if downPayment > vehiclePrice then
-        return exports.qbx_core:Notify(src, Lang:t('error.notworth'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.notworth'), 'error')
     end
     if downPayment < minDown then
-        return exports.qbx_core:Notify(src, Lang:t('error.downtoosmall'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.downtoosmall'), 'error')
     end
     if paymentAmount > sharedConfig.finance.maximumPayments then
-        return exports.qbx_core:Notify(src, Lang:t('error.exceededmax'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.exceededmax'), 'error')
     end
 
     local currencyType = findChargeableCurrencyType(downPayment, player.PlayerData.money.cash, player.PlayerData.money.bank)
 
     if not currencyType then
-        return exports.qbx_core:Notify(src, Lang:t('error.notenoughmoney'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
     end
 
     local plate = generatePlate()
@@ -294,7 +294,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
             timer = timer,
         }
     })
-    exports.qbx_core:Notify(src, Lang:t('success.purchased'), 'success')
+    exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
     TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
     player.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 end)
@@ -308,18 +308,18 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
     local player = exports.qbx_core:GetPlayer(src)
     local currencyType = findChargeableCurrencyType(downPayment, target.PlayerData.money.cash, target.PlayerData.money.bank)
     if not currencyType then
-        exports.qbx_core:Notify(src, Lang:t('error.notenoughmoney'), 'error')
+        exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
         return false
     end
 
     target.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 
-    local commission = math.round(price * config.commissionRate)
+    local commission = qbx.math.round(price * config.commissionRate)
     player.Functions.AddMoney('bank', price * config.commissionRate)
-    exports.qbx_core:Notify(src, Lang:t('success.earned_commission', {amount = CommaValue(commission)}), 'success')
+    exports.qbx_core:Notify(src, locale('success.earned_commission', lib.math.groupdigits(commission)), 'success')
 
     exports['Renewed-Banking']:addAccountMoney(player.PlayerData.job.name, price)
-    exports.qbx_core:Notify(target.PlayerData.source, Lang:t('success.purchased'), 'success')
+    exports.qbx_core:Notify(target.PlayerData.source, locale('success.purchased'), 'success')
     return true
 end
 
@@ -329,11 +329,11 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
     local target = exports.qbx_core:GetPlayer(tonumber(playerid))
 
     if not target then
-        return exports.qbx_core:Notify(src, Lang:t('error.Invalid_ID'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
     end
 
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target.PlayerData.source))) >= 3 then
-        return exports.qbx_core:Notify(src, Lang:t('error.playertoofar'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
     end
 
     local vehicle = data
@@ -359,26 +359,26 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
     local target = exports.qbx_core:GetPlayer(tonumber(playerid))
 
     if not target then
-        return exports.qbx_core:Notify(src, Lang:t('error.Invalid_ID'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
     end
 
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target.PlayerData.source))) >= 3 then
-        return exports.qbx_core:Notify(src, Lang:t('error.playertoofar'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
     end
 
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
     local vehiclePrice = coreVehicles[vehicle].price
-    local minDown = tonumber(math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
+    local minDown = tonumber(qbx.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
-        return exports.qbx_core:Notify(src, Lang:t('error.notworth'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.notworth'), 'error')
     end
     if downPayment < minDown then
-        return exports.qbx_core:Notify(src, Lang:t('error.downtoosmall'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.downtoosmall'), 'error')
     end
     if paymentAmount > sharedConfig.finance.maximumPayments then
-        return exports.qbx_core:Notify(src, Lang:t('error.exceededmax'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.exceededmax'), 'error')
     end
 
     local cid = target.PlayerData.citizenid
@@ -413,64 +413,64 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local result = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     if not result[1] then return end
 
-    exports.qbx_core:Notify(src, Lang:t('general.paymentduein', {time = config.finance.paymentWarning}))
+    exports.qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
     Wait(config.finance.paymentWarning * 60000)
     local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in pairs(vehicles) do
         local plate = v.plate
         DeleteVehicleEntity(plate)
         --MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE plate = ?', {'REPO-'..v.citizenid, plate}) -- Use this if you don't want them to be deleted
-        exports.qbx_core:Notify(src, Lang:t('error.repossessed', {plate = plate}), 'error')
+        exports.qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
     end
 end)
 
 -- Transfer vehicle to player in passenger seat
-lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicle'), params = {
-    {name = 'id', type = 'playerId', help = Lang:t('general.command_transfervehicle_help')},
-    {name = 'amount', type = 'number', help = Lang:t('general.command_transfervehicle_amount'), optional = true}}}, function(source, args)
+lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicle'), params = {
+    {name = 'id', type = 'playerId', help = locale('general.command_transfervehicle_help')},
+    {name = 'amount', type = 'number', help = locale('general.command_transfervehicle_amount'), optional = true}}}, function(source, args)
     local src = source
     local buyerId = args.id
     local sellAmount = args.amount or 0
     if saleTimeout[src] then
-        return exports.qbx_core:Notify(src, Lang:t('error.sale_timeout'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.sale_timeout'), 'error')
     end
     if buyerId == 0 then
-        return exports.qbx_core:Notify(src, Lang:t('error.Invalid_ID'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
     end
     local ped = GetPlayerPed(src)
 
     local targetPed = GetPlayerPed(buyerId)
     if targetPed == 0 then
-        return exports.qbx_core:Notify(src, Lang:t('error.buyerinfo'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.buyerinfo'), 'error')
     end
 
     local vehicle = GetVehiclePedIsIn(ped, false)
     if vehicle == 0 then
-        return exports.qbx_core:Notify(src, Lang:t('error.notinveh'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.notinveh'), 'error')
     end
 
     local plate = string.trim(GetVehicleNumberPlateText(vehicle))
     if not plate then
-        return exports.qbx_core:Notify(src, Lang:t('error.vehinfo'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.vehinfo'), 'error')
     end
 
     local player = exports.qbx_core:GetPlayer(src)
     local target = exports.qbx_core:GetPlayer(buyerId)
     local row = FetchVehicleEntityByPlate(plate)
     if config.finance.preventSelling and row.balance > 0 then
-        return exports.qbx_core:Notify(src, Lang:t('error.financed'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.financed'), 'error')
     end
     if row.citizenid ~= player.PlayerData.citizenid then
-        return exports.qbx_core:Notify(src, Lang:t('error.notown'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.notown'), 'error')
     end
 
     if #(GetEntityCoords(ped) - GetEntityCoords(targetPed)) > 5.0 then
-        return exports.qbx_core:Notify(src, Lang:t('error.playertoofar'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
     end
     local targetcid = target.PlayerData.citizenid
     local targetlicense = GetPlayerIdentifierByType(target.PlayerData.source, 'license')
     if not target then
-        return exports.qbx_core:Notify(src, Lang:t('error.buyerinfo'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.buyerinfo'), 'error')
     end
 
     saleTimeout[src] = true
@@ -480,21 +480,21 @@ lib.addCommand('transfervehicle', {help = Lang:t('general.command_transfervehicl
 
     lib.callback('qbx_vehicleshop:client:confirmTrade', buyerId, function(approved)
         if not approved then
-            exports.qbx_core:Notify(src, Lang:t('error.buyerdeclined'), 'error')
+            exports.qbx_core:Notify(src, locale('error.buyerdeclined'), 'error')
             return
         end
         if sellAmount > 0 then
             local currencyType = findChargeableCurrencyType(sellAmount, target.PlayerData.money.cash, target.PlayerData.money.bank)
             if not currencyType then
-                return exports.qbx_core:Notify(src, Lang:t('error.buyertoopoor'), 'error')
+                return exports.qbx_core:Notify(src, locale('error.buyertoopoor'), 'error')
             end
             player.Functions.AddMoney(currencyType, sellAmount)
             target.Functions.RemoveMoney(currencyType, sellAmount)
         end
         UpdateVehicleEntityOwner(targetcid, targetlicense, plate)
         TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
-        local sellerMessage = sellAmount > 0 and Lang:t('success.soldfor') .. CommaValue(sellAmount) or Lang:t('success.gifted')
-        local buyerMessage = sellAmount > 0 and Lang:t('success.boughtfor') .. CommaValue(sellAmount) or Lang:t('success.received_gift')
+        local sellerMessage = sellAmount > 0 and locale('success.soldfor') .. lib.math.groupdigits(sellAmount) or locale('success.gifted')
+        local buyerMessage = sellAmount > 0 and locale('success.boughtfor') .. lib.math.groupdigits(sellAmount) or locale('success.received_gift')
         exports.qbx_core:Notify(src, sellerMessage, 'success')
         exports.qbx_core:Notify(buyerId, buyerMessage, 'success')
     end, GetEntityModel(vehicle), sellAmount)

@@ -14,10 +14,10 @@ local insideShop = nil
 
 ---@param data VehicleFinanceClient
 local function financePayment(data)
-    local dialog = lib.inputDialog(Lang:t('menus.veh_finance'), {
+    local dialog = lib.inputDialog(locale('menus.veh_finance'), {
         {
             type = 'number',
-            label = Lang:t('menus.veh_finance_payment'),
+            label = locale('menus.veh_finance_payment'),
         }
     })
 
@@ -48,17 +48,17 @@ local function showVehicleFinanceMenu(data)
         {
             title = 'Finance Information',
             icon = 'circle-info',
-            description = string.format('Name: %s\nPlate: %s\nRemaining Balance: $%s\nRecurring Payment Amount: $%s\nPayments Left: %s', vehLabel, data.vehiclePlate, CommaValue(data.balance), CommaValue(data.paymentAmount), data.paymentsLeft),
+            description = string.format('Name: %s\nPlate: %s\nRemaining Balance: $%s\nRecurring Payment Amount: $%s\nPayments Left: %s', vehLabel, data.vehiclePlate, lib.math.groupdigits(data.balance), lib.math.groupdigits(data.paymentAmount), data.paymentsLeft),
             readOnly = true,
         },
         {
-            title = Lang:t('menus.veh_finance_pay'),
+            title = locale('menus.veh_finance_pay'),
             onSelect = function()
                 financePayment(data)
             end,
         },
         {
-            title = Lang:t('menus.veh_finance_payoff'),
+            title = locale('menus.veh_finance_payoff'),
             onSelect = function()
                 local check = confirmationCheck()
                 if check == 'confirm' then
@@ -72,7 +72,7 @@ local function showVehicleFinanceMenu(data)
 
     lib.registerContext({
         id = 'vehicleFinance',
-        title = Lang:t('menus.financed_header'),
+        title = locale('menus.financed_header'),
         menu = 'ownedVehicles',
         options = vehFinance
     })
@@ -85,14 +85,14 @@ local function showFinancedVehiclesMenu()
     local vehicles = lib.callback.await('qbx_vehicleshop:server:GetVehiclesByName')
     local ownedVehicles = {}
 
-    if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error') end
+    if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(locale('error.nofinanced'), 'error') end
     for _, v in pairs(vehicles) do
         if v.balance ~= 0 then
             local name = VEHICLES[v.vehicle].name
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = name,
-                description = Lang:t('menus.veh_platetxt')..plate,
+                description = locale('menus.veh_platetxt')..plate,
                 icon = 'fa-solid fa-car-side',
                 arrow = true,
                 onSelect = function()
@@ -109,12 +109,12 @@ local function showFinancedVehiclesMenu()
     end
 
     if #ownedVehicles == 0 then
-        return exports.qbx_core:Notify(Lang:t('error.nofinanced'), 'error')
+        return exports.qbx_core:Notify(locale('error.nofinanced'), 'error')
     end
 
     lib.registerContext({
         id = 'ownedVehicles',
-        title = Lang:t('menus.owned_vehicles_header'),
+        title = locale('menus.owned_vehicles_header'),
         options = ownedVehicles
     })
     lib.showContext('ownedVehicles')
@@ -138,7 +138,7 @@ end
 ---@return string
 local function getVehPrice(closestVehicle)
     local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].vehicle
-    return CommaValue(VEHICLES[vehicle].price)
+    return lib.math.groupdigits(VEHICLES[vehicle].price)
 end
 
 --- Fetches the brand of a vehicle from QB Shared
@@ -173,11 +173,11 @@ local function openFinance(closestShowroomVehicle, buyVehicle)
     local dialog = lib.inputDialog(VEHICLES[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(closestShowroomVehicle), {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
+            label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
+            label = locale('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
         }
     })
 
@@ -206,7 +206,7 @@ local function openVehCatsMenu(category)
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
-                            description = Lang:t('menus.veh_price')..lib.math.groupdigits(v.price),
+                            description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
                             serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                             args = {
                                 toVehicle = v.model,
@@ -219,7 +219,7 @@ local function openVehCatsMenu(category)
             elseif config.vehicles[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
-                    description = Lang:t('menus.veh_price')..lib.math.groupdigits(v.price),
+                    description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
                     serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                     args = {
                         toVehicle = v.model,
@@ -256,7 +256,7 @@ local function openVehicleCategoryMenu()
 
     lib.registerContext({
         id = 'vehicleCategories',
-        title = Lang:t('menus.categories_header'),
+        title = locale('menus.categories_header'),
         menu = 'vehicleMenu',
         options = categoryMenu
     })
@@ -270,15 +270,15 @@ local function openCustomFinance(closestVehicle)
     local dialog = lib.inputDialog(getVehBrand(closestVehicle):upper()..' '..vehicle:upper()..' - $'..getVehPrice(closestVehicle), {
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
+            label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
         },
         {
             type = 'number',
-            label = Lang:t('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
+            label = locale('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
         },
         {
             type = 'number',
-            label = Lang:t('menus.submit_ID'),
+            label = locale('menus.submit_ID'),
         }
     })
 
@@ -300,7 +300,7 @@ local function getPlayerIdInput(vehModel)
     local dialog = lib.inputDialog(VEHICLES[vehModel].name, {
         {
             type = 'number',
-            label = Lang:t('menus.submit_ID'),
+            label = locale('menus.submit_ID'),
             placeholder = 1
         }
     })
@@ -329,8 +329,8 @@ local function openVehicleSellMenu()
     local options
     local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].vehicle
     local swapOption = {
-        title = Lang:t('menus.swap_header'),
-        description = Lang:t('menus.swap_txt'),
+        title = locale('menus.swap_header'),
+        description = locale('menus.swap_txt'),
         onSelect = openVehicleCategoryMenu,
         arrow = true
     }
@@ -339,8 +339,8 @@ local function openVehicleSellMenu()
 
         if config.enableTestDrive then
             options[#options + 1] = {
-                title = Lang:t('menus.test_header'),
-                description = Lang:t('menus.freeuse_test_txt'),
+                title = locale('menus.test_header'),
+                description = locale('menus.freeuse_test_txt'),
                 event = 'qbx_vehicleshop:client:testDrive',
                 args = {
                     vehicle = vehicle
@@ -350,8 +350,8 @@ local function openVehicleSellMenu()
 
         if config.enableFreeUseBuy then
             options[#options + 1] = {
-                title = Lang:t('menus.freeuse_buy_header'),
-                description = Lang:t('menus.freeuse_buy_txt'),
+                title = locale('menus.freeuse_buy_header'),
+                description = locale('menus.freeuse_buy_txt'),
                 serverEvent = 'qbx_vehicleshop:server:buyShowroomVehicle',
                 args = {
                     buyVehicle = vehicle
@@ -361,8 +361,8 @@ local function openVehicleSellMenu()
 
         if config.finance.enable then
             options[#options + 1] = {
-                title = Lang:t('menus.finance_header'),
-                description = Lang:t('menus.freeuse_finance_txt'),
+                title = locale('menus.finance_header'),
+                description = locale('menus.freeuse_finance_txt'),
                 onSelect = function()
                     openFinance(closestVehicle, vehicle)
                 end
@@ -373,8 +373,8 @@ local function openVehicleSellMenu()
     else
         options = {
             {
-                title = Lang:t('menus.managed_sell_header'),
-                description = Lang:t('menus.managed_sell_txt'),
+                title = locale('menus.managed_sell_header'),
+                description = locale('menus.managed_sell_txt'),
                 onSelect = function()
                     sellVehicle(vehicle)
                 end,
@@ -383,18 +383,18 @@ local function openVehicleSellMenu()
 
         if config.enableTestDrive then
             options[#options + 1] = {
-                title = Lang:t('menus.test_header'),
-                description = Lang:t('menus.managed_test_txt'),
+                title = locale('menus.test_header'),
+                description = locale('menus.managed_test_txt'),
                 onSelect = function()
                     startTestDrive(vehicle)
                 end
             }
         end
-        
+
         if config.finance.enable then
             options[#options + 1] = {
-                title = Lang:t('menus.finance_header'),
-                description = Lang:t('menus.managed_finance_txt'),
+                title = locale('menus.finance_header'),
+                description = locale('menus.managed_finance_txt'),
                 onSelect = function()
                     openCustomFinance(closestVehicle)
                 end
@@ -426,9 +426,9 @@ local function startTestDriveTimer(time)
                 TriggerServerEvent('qbx_vehicleshop:server:deleteVehicle', testDriveVeh)
                 testDriveVeh = 0
                 inTestDrive = false
-                exports.qbx_core:Notify(Lang:t('general.testdrive_complete'), 'success')
+                exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
             end
-            DrawText2D(Lang:t('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), vec2(1.0, 1.38), 1.0, 1.0, 0.5)
+            qbx.drawText2d({ text = locale('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), coords = vec2(1.0, 1.38), scale = 0.5})
             Wait(0)
         end
     end)
@@ -442,7 +442,7 @@ local function createVehicleTarget(shopName, entity)
         {
             name = 'vehicleshop:showVehicleOptions',
             icon = 'fas fa-car',
-            label = Lang:t('general.vehinteraction'),
+            label = locale('general.vehinteraction'),
             distance = shop.zone.targetDistance,
             onSelect = function()
                 openVehicleSellMenu()
@@ -463,7 +463,7 @@ local function createVehicleZone(shopName, coords)
         onEnter = function()
             local job = config.shops[insideShop].job
             if job and QBX.PlayerData.job.name ~= job then return end
-            lib.showTextUI(Lang:t('menus.keypress_vehicleViewMenu'))
+            lib.showTextUI(locale('menus.keypress_vehicleViewMenu'))
         end,
         inside = function()
             local job = config.shops[insideShop].job
@@ -498,7 +498,7 @@ end
 ---@param coords vector4
 ---@return number vehicleEntity
 local function createShowroomVehicle(model, coords)
-    lib.requestModel(model, requestModelTimeout)
+    lib.requestModel(model, 1000)
     local veh = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, false, false)
     SetModelAsNoLongerNeeded(model)
     SetVehicleOnGroundProperly(veh)
@@ -528,7 +528,7 @@ local function init()
                 rotation = 0,
                 debug = config.debugPoly,
                 onEnter = function()
-                    lib.showTextUI(Lang:t('menus.keypress_showFinanceMenu'))
+                    lib.showTextUI(locale('menus.keypress_showFinanceMenu'))
                 end,
                 inside = function()
                     if IsControlJustPressed(0, 38) then
@@ -578,7 +578,7 @@ end)
 --- @param args table
 RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
     if inTestDrive then
-        exports.qbx_core:Notify(Lang:t('error.testdrive_alreadyin'), 'error')
+        exports.qbx_core:Notify(locale('error.testdrive_alreadyin'), 'error')
         return
     end
 
@@ -586,10 +586,10 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
 
     inTestDrive = true
     local testDrive = config.shops[insideShop].testDrive
-    local plate = 'TEST'..RandomNumber(4)
+    local plate = 'TEST'..lib.string.random('1111')
     local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, testDrive.spawn, plate)
     testDriveVeh = netId
-    exports.qbx_core:Notify(Lang:t('general.testdrive_timenoti'), testDrive.limit, 'inform')
+    exports.qbx_core:Notify(locale('general.testdrive_timenoti', testDrive.limit), 'inform')
     startTestDriveTimer(testDrive.limit * 60)
 end)
 
@@ -602,11 +602,11 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
 
     local closestVehicle = lib.getClosestVehicle(dataClosestVehicle.coords.xyz, 5, false)
     if not closestVehicle then return end
-    
+
     if not IsModelInCdimage(data.toVehicle) then
         lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
-        return 
-    end    
+        return
+    end
 
     DeleteEntity(closestVehicle)
     while DoesEntityExist(closestVehicle) do
@@ -633,7 +633,7 @@ RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, 
 end)
 
 lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
-    local input = lib.inputDialog((Lang:t('general.transfervehicle_confirm')):format(VEHICLES_HASH[vehicle].brand,VEHICLES_HASH[vehicle].name, CommaValue(sellAmount) or 0),{
+    local input = lib.inputDialog(locale('general.transfervehicle_confirm', VEHICLES_HASH[vehicle].brand, VEHICLES_HASH[vehicle].name, lib.math.groupdigits(sellAmount) or 0),{
         {
             type = 'checkbox',
             label = 'Confirm'
