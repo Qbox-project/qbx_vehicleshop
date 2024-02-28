@@ -101,6 +101,12 @@ end
 
 ---@param citizenId string
 ---@return VehicleEntity[]
+function FetchFinancedVehicleEntityByPlate(plate)
+    return MySQL.single.await('SELECT * FROM vehicle_financing WHERE plate = ? AND balance > 0 AND financetime < 1', {plate})
+end
+
+---@param citizenId string
+---@return VehicleEntity[]
 function FetchFinancedVehicleEntitiesByCitizenId(citizenId)
     return MySQL.query.await('SELECT * FROM vehicle_financing WHERE citizenid = ? AND balance > 0 AND financetime < 1', {citizenId})
 end

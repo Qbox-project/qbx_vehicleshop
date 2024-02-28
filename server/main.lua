@@ -32,7 +32,7 @@ AddEventHandler('playerDropped', function()
     local src = source
     local license = GetPlayerIdentifierByType(src, 'license2') or GetPlayerIdentifierByType(src, 'license')
     if not license then return end
-    local vehicles = FetchVehicleEntitiesByLicense(license)
+    local vehicles = FetchFinancedVehicleEntitiesByLicense(license)
     if not vehicles then return end
     for _, v in pairs(vehicles) do
         local playTime = financeTimer[v.citizenid]
@@ -457,8 +457,11 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
     local player = exports.qbx_core:GetPlayer(src)
     local target = exports.qbx_core:GetPlayer(buyerId)
     local row = FetchVehicleEntityByPlate(plate)
-    if config.finance.preventSelling and row.balance > 0 then
-        return exports.qbx_core:Notify(src, locale('error.financed'), 'error')
+    if config.finance.preventSelling then
+        local financeRow = FetchFinancedVehicleEntityByPlate(plate)
+        if financeRow.balance > 0 then
+            return exports.qbx_core:Notify(src, locale('error.financed'), 'error')
+        end
     end
     if row.citizenid ~= player.PlayerData.citizenid then
         return exports.qbx_core:Notify(src, locale('error.notown'), 'error')
