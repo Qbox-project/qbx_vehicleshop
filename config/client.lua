@@ -163,7 +163,7 @@ return {
                     vec3(-716.94, -1326.88, 0)
                 },
                 size = vec3(8, 8, 6),
-                targetDistance = 5,
+                targetDistance = 10,
             },
             blip = {
                 label = 'Marina Shop',
