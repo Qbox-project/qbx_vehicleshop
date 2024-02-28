@@ -199,10 +199,13 @@ local function openVehCatsMenu(category)
 
     for k, v in pairs(VEHICLES) do
         if VEHICLES[k].category == category then
-            if config.vehicles[k] == nil then
-                lib.print.debug('Vehicle not found in config.vehicles. Skipping: '..k)
-            elseif type(config.vehicles[k].shop) == 'table' then
-                for _, shop in pairs(config.vehicles[k].shop) do
+            if not VEHICLES[k].shop then
+                lib.print.debug('Vehicle '..k..' does not have a shop set')
+                goto continue
+            end
+            
+            if type(VEHICLES[k].shop) == 'table' then
+                for _, shop in pairs(VEHICLES[k].shop) do
                     if shop == insideShop then
                         vehMenu[#vehMenu + 1] = {
                             title = v.brand..' '..v.name,
@@ -216,7 +219,7 @@ local function openVehCatsMenu(category)
                         }
                     end
                 end
-            elseif config.vehicles[k].shop == insideShop then
+            elseif VEHICLES[k].shop == insideShop then
                 vehMenu[#vehMenu + 1] = {
                     title = v.brand..' '..v.name,
                     description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
