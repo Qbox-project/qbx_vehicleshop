@@ -54,12 +54,6 @@ function FetchVehicleEntitiesByCitizenId(citizenId)
     return MySQL.query.await('SELECT * FROM player_vehicles WHERE citizenid = ?', {citizenId})
 end
 
----@param license string
----@return VehicleEntity[]
-function FetchVehicleEntitiesByLicense(license)
-    return MySQL.query.await('SELECT * FROM player_vehicles WHERE license = ?', {license})
-end
-
 ---@param plate string
 ---@return VehicleEntity
 function FetchVehicleEntityByPlate(plate)
