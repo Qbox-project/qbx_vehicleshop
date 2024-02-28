@@ -16,8 +16,8 @@ RegisterNetEvent('qbx_vehicleshop:server:removePlayer', function(citizenid)
     if not financeTimer[citizenid] then return end
 
     local playTime = financeTimer[citizenid]
-    local financetime = FetchVehicleEntitiesByCitizenId(citizenid)
-    for _, v in pairs(financetime) do
+    local vehicles = FetchFinancedVehicleEntitiesByCitizenId(citizenid)
+    for _, v in pairs(vehicles) do
         if v.balance >= 1 then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
             if newTime < 0 then newTime = 0 end
