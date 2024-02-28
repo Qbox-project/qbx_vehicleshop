@@ -223,15 +223,15 @@ local function openVehCatsMenu(category, targetVehicle)
 end
 
 --- Opens a menu with list of vehicle categories
----@param targetVehicle number
-local function openVehicleCategoryMenu(targetVehicle)
+---@param args table<string, any>
+local function openVehicleCategoryMenu(args)
     local categoryMenu = {}
     for k, v in pairs(config.shops[insideShop].categories) do
         categoryMenu[#categoryMenu + 1] = {
             title = v,
             arrow = true,
             onSelect = function()
-                openVehCatsMenu(k, targetVehicle)
+                openVehCatsMenu(k, args.targetVehicle)
             end
         }
     end
