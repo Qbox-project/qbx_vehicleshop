@@ -149,28 +149,10 @@ local function getVehBrand(closestVehicle)
     return VEHICLES[vehicle].brand
 end
 
---- based on which vehicleshop player is in
----@return integer index
-local function getClosestShowroomVehicle()
-    local pos = GetEntityCoords(cache.ped, true)
-    local current = nil
-    local dist = nil
-    local closestShop = insideShop
-    local showroomVehicles = config.shops[closestShop].showroomVehicles
-    for id in pairs(showroomVehicles) do
-        local dist2 = #(pos - showroomVehicles[id].coords.xyz)
-        if not current or dist2 < dist then
-            current = id
-            dist = dist2
-        end
-    end
-    return current
-end
-
----@param closestShowroomVehicle integer vehicleName
+---@param targetShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
-local function openFinance(closestShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(VEHICLES[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(closestShowroomVehicle), {
+local function openFinance(targetShowroomVehicle, buyVehicle)
+    local dialog = lib.inputDialog(VEHICLES[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(targetShowroomVehicle), {
         {
             type = 'number',
             label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
@@ -193,10 +175,9 @@ end
 
 --- Opens a menu with list of vehicles based on given category
 ---@param category string
-local function openVehCatsMenu(category)
+---@param targetVehicle number
+local function openVehCatsMenu(category, targetVehicle)
     local vehMenu = {}
-    local closestVehicle = getClosestShowroomVehicle()
-
     for k, v in pairs(VEHICLES) do
         if VEHICLES[k].category == category then
             if config.vehicles[k] == nil then
@@ -210,7 +191,7 @@ local function openVehCatsMenu(category)
                             serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                             args = {
                                 toVehicle = v.model,
-                                ClosestVehicle = closestVehicle,
+                                targetVehicle = targetVehicle,
                                 ClosestShop = insideShop
                             }
                         }
@@ -223,7 +204,7 @@ local function openVehCatsMenu(category)
                     serverEvent = 'qbx_vehicleshop:server:swapVehicle',
                     args = {
                         toVehicle = v.model,
-                        ClosestVehicle = closestVehicle,
+                        targetVehicle = targetVehicle,
                         ClosestShop = insideShop
                     }
                 }
@@ -242,14 +223,15 @@ local function openVehCatsMenu(category)
 end
 
 --- Opens a menu with list of vehicle categories
-local function openVehicleCategoryMenu()
+---@param targetVehicle number
+local function openVehicleCategoryMenu(targetVehicle)
     local categoryMenu = {}
     for k, v in pairs(config.shops[insideShop].categories) do
         categoryMenu[#categoryMenu + 1] = {
             title = v,
             arrow = true,
             onSelect = function()
-                openVehCatsMenu(k)
+                openVehCatsMenu(k, targetVehicle)
             end
         }
     end
@@ -264,10 +246,10 @@ local function openVehicleCategoryMenu()
     lib.showContext('vehicleCategories')
 end
 
----@param closestVehicle integer
-local function openCustomFinance(closestVehicle)
-    local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].vehicle
-    local dialog = lib.inputDialog(getVehBrand(closestVehicle):upper()..' '..vehicle:upper()..' - $'..getVehPrice(closestVehicle), {
+---@param targetVehicle integer
+local function openCustomFinance(targetVehicle)
+    local vehicle = config.shops[insideShop].showroomVehicles[targetVehicle].vehicle
+    local dialog = lib.inputDialog(getVehBrand(targetVehicle):upper()..' '..vehicle:upper()..' - $'..getVehPrice(targetVehicle), {
         {
             type = 'number',
             label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
@@ -324,19 +306,21 @@ local function sellVehicle(vehModel)
 end
 
 --- Opens the vehicle shop menu
-local function openVehicleSellMenu()
-    local closestVehicle = getClosestShowroomVehicle()
-    local options
-    local vehicle = config.shops[insideShop].showroomVehicles[closestVehicle].vehicle
+---@param targetVehicle number
+local function openVehicleSellMenu(targetVehicle)
+    local options = {}
+    local vehicle = config.shops[insideShop].showroomVehicles[targetVehicle].vehicle
     local swapOption = {
         title = locale('menus.swap_header'),
         description = locale('menus.swap_txt'),
         onSelect = openVehicleCategoryMenu,
+        args = {
+            targetVehicle = targetVehicle
+        },
         arrow = true
     }
-    if config.shops[insideShop].type == 'free-use' then
-        options = {}
 
+    if config.shops[insideShop].type == 'free-use' then
         if config.enableTestDrive then
             options[#options + 1] = {
                 title = locale('menus.test_header'),
@@ -364,21 +348,19 @@ local function openVehicleSellMenu()
                 title = locale('menus.finance_header'),
                 description = locale('menus.freeuse_finance_txt'),
                 onSelect = function()
-                    openFinance(closestVehicle, vehicle)
+                    openFinance(targetVehicle, vehicle)
                 end
             }
         end
 
         options[#options + 1] = swapOption
     else
-        options = {
-            {
+        options[1] = {
                 title = locale('menus.managed_sell_header'),
                 description = locale('menus.managed_sell_txt'),
                 onSelect = function()
                     sellVehicle(vehicle)
                 end,
-            }
         }
 
         if config.enableTestDrive then
@@ -396,7 +378,7 @@ local function openVehicleSellMenu()
                 title = locale('menus.finance_header'),
                 description = locale('menus.managed_finance_txt'),
                 onSelect = function()
-                    openCustomFinance(closestVehicle)
+                    openCustomFinance(targetVehicle)
                 end
             }
         end
@@ -406,7 +388,7 @@ local function openVehicleSellMenu()
 
     lib.registerContext({
         id = 'vehicleMenu',
-        title = getVehBrand(closestVehicle):upper()..' '..getVehName(closestVehicle):upper()..' - $'..getVehPrice(closestVehicle),
+        title = getVehBrand(targetVehicle):upper()..' '..getVehName(targetVehicle):upper()..' - $'..getVehPrice(targetVehicle),
         options = options
     })
     lib.showContext('vehicleMenu')
@@ -436,7 +418,8 @@ end
 
 ---@param shopName string
 ---@param entity number vehicle
-local function createVehicleTarget(shopName, entity)
+---@param targetVehicle number
+local function createVehicleTarget(shopName, entity, targetVehicle)
     local shop = config.shops[shopName]
     exports.ox_target:addLocalEntity(entity, {
         {
@@ -445,7 +428,7 @@ local function createVehicleTarget(shopName, entity)
             label = locale('general.vehinteraction'),
             distance = shop.zone.targetDistance,
             onSelect = function()
-                openVehicleSellMenu()
+                openVehicleSellMenu(targetVehicle)
             end
         }
     })
@@ -453,7 +436,8 @@ end
 
 ---@param shopName string
 ---@param coords vector4
-local function createVehicleZone(shopName, coords)
+---@param targetVehicle number
+local function createVehicleZone(shopName, coords, targetVehicle)
     local shop = config.shops[shopName]
     lib.zones.box({
         coords = coords.xyz,
@@ -468,7 +452,7 @@ local function createVehicleZone(shopName, coords)
         inside = function()
             local job = config.shops[insideShop].job
             if not IsControlJustPressed(0, 38) or job and QBX.PlayerData.job.name ~= job then return end
-            openVehicleSellMenu()
+            openVehicleSellMenu(targetVehicle)
         end,
         onExit = function()
             lib.hideTextUI()
@@ -550,9 +534,9 @@ local function init()
                 local veh = createShowroomVehicle(showroomVehicle.vehicle, showroomVehicle.coords)
                 shopVehs[#shopVehs + 1] = veh
                 if config.useTarget then
-                    createVehicleTarget(shopName, veh)
+                    createVehicleTarget(shopName, veh, i)
                 else
-                    createVehicleZone(shopName, showroomVehicle.coords)
+                    createVehicleZone(shopName, showroomVehicle.coords, i)
                 end
             end
         end
@@ -594,13 +578,13 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
 end)
 
 --- Swaps the chosen vehicle with another one
----@param data {toVehicle: string, ClosestVehicle: integer, ClosestShop: string}
+---@param data {toVehicle: string, targetVehicle: integer, ClosestShop: string}
 RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     local shopName = data.ClosestShop
-    local dataClosestVehicle = config.shops[shopName].showroomVehicles[data.ClosestVehicle]
-    if dataClosestVehicle.vehicle == data.toVehicle then return end
+    local dataTargetVehicle = config.shops[shopName].showroomVehicles[data.targetVehicle]
+    if dataTargetVehicle.vehicle == data.toVehicle then return end
 
-    local closestVehicle = lib.getClosestVehicle(dataClosestVehicle.coords.xyz, 5, false)
+    local closestVehicle = lib.getClosestVehicle(dataTargetVehicle.coords.xyz, 5, false)
     if not closestVehicle then return end
 
     if not IsModelInCdimage(data.toVehicle) then
@@ -613,11 +597,11 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
         Wait(50)
     end
 
-    local veh = createShowroomVehicle(data.toVehicle, dataClosestVehicle.coords)
+    local veh = createShowroomVehicle(data.toVehicle, dataTargetVehicle.coords)
 
-    dataClosestVehicle.vehicle = data.toVehicle
+    dataTargetVehicle.vehicle = data.toVehicle
 
-    if config.useTarget then createVehicleTarget(shopName, veh) end
+    if config.useTarget then createVehicleTarget(shopName, veh, data.targetVehicle) end
 end)
 
 --- Buys the selected vehicle
