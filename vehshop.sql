@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `vehicle_financing` (
     `paymentamount` int(11) DEFAULT NULL,
     `paymentsleft` int(11) DEFAULT NULL,
     `financetime` int(11) DEFAULT NULL,
+    PRIMARY KEY (`vehicleId`),
     FOREIGN KEY `vehicleId` (`vehicleId`) REFERENCES `player_vehicles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY `plate` (`plate`) REFERENCES `player_vehicles` (`plate`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY `citizenid` (`citizenid`) REFERENCES `players` (`citizenid`) ON DELETE CASCADE ON UPDATE CASCADE
