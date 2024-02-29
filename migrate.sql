@@ -1,14 +1,15 @@
 CREATE TABLE IF NOT EXISTS `vehicle_financing` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `citizenid` varchar(50) DEFAULT NULL,
+    `vehicleId` int(11) NOT NULL,
+    `citizenid` varchar(50) NOT NULL,
     `plate` varchar(15) NOT NULL,
-    `balance` int(11) NOT NULL DEFAULT 0,
-    `paymentamount` int(11) NOT NULL DEFAULT 0,
-    `paymentsleft` int(11) NOT NULL DEFAULT 0,
-    `financetime` int(11) NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`),
+    `balance` int(11) DEFAULT NULL,
+    `paymentamount` int(11) DEFAULT NULL,
+    `paymentsleft` int(11) DEFAULT NULL,
+    `financetime` int(11) DEFAULT NULL,
+    PRIMARY KEY (`vehicleId`),
+    FOREIGN KEY `vehicleId` (`vehicleId`) REFERENCES `player_vehicles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY `plate` (`plate`) REFERENCES `player_vehicles` (`plate`) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY `citizenid` (`citizenid`) REFERENCES `players` (citizenid) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY `citizenid` (`citizenid`) REFERENCES `players` (`citizenid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO vehicle_financing (citizenid, plate, balance, paymentamount, paymentsleft, financetime)
