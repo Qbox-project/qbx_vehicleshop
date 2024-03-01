@@ -108,7 +108,7 @@ end
 ---@param license string
 ---@return VehicleEntity[]
 function FetchFinancedVehicleEntitiesByLicense(license)
-    return MySQL.query.await('SELECT * FROM vehicle_financing WHERE citizenid = (SELECT citizenid FROM players WHERE license = ?) AND balance > 0 AND financetime < 1', {license})
+    return MySQL.query.await('SELECT * FROM vehicle_financing WHERE citizenid IN (SELECT citizenid FROM players WHERE license = ?) AND balance > 0 AND financetime < 1', {license})
 end
 
 ---@param plate string
