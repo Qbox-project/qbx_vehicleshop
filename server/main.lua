@@ -325,7 +325,7 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
     player.Functions.AddMoney('bank', price * config.commissionRate)
     exports.qbx_core:Notify(src, locale('success.earned_commission', lib.math.groupdigits(commission)), 'success')
 
-    exports.qbx_management:AddMoney(player.PlayerData.job.name, price)
+    exports['Renewed-Banking']:addAccountMoney(player.PlayerData.job.name, price)
     exports.qbx_core:Notify(target.PlayerData.source, locale('success.purchased'), 'success')
     return true
 end
