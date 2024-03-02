@@ -6,15 +6,11 @@
 
 ---@param request InsertVehicleEntityRequest
 function InsertVehicleEntity(request)
-    local vehicleId = MySQL.insert.await('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
-        request.license,
-        request.citizenId,
-        request.model,
-        joaat(request.model),
-        '{}',
-        request.plate,
-        'pillboxgarage',
-        0
+    exports.qbx_vehicles:CreateVehicleEntity({
+        citizenId = request.citizenId,
+        model = request.model,
+        plate = request.plate,
+        state = 0
     })
     return vehicleId
 end
@@ -108,16 +104,16 @@ end
 ---@param citizenId string
 ---@return VehicleFinancingEntity
 function FetchFinancedVehicleEntitiesByCitizenId(citizenId)
-    return MySQL.query.await('SELECT vehicle_financing.* FROM vehicle_financing INNER JOIN player_vehicles ON player_vehicles.citizenid = "KLH31301" WHERE vehicle_financing.vehicleId = player_vehicles.id AND vehicle_financing.balance > 0 AND vehicle_financing.financetime > 1', {citizenId})
+    return MySQL.query.await('SELECT vehicle_financing.* FROM vehicle_financing INNER JOIN player_vehicles ON player_vehicles.citizenid = ? WHERE vehicle_financing.vehicleId = player_vehicles.id AND vehicle_financing.balance > 0 AND vehicle_financing.financetime > 1', {citizenId})
 end
 
 ---@param license string
 ---@return VehicleFinancingEntity
 function FetchFinancedVehicleEntitiesByLicense(license)
-    return MySQL.query.await('SELECT * FROM vehicle_financing AS vf INNER JOIN players AS p ON p.citizenid = ? INNER JOIN player_vehicles AS pv ON pv.citizenid = p.citizenid AND vf.balance > 0 AND vf.financetime < 1', {license})
+    return MySQL.query.await('SELECT vf.*, p.citizenid FROM vehicle_financing AS vf INNER JOIN players AS p ON p.citizenid = ? INNER JOIN player_vehicles AS pv ON pv.citizenid = p.citizenid AND vf.balance > 0 AND vf.financetime < 1', {license})
 end
 
 ---@param vehicleId integer
 function DeleteVehicleEntity(vehicleId)
-    MySQL.query('DELETE FROM player_vehicles WHERE id = ?', {vehicleId})
+    exports.qbx_vehicles:DeleteEntityById(vehicleId)
 end
