@@ -5,14 +5,14 @@
 ---@field plate string
 
 ---@param request InsertVehicleEntityRequest
+---@return integer vehicleId
 function InsertVehicleEntity(request)
-    exports.qbx_vehicles:CreateVehicleEntity({
+    return exports.qbx_vehicles:CreateVehicleEntity({
         citizenId = request.citizenId,
         model = request.model,
         plate = request.plate,
         state = 0
     })
-    return vehicleId
 end
 
 ---@class VehicleFinanceServer
