@@ -244,11 +244,9 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
         return
     end
 
-    local cid = player.PlayerData.citizenid
     local plate = generatePlate()
-    InsertVehicleEntity({
-        license = player.PlayerData.license,
-        citizenId = cid,
+    exports.qbx_vehicles:CreateVehicleEntity({
+        citizenId = player.PlayerData.citizenid,
         model = vehicle,
         plate = plate,
     })
@@ -289,7 +287,6 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
 
     InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
-            license = player.PlayerData.license,
             citizenId = cid,
             model = vehicle,
             plate = plate,
@@ -350,8 +347,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, vehiclePrice) then return end
 
-    InsertVehicleEntity({
-        license = target.PlayerData.license,
+    exports.qbx_vehicles:CreateVehicleEntity({
         citizenId = cid,
         model = vehicle,
         plate = plate
@@ -397,7 +393,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
 
     InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
-            license = target.PlayerData.license,
             citizenId = cid,
             model = vehicle,
             plate = plate,

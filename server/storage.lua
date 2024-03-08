@@ -1,19 +1,7 @@
 ---@class InsertVehicleEntityRequest
----@field license string
 ---@field citizenId string
 ---@field model string
 ---@field plate string
-
----@param request InsertVehicleEntityRequest
----@return integer vehicleId
-function InsertVehicleEntity(request)
-    return exports.qbx_vehicles:CreateVehicleEntity({
-        citizenId = request.citizenId,
-        model = request.model,
-        plate = request.plate,
-        state = 0
-    })
-end
 
 ---@class VehicleFinanceServer
 ---@field balance number
@@ -27,8 +15,7 @@ end
 
 ---@param request InsertVehicleEntityWithFinanceRequest
 function InsertVehicleEntityWithFinance(request)
-    local vehicleId = InsertVehicleEntity({
-        license = request.insertVehicleEntityRequest.license,
+    local vehicleId = exports.qbx_vehicles:CreateVehicleEntity({
         citizenId = request.insertVehicleEntityRequest.citizenId,
         model = request.insertVehicleEntityRequest.model,
         plate = request.insertVehicleEntityRequest.plate
