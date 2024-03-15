@@ -16,12 +16,12 @@ RegisterNetEvent('qbx_vehicleshop:server:removePlayer', function(citizenid)
     if not financeTimer[citizenid] then return end
 
     local playTime = financeTimer[citizenid]
-    local financetime = FetchVehicleEntitiesByCitizenId(citizenid)
-    for _, v in pairs(financetime) do
+    local vehicles = FetchFinancedVehicleEntitiesByCitizenId(citizenid)
+    for _, v in pairs(vehicles) do
         if v.balance >= 1 then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
             if newTime < 0 then newTime = 0 end
-            UpdateVehicleEntityFinanceTime(newTime, v.plate)
+            UpdateVehicleEntityFinanceTime(newTime, v.vehicleId)
         end
     end
     financeTimer[citizenid] = nil
@@ -32,14 +32,14 @@ AddEventHandler('playerDropped', function()
     local src = source
     local license = GetPlayerIdentifierByType(src, 'license2') or GetPlayerIdentifierByType(src, 'license')
     if not license then return end
-    local vehicles = FetchVehicleEntitiesByLicense(license)
+    local vehicles = FetchFinancedVehicleEntitiesByLicense(license)
     if not vehicles then return end
     for _, v in pairs(vehicles) do
         local playTime = financeTimer[v.citizenid]
         if v.balance >= 1 and playTime then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
             if newTime < 0 then newTime = 0 end
-            UpdateVehicleEntityFinanceTime(newTime, v.plate)
+            UpdateVehicleEntityFinanceTime(newTime, v.vehicleId)
         end
     end
     if vehicles[1] and financeTimer[vehicles[1].citizenid] then
@@ -94,6 +94,13 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
     local vehicles = FetchVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
+    local financeVehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
+    for _, v in pairs(financeVehicles) do
+        vehicles[v.vehicleId].balance = v.balance
+        vehicles[v.vehicleId].paymentamount = v.paymentamount
+        vehicles[v.vehicleId].paymentsleft = v.paymentsleft
+        vehicles[v.vehicleId].financetime = v.financetime
+    end
     if vehicles[1] then
         return vehicles
     end
@@ -237,11 +244,9 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
         return
     end
 
-    local cid = player.PlayerData.citizenid
     local plate = generatePlate()
-    InsertVehicleEntity({
-        license = player.PlayerData.license,
-        citizenId = cid,
+    exports.qbx_vehicles:CreateVehicleEntity({
+        citizenId = player.PlayerData.citizenid,
         model = vehicle,
         plate = plate,
     })
@@ -282,7 +287,6 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
 
     InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
-            license = player.PlayerData.license,
             citizenId = cid,
             model = vehicle,
             plate = plate,
@@ -343,8 +347,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, vehiclePrice) then return end
 
-    InsertVehicleEntity({
-        license = target.PlayerData.license,
+    exports.qbx_vehicles:CreateVehicleEntity({
         citizenId = cid,
         model = vehicle,
         plate = plate
@@ -390,7 +393,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
 
     InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
-            license = target.PlayerData.license,
             citizenId = cid,
             model = vehicle,
             plate = plate,
@@ -418,8 +420,8 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in pairs(vehicles) do
         local plate = v.plate
-        DeleteVehicleEntity(plate)
-        --MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE plate = ?', {'REPO-'..v.citizenid, plate}) -- Use this if you don't want them to be deleted
+        DeleteVehicleEntity(v.id)
+        --MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE id = ?', {'REPO-'..v.citizenid, v.id}) -- Use this if you don't want them to be deleted
         exports.qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
     end
 end)
@@ -457,8 +459,11 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
     local player = exports.qbx_core:GetPlayer(src)
     local target = exports.qbx_core:GetPlayer(buyerId)
     local row = FetchVehicleEntityByPlate(plate)
-    if config.finance.preventSelling and row.balance > 0 then
-        return exports.qbx_core:Notify(src, locale('error.financed'), 'error')
+    if config.finance.preventSelling then
+        local financeRow = FetchFinancedVehicleEntityById(row.id)
+        if financeRow.balance > 0 then
+            return exports.qbx_core:Notify(src, locale('error.financed'), 'error')
+        end
     end
     if row.citizenid ~= player.PlayerData.citizenid then
         return exports.qbx_core:Notify(src, locale('error.notown'), 'error')
@@ -491,7 +496,7 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
             player.Functions.AddMoney(currencyType, sellAmount)
             target.Functions.RemoveMoney(currencyType, sellAmount)
         end
-        UpdateVehicleEntityOwner(targetcid, targetlicense, plate)
+        UpdateVehicleEntityOwner(targetcid, targetlicense, row.id)
         TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
         local sellerMessage = sellAmount > 0 and locale('success.soldfor') .. lib.math.groupdigits(sellAmount) or locale('success.gifted')
         local buyerMessage = sellAmount > 0 and locale('success.boughtfor') .. lib.math.groupdigits(sellAmount) or locale('success.received_gift')

@@ -29,6 +29,8 @@ files {
     'locales/*.json'
 }
 
+dependency 'qbx_vehicles'
+
 provide 'qb-vehicleshop'
 lua54 'yes'
 use_experimental_fxv2_oal 'yes'

@@ -87,7 +87,7 @@ local function showFinancedVehiclesMenu()
 
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(locale('error.nofinanced'), 'error') end
     for _, v in pairs(vehicles) do
-        if v.balance ~= 0 then
+        if v.balance and v.balance > 0 then
             local name = VEHICLES[v.vehicle].name
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
@@ -152,14 +152,18 @@ end
 ---@param targetShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(targetShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(VEHICLES[buyVehicle].name:upper()..' '..buyVehicle:upper()..' - $'..getVehPrice(targetShowroomVehicle), {
+    local dialog = lib.inputDialog(VEHICLES[buyVehicle].brand:upper()..' '..VEHICLES[buyVehicle].name:upper()..' - $'..getVehPrice(targetShowroomVehicle), {
         {
             type = 'number',
             label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
+            min = VEHICLES[buyVehicle].price * sharedConfig.finance.minimumDown / 100,
+            max = VEHICLES[buyVehicle].price
         },
         {
             type = 'number',
             label = locale('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
+            min = 2,
+            max = sharedConfig.finance.maximumPayments
         }
     })
 

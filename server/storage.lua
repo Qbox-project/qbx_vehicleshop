@@ -1,22 +1,7 @@
 ---@class InsertVehicleEntityRequest
----@field license string
 ---@field citizenId string
 ---@field model string
 ---@field plate string
-
----@param request InsertVehicleEntityRequest
-function InsertVehicleEntity(request)
-    MySQL.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
-        request.license,
-        request.citizenId,
-        request.model,
-        joaat(request.model),
-        '{}',
-        request.plate,
-        'pillboxgarage',
-        0
-    })
-end
 
 ---@class VehicleFinanceServer
 ---@field balance number
@@ -30,15 +15,13 @@ end
 
 ---@param request InsertVehicleEntityWithFinanceRequest
 function InsertVehicleEntityWithFinance(request)
-    MySQL.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, garage, state, balance, paymentamount, paymentsleft, financetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', {
-        request.insertVehicleEntityRequest.license,
-        request.insertVehicleEntityRequest.citizenId,
-        request.insertVehicleEntityRequest.model,
-        joaat(request.insertVehicleEntityRequest.model),
-        '{}',
-        request.insertVehicleEntityRequest.plate,
-        'pillboxgarage',
-        0,
+    local vehicleId = exports.qbx_vehicles:CreateVehicleEntity({
+        citizenId = request.insertVehicleEntityRequest.citizenId,
+        model = request.insertVehicleEntityRequest.model,
+        plate = request.insertVehicleEntityRequest.plate
+    })
+    MySQL.insert('INSERT INTO vehicle_financing (vehicleId, balance, paymentamount, paymentsleft, financetime) VALUES (?, ?, ?, ?, ?)', {
+        vehicleId,
         request.vehicleFinance.balance,
         request.vehicleFinance.payment,
         request.vehicleFinance.paymentsLeft,
@@ -48,16 +31,17 @@ end
 
 ---@alias VehicleEntity table
 
+---@class VehicleFinancingEntity
+---@field vehicleId integer
+---@field balance number
+---@field paymentamount number
+---@field paymentsleft integer
+---@field financetime number
+
 ---@param citizenId string
 ---@return VehicleEntity[]
 function FetchVehicleEntitiesByCitizenId(citizenId)
     return MySQL.query.await('SELECT * FROM player_vehicles WHERE citizenid = ?', {citizenId})
-end
-
----@param license string
----@return VehicleEntity[]
-function FetchVehicleEntitiesByLicense(license)
-    return MySQL.query.await('SELECT * FROM player_vehicles WHERE license = ?', {license})
 end
 
 ---@param plate string
@@ -74,15 +58,15 @@ function DoesVehicleEntityExist(plate)
 end
 
 ---@param time number
----@param plate string
-function UpdateVehicleEntityFinanceTime(time, plate)
-    MySQL.update('UPDATE player_vehicles SET financetime = ? WHERE plate = ?', {time, plate})
+---@param vehicleId integer
+function UpdateVehicleEntityFinanceTime(time, vehicleId)
+    MySQL.update('UPDATE vehicle_financing SET financetime = ? WHERE vehicleId = ?', {time, vehicleId})
 end
 
 ---@param vehicleFinance VehicleFinanceServer
 ---@param plate string
 function UpdateVehicleFinance(vehicleFinance, plate)
-    MySQL.update('UPDATE player_vehicles SET balance = ?, paymentamount = ?, paymentsleft = ?, financetime = ? WHERE plate = ?', {
+    MySQL.update('UPDATE vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON vf.vehicleId = pv.id SET vf.balance = ?, vf.paymentamount = ?, vf.paymentsleft = ?, vf.financetime = ? WHERE pv.plate = ?', {
         vehicleFinance.balance,
         vehicleFinance.payment,
         vehicleFinance.paymentsLeft,
@@ -93,18 +77,30 @@ end
 
 ---@param citizenId string
 ---@param license string
----@param plate string
-function UpdateVehicleEntityOwner(citizenId, license, plate)
-    MySQL.update('UPDATE player_vehicles SET citizenid = ?, license = ? WHERE plate = ?', {citizenId, license, plate})
+---@param vehicleId integer
+function UpdateVehicleEntityOwner(citizenId, license, vehicleId)
+    MySQL.update('UPDATE player_vehicles SET citizenid = ?, license = ? WHERE id = ?', {citizenId, license, vehicleId})
+end
+
+---@param id integer
+---@return VehicleFinancingEntity
+function FetchFinancedVehicleEntityById(id)
+    return MySQL.single.await('SELECT * FROM vehicle_financing WHERE vehicleId = ? AND balance > 0 AND financetime < 1', {id})
 end
 
 ---@param citizenId string
----@return VehicleEntity[]
+---@return VehicleFinancingEntity
 function FetchFinancedVehicleEntitiesByCitizenId(citizenId)
-    return MySQL.query.await('SELECT * FROM player_vehicles WHERE citizenid = ? AND balance > 0 AND financetime < 1', {citizenId})
+    return MySQL.query.await('SELECT vehicle_financing.* FROM vehicle_financing INNER JOIN player_vehicles ON player_vehicles.citizenid = ? WHERE vehicle_financing.vehicleId = player_vehicles.id AND vehicle_financing.balance > 0 AND vehicle_financing.financetime > 1', {citizenId})
 end
 
----@param plate string
-function DeleteVehicleEntity(plate)
-    MySQL.query('DELETE FROM player_vehicles WHERE plate = ?', {plate})
+---@param license string
+---@return VehicleFinancingEntity
+function FetchFinancedVehicleEntitiesByLicense(license)
+    return MySQL.query.await('SELECT vf.*, p.citizenid FROM vehicle_financing AS vf INNER JOIN players AS p ON p.citizenid = ? INNER JOIN player_vehicles AS pv ON pv.citizenid = p.citizenid AND vf.balance > 0 AND vf.financetime < 1', {license})
+end
+
+---@param vehicleId integer
+function DeleteVehicleEntity(vehicleId)
+    exports.qbx_vehicles:DeleteEntityById(vehicleId)
 end
