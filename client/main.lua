@@ -226,14 +226,24 @@ end
 ---@param args table<string, any>
 local function openVehicleCategoryMenu(args)
     local categoryMenu = {}
+    local sortedCategories = {}
     for k, v in pairs(config.shops[insideShop].categories) do
-        categoryMenu[#categoryMenu + 1] = {
-            title = v,
-            arrow = true,
-            onSelect = function()
-                openVehCatsMenu(k, args.targetVehicle)
+        table.insert(sortedCategories, v)
+    end
+    table.sort(sortedCategories)
+    for _, v in ipairs(sortedCategories) do
+        for k, originalValue in pairs(config.shops[insideShop].categories) do
+            if v == originalValue then
+                categoryMenu[#categoryMenu + 1] = {
+                    title = v,
+                    arrow = true,
+                    onSelect = function()
+                        openVehCatsMenu(k, args.targetVehicle)
+                    end
+                }
+                break
             end
-        }
+        end
     end
 
     lib.registerContext({
