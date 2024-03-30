@@ -433,6 +433,9 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
     local src = source
     local buyerId = args.id
     local sellAmount = args.amount or 0
+    if src == buyerId then
+        return exports.qbx_core:Notify(src, locale('error.selftransfer'), 'error')
+    end
     if saleTimeout[src] then
         return exports.qbx_core:Notify(src, locale('error.sale_timeout'), 'error')
     end
@@ -451,7 +454,7 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
         return exports.qbx_core:Notify(src, locale('error.notinveh'), 'error')
     end
 
-    local plate = string.trim(GetVehicleNumberPlateText(vehicle))
+    local plate = qbx.string.trim(GetVehicleNumberPlateText(vehicle))
     if not plate then
         return exports.qbx_core:Notify(src, locale('error.vehinfo'), 'error')
     end
@@ -461,7 +464,7 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
     local row = FetchVehicleEntityByPlate(plate)
     if config.finance.preventSelling then
         local financeRow = FetchFinancedVehicleEntityById(row.id)
-        if financeRow.balance > 0 then
+        if financeRow and financeRow.balance > 0 then
             return exports.qbx_core:Notify(src, locale('error.financed'), 'error')
         end
     end
