@@ -431,6 +431,7 @@ local function createVehicleTarget(shopName, entity, targetVehicle)
             icon = 'fas fa-car',
             label = locale('general.vehinteraction'),
             distance = shop.zone.targetDistance,
+            groups = shop.job,
             onSelect = function()
                 openVehicleSellMenu(targetVehicle)
             end
