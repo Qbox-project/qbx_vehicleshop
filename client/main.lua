@@ -620,15 +620,41 @@ RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, 
     TriggerServerEvent('qb-vehicletuning:server:SaveVehicleProps', props)
 end)
 
-lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
-    local input = lib.inputDialog(locale('general.transfervehicle_confirm', VEHICLES_HASH[vehicle].brand, VEHICLES_HASH[vehicle].name, lib.math.groupdigits(sellAmount) or 0),{
-        {
-            type = 'checkbox',
-            label = 'Confirm'
-        },
+local function confirmTrade(confirmationText)
+    local accepted
+    exports.npwd:createSystemNotification({
+        uniqId = "vehicleShop:confirmTrade",
+        content = confirmationText,
+        secondary = "Confirm Trade",
+        keepOpen = true,
+        duration = 10000,
+        controls = true,
+        onConfirm = function()
+            accepted = true
+        end,
+        onCancel = function()
+            accepted = false
+        end,
     })
-    if not input then return false end
-    if input[1] == true then return true end
+    while accepted == nil do Wait(100) end
+    return accepted
+end
+
+lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
+    local confirmationText = locale('general.transfervehicle_confirm', VEHICLES_HASH[vehicle].brand, VEHICLES_HASH[vehicle].name, lib.math.groupdigits(sellAmount) or 0)
+    if GetResourceState('npwd') ~= 'started' then
+        local input = lib.inputDialog(confirmationText, {
+            {
+                type = 'checkbox',
+                label = 'Confirm'
+            },
+        })
+        return input?[1]
+    end
+
+    local p = promise:new()
+    p:resolve(confirmTrade(confirmationText))
+    return Citizen.Await(p)
 end)
 
 --- Thread to create blips
