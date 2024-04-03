@@ -653,9 +653,7 @@ lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, s
         return input?[1]
     end
 
-    local p = promise:new()
-    p:resolve(confirmTrade(confirmationText))
-    return Citizen.Await(p)
+    return Citizen.Await(confirmTrade(confirmationText))
 end)
 
 --- Thread to create blips
