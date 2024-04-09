@@ -227,6 +227,8 @@ end
 local function openVehicleCategoryMenu(args)
     local categoryMenu = {}
     local sortedCategories = {}
+    local categories = config.shops[insideShop].categories
+
     for k, v in pairs(config.shops[insideShop].categories) do
         table.insert(sortedCategories, v)
     end
