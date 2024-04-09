@@ -212,6 +212,12 @@ local function openVehCatsMenu(category, targetVehicle)
         end
     end
 
+    table.sort(vehMenu, function(a, b)
+        local _, aName = string.strsplit(' ', string.upper(a.title), 2)
+        local _, bName = string.strsplit(' ', string.upper(b.title), 2)
+        return aName < bName
+    end)
+
     lib.registerContext({
         id = 'openVehCats',
         title = config.shops[insideShop].categories[category],
