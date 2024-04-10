@@ -216,6 +216,12 @@ local function openVehCatsMenu(category, targetVehicle)
         end
     end
 
+    table.sort(vehMenu, function(a, b)
+        local _, aName = string.strsplit(' ', string.upper(a.title), 2)
+        local _, bName = string.strsplit(' ', string.upper(b.title), 2)
+        return aName < bName
+    end)
+
     lib.registerContext({
         id = 'openVehCats',
         title = config.shops[insideShop].categories[category],
@@ -230,12 +236,26 @@ end
 ---@param args table<string, any>
 local function openVehicleCategoryMenu(args)
     local categoryMenu = {}
-    for k, v in pairs(config.shops[insideShop].categories) do
+    local sortedCategories = {}
+    local categories = config.shops[insideShop].categories
+
+    for k, v in pairs(categories) do
+        sortedCategories[#sortedCategories + 1] = {
+            category = k,
+            label = v
+        }
+    end
+
+    table.sort(sortedCategories, function(a, b)
+        return string.upper(a.label) < string.upper(b.label)
+    end)
+
+    for i = 1, #sortedCategories do
         categoryMenu[#categoryMenu + 1] = {
-            title = v,
+            title = sortedCategories[i].label,
             arrow = true,
             onSelect = function()
-                openVehCatsMenu(k, args.targetVehicle)
+                openVehCatsMenu(sortedCategories[i].category, args.targetVehicle)
             end
         }
     end
