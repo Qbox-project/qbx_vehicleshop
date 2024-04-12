@@ -673,7 +673,7 @@ lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, s
         return input?[1]
     end
 
-    return Citizen.Await(confirmTrade(confirmationText))
+    return confirmTrade(confirmationText)
 end)
 
 --- Thread to create blips
