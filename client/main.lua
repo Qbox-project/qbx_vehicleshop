@@ -487,7 +487,7 @@ end
 ---@param coords vector4
 ---@return number vehicleEntity
 local function createShowroomVehicle(model, coords)
-    lib.requestModel(model, 1000)
+    lib.requestModel(model, 5000)
     local veh = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, false, false)
     SetModelAsNoLongerNeeded(model)
     SetVehicleOnGroundProperly(veh)
