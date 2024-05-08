@@ -107,9 +107,8 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
 end)
 
 lib.callback.register('qbx_vehicleshop:server:spawnVehicle', function(source, model, coords, plate)
-    local netId = qbx.spawnVehicle({model = model, spawnSource = coords, warp = GetPlayerPed(source)})
+    local netId, veh = qbx.spawnVehicle({model = model, spawnSource = coords, warp = GetPlayerPed(source)})
     if not netId or netId == 0 then return end
-    local veh = NetworkGetEntityFromNetworkId(netId)
     if not veh or veh == 0 then return end
 
     SetVehicleNumberPlateText(veh, plate)
