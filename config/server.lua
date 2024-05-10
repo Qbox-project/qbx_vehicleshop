@@ -3,7 +3,7 @@ return {
     finance = {
         paymentWarning = 10, -- time in minutes that player has to make payment before repo
         paymentInterval = 24, -- time in hours between payment being due
-        preventSelling = false, -- prevents players from using /transfervehicle if financed
+        preventSelling = true, -- prevents players from using /transfervehicle if financed
     },
     saleTimeout = 60000 -- Delay between attempts to sell/gift a vehicle. Prevents abuse
 }
