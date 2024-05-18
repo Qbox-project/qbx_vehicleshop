@@ -285,7 +285,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
     local cid = player.PlayerData.citizenid
     local timer = (config.finance.paymentInterval * 60)
 
-    InsertVehicleEntityWithFinance({
+    local vehicleId = InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
             citizenId = cid,
             model = vehicle,
@@ -299,7 +299,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
         }
     })
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
-    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate)
+    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate, vehicleId)
     player.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 end)
 
@@ -391,7 +391,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, downPayment) then return end
 
-    InsertVehicleEntityWithFinance({
+    local vehicleId = InsertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
             citizenId = cid,
             model = vehicle,
@@ -405,7 +405,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         }
     })
 
-    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate)
+    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate, vehicleId)
 end)
 
 -- Check if payment is due
