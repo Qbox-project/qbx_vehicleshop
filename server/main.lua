@@ -82,7 +82,7 @@ end
 local function generateUniquePlate()
     while true do
         local plate = qbx.generateRandomPlate('11AAA111')
-        if not DoesVehicleEntityExist(plate) then return plate end
+        if not DoesVehicleEntityExist(plate) and not exports.qbx_vehicles:DoesEntityPlateExist(plate) then return plate end
         Wait(0)
     end
 end
