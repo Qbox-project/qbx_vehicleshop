@@ -27,6 +27,8 @@ function InsertVehicleEntityWithFinance(request)
         request.vehicleFinance.paymentsLeft,
         request.vehicleFinance.timer
     })
+
+    return vehicleId
 end
 
 ---@alias VehicleEntity table

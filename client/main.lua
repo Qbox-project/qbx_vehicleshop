@@ -632,9 +632,9 @@ end)
 --- Buys the selected vehicle
 ---@param vehicle number
 ---@param plate string
-RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
+RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate, vehicleId)
     local tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate)
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate, vehicleId)
     local veh = NetToVeh(netId)
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
