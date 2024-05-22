@@ -96,10 +96,12 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     local vehicles = FetchVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     local financeVehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in pairs(financeVehicles) do
-        vehicles[v.vehicleId].balance = v.balance
-        vehicles[v.vehicleId].paymentamount = v.paymentamount
-        vehicles[v.vehicleId].paymentsleft = v.paymentsleft
-        vehicles[v.vehicleId].financetime = v.financetime
+        if vehicles[v.vehicleId] then
+            vehicles[v.vehicleId].balance = v.balance
+            vehicles[v.vehicleId].paymentamount = v.paymentamount
+            vehicles[v.vehicleId].paymentsleft = v.paymentsleft
+            vehicles[v.vehicleId].financetime = v.financetime
+        end
     end
     if vehicles[1] then
         return vehicles
