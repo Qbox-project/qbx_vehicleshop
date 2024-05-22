@@ -216,6 +216,12 @@ local function openVehCatsMenu(category, targetVehicle)
         end
     end
 
+    table.sort(vehMenu, function(a, b)
+        local _, aName = string.strsplit(' ', string.upper(a.title), 2)
+        local _, bName = string.strsplit(' ', string.upper(b.title), 2)
+        return aName < bName
+    end)
+
     lib.registerContext({
         id = 'openVehCats',
         title = config.shops[insideShop].categories[category],
@@ -230,12 +236,26 @@ end
 ---@param args table<string, any>
 local function openVehicleCategoryMenu(args)
     local categoryMenu = {}
-    for k, v in pairs(config.shops[insideShop].categories) do
+    local sortedCategories = {}
+    local categories = config.shops[insideShop].categories
+
+    for k, v in pairs(categories) do
+        sortedCategories[#sortedCategories + 1] = {
+            category = k,
+            label = v
+        }
+    end
+
+    table.sort(sortedCategories, function(a, b)
+        return string.upper(a.label) < string.upper(b.label)
+    end)
+
+    for i = 1, #sortedCategories do
         categoryMenu[#categoryMenu + 1] = {
-            title = v,
+            title = sortedCategories[i].label,
             arrow = true,
             onSelect = function()
-                openVehCatsMenu(k, args.targetVehicle)
+                openVehCatsMenu(sortedCategories[i].category, args.targetVehicle)
             end
         }
     end
@@ -612,9 +632,9 @@ end)
 --- Buys the selected vehicle
 ---@param vehicle number
 ---@param plate string
-RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate)
+RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate, vehicleId)
     local tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate)
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate, vehicleId)
     local veh = NetToVeh(netId)
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
@@ -653,9 +673,7 @@ lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, s
         return input?[1]
     end
 
-    local p = promise:new()
-    p:resolve(confirmTrade(confirmationText))
-    return Citizen.Await(p)
+    return confirmTrade(confirmationText)
 end)
 
 --- Thread to create blips
