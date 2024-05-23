@@ -93,20 +93,9 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
-    local vehicles = FetchVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     local financeVehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
-    for _, v in pairs(financeVehicles) do
-        for k, v2 in pairs(vehicles) do
-            if v.vehicleId == v2.id then
-                vehicles[k].balance = v.balance
-                vehicles[k].paymentamount = v.paymentamount
-                vehicles[k].paymentsleft = v.paymentsleft
-                vehicles[k].financetime = v.financetime
-            end
-        end
-    end
-    if vehicles[1] then
-        return vehicles
+    if #financeVehicles > 0 then
+        return financeVehicles
     end
 end)
 
@@ -416,12 +405,11 @@ end)
 RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
-    local result = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
-    if not result[1] then return end
+    local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
+    if not vehicles[1] then return end
 
     exports.qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
     Wait(config.finance.paymentWarning * 60000)
-    local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in pairs(vehicles) do
         local plate = v.plate
         DeleteVehicleEntity(v.id)
