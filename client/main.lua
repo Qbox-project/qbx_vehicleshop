@@ -29,13 +29,13 @@ end
 
 local function confirmationCheck()
     local alert = lib.alertDialog({
-        header = 'Wait a minute!',
-        content = 'Are you sure you wish to proceed?',
+        header = 'Espere um minuto!',
+        content = 'Tem certeza de que deseja prosseguir?',
         centered = true,
         cancel = true,
         labels = {
-            cancel = 'No',
-            confirm = 'Yes',
+            cancel = 'Não',
+            confirm = 'Sim',
         }
     })
     return alert
@@ -46,9 +46,9 @@ local function showVehicleFinanceMenu(data)
     local vehLabel = VEHICLES[data.vehicle].brand..' '..VEHICLES[data.vehicle].name
     local vehFinance = {
         {
-            title = 'Finance Information',
+            title = locale('menus.veh_finance_title'),
             icon = 'circle-info',
-            description = string.format('Name: %s\nPlate: %s\nRemaining Balance: $%s\nRecurring Payment Amount: $%s\nPayments Left: %s', vehLabel, data.vehiclePlate, lib.math.groupdigits(data.balance), lib.math.groupdigits(data.paymentAmount), data.paymentsLeft),
+            description = string.format('Nome: %s\nPlaca: %s\nSaldo restante: R$%s\nValor das parcelas: R$%s\nParcelas restantes: %s', vehLabel, data.vehiclePlate, lib.math.groupdigits(data.balance), lib.math.groupdigits(data.paymentAmount), data.paymentsLeft),
             readOnly = true,
         },
         {
@@ -152,16 +152,19 @@ end
 ---@param targetShowroomVehicle integer vehicleName
 ---@param buyVehicle string model
 local function openFinance(targetShowroomVehicle, buyVehicle)
-    local dialog = lib.inputDialog(VEHICLES[buyVehicle].brand:upper()..' '..VEHICLES[buyVehicle].name:upper()..' - $'..getVehPrice(targetShowroomVehicle), {
+    local dialog = lib.inputDialog(VEHICLES[buyVehicle].brand:upper()..' '..VEHICLES[buyVehicle].name:upper()..' - R$'..getVehPrice(targetShowroomVehicle), {
         {
             type = 'number',
             label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
+            placeholder = string.format('%.2f', math.ceil(VEHICLES[buyVehicle].price * sharedConfig.finance.minimumDown / 100)),
+            default = math.ceil(VEHICLES[buyVehicle].price * sharedConfig.finance.minimumDown / 100),
             min = VEHICLES[buyVehicle].price * sharedConfig.finance.minimumDown / 100,
             max = VEHICLES[buyVehicle].price
         },
         {
             type = 'number',
             label = locale('menus.financesubmit_totalpayment')..sharedConfig.finance.maximumPayments,
+            default = 2,
             min = 2,
             max = sharedConfig.finance.maximumPayments
         }
@@ -273,7 +276,7 @@ end
 ---@param targetVehicle integer
 local function openCustomFinance(targetVehicle)
     local vehicle = config.shops[insideShop].showroomVehicles[targetVehicle].vehicle
-    local dialog = lib.inputDialog(getVehBrand(targetVehicle):upper()..' '..vehicle:upper()..' - $'..getVehPrice(targetVehicle), {
+    local dialog = lib.inputDialog(getVehBrand(targetVehicle):upper()..' '..vehicle:upper()..' - R$'..getVehPrice(targetVehicle), {
         {
             type = 'number',
             label = locale('menus.financesubmit_downpayment')..sharedConfig.finance.minimumDown..'%',
@@ -337,6 +340,7 @@ local function openVehicleSellMenu(targetVehicle)
     local swapOption = {
         title = locale('menus.swap_header'),
         description = locale('menus.swap_txt'),
+        icon = 'right-left',
         onSelect = openVehicleCategoryMenu,
         args = {
             targetVehicle = targetVehicle
@@ -349,6 +353,7 @@ local function openVehicleSellMenu(targetVehicle)
             options[#options + 1] = {
                 title = locale('menus.test_header'),
                 description = locale('menus.freeuse_test_txt'),
+                icon = 'fas fa-car',
                 event = 'qbx_vehicleshop:client:testDrive',
                 args = {
                     vehicle = vehicle
@@ -360,6 +365,7 @@ local function openVehicleSellMenu(targetVehicle)
             options[#options + 1] = {
                 title = locale('menus.freeuse_buy_header'),
                 description = locale('menus.freeuse_buy_txt'),
+                icon = 'dollar-sign',
                 serverEvent = 'qbx_vehicleshop:server:buyShowroomVehicle',
                 args = {
                     buyVehicle = vehicle
@@ -371,6 +377,7 @@ local function openVehicleSellMenu(targetVehicle)
             options[#options + 1] = {
                 title = locale('menus.finance_header'),
                 description = locale('menus.freeuse_finance_txt'),
+                icon = 'fa-solid fa-file-invoice-dollar',
                 onSelect = function()
                     openFinance(targetVehicle, vehicle)
                 end
@@ -382,6 +389,7 @@ local function openVehicleSellMenu(targetVehicle)
         options[1] = {
                 title = locale('menus.managed_sell_header'),
                 description = locale('menus.managed_sell_txt'),
+                icon = 'fa-solid fa-hand-holding-dollar',
                 onSelect = function()
                     sellVehicle(vehicle)
                 end,
@@ -391,6 +399,7 @@ local function openVehicleSellMenu(targetVehicle)
             options[#options + 1] = {
                 title = locale('menus.test_header'),
                 description = locale('menus.managed_test_txt'),
+                icon = 'fas fa-car',
                 onSelect = function()
                     startTestDrive(vehicle)
                 end
@@ -401,6 +410,7 @@ local function openVehicleSellMenu(targetVehicle)
             options[#options + 1] = {
                 title = locale('menus.finance_header'),
                 description = locale('menus.managed_finance_txt'),
+                icon = 'fa-solid fa-file-invoice-dollar',
                 onSelect = function()
                     openCustomFinance(targetVehicle)
                 end
@@ -412,7 +422,8 @@ local function openVehicleSellMenu(targetVehicle)
 
     lib.registerContext({
         id = 'vehicleMenu',
-        title = getVehBrand(targetVehicle):upper()..' '..getVehName(targetVehicle):upper()..' - $'..getVehPrice(targetVehicle),
+        title = getVehBrand(targetVehicle):upper()..' '..getVehName(targetVehicle):upper(),
+        description = '**R$'..getVehPrice(targetVehicle)..'**',
         options = options
     })
     lib.showContext('vehicleMenu')

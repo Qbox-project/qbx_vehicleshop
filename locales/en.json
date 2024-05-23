@@ -41,6 +41,7 @@
         "goback_header": "Go Back",
         "veh_price": "Price: $",
         "veh_platetxt": "Plate: ",
+        "veh_finance_title": "Finance Information",
         "veh_finance": "Vehicle Payment",
         "veh_finance_balance": "Total Balance Remaining",
         "veh_finance_currency": "$",
