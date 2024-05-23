@@ -93,7 +93,7 @@ end
 ---@param citizenId string
 ---@return VehicleFinancingEntity
 function FetchFinancedVehicleEntitiesByCitizenId(citizenId)
-    return MySQL.query.await('SELECT vehicle_financing.* FROM vehicle_financing INNER JOIN player_vehicles ON player_vehicles.citizenid = ? WHERE vehicle_financing.vehicleId = player_vehicles.id AND vehicle_financing.balance > 0 AND vehicle_financing.financetime > 1', {citizenId})
+    return MySQL.query.await('SELECT player_vehicles.vehicle, player_vehicles.plate, vehicle_financing.* FROM player_vehicles LEFT JOIN vehicle_financing ON player_vehicles.id = vehicle_financing.vehicleId WHERE citizenid = ?', {citizenId})
 end
 
 ---@param license string
