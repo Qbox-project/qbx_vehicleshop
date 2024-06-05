@@ -532,6 +532,7 @@ local function createShowroomVehicle(model, coords)
     SetVehicleDoorsLocked(veh, 3)
     FreezeEntityPosition(veh, true)
     SetVehicleNumberPlateText(veh, 'BUY ME')
+    Entity(veh).state.isVehicleShopEntity = true;
     return veh
 end
 
@@ -615,7 +616,6 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
     local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, testDrive.spawn, plate)
     testDriveVeh = netId
     while not NetworkGetEntityFromNetworkId(netId) do Wait(100) end
-
     exports.qbx_core:Notify(locale('general.testdrive_timenoti', testDrive.limit), 'inform')
     startTestDriveTimer(testDrive.limit * 60)
 end)
