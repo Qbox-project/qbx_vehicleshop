@@ -82,7 +82,7 @@ end
 local function generateUniquePlate()
     while true do
         local plate = qbx.generateRandomPlate('11AAA111')
-        if not DoesVehicleEntityExist(plate) and not exports.qbx_vehicles:DoesEntityPlateExist(plate) then return plate end
+        if not DoesVehicleEntityExist(plate) and not exports.qbx_vehicles:DoesPlayerVehiclePlateExist(plate) then return plate end
         Wait(0)
     end
 end
@@ -245,10 +245,12 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     end
 
     local plate = generateUniquePlate()
-    local vehicleId = exports.qbx_vehicles:CreateVehicleEntity({
-        citizenId = player.PlayerData.citizenid,
+    local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
-        plate = plate,
+        citizenId = player.PlayerData.citizenid,
+        props = {
+            plate = plate
+        }
     })
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
     TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate, vehicleId)
@@ -347,10 +349,12 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, vehiclePrice) then return end
 
-    local vehicleId = exports.qbx_vehicles:CreateVehicleEntity({
-        citizenId = cid,
+    local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
-        plate = plate
+        citizenId = cid,
+        props = {
+            plate = plate
+        }
     })
 
     TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate, vehicleId)
@@ -420,7 +424,7 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in pairs(vehicles) do
         local plate = v.plate
-        DeleteVehicleEntity(v.id)
+        exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
         --MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE id = ?', {'REPO-'..v.citizenid, v.id}) -- Use this if you don't want them to be deleted
         exports.qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
     end

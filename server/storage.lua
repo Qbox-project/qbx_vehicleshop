@@ -15,10 +15,12 @@
 
 ---@param request InsertVehicleEntityWithFinanceRequest
 function InsertVehicleEntityWithFinance(request)
-    local vehicleId = exports.qbx_vehicles:CreateVehicleEntity({
-        citizenId = request.insertVehicleEntityRequest.citizenId,
+    local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = request.insertVehicleEntityRequest.model,
-        plate = request.insertVehicleEntityRequest.plate
+        citizenId = request.insertVehicleEntityRequest.citizenId,
+        props = {
+            plate = request.insertVehicleEntityRequest.plate
+        }
     })
     MySQL.insert('INSERT INTO vehicle_financing (vehicleId, balance, paymentamount, paymentsleft, financetime) VALUES (?, ?, ?, ?, ?)', {
         vehicleId,
@@ -100,9 +102,4 @@ end
 ---@return VehicleFinancingEntity
 function FetchFinancedVehicleEntitiesByLicense(license)
     return MySQL.query.await('SELECT vf.*, p.citizenid FROM vehicle_financing AS vf INNER JOIN players AS p ON p.citizenid = ? INNER JOIN player_vehicles AS pv ON pv.citizenid = p.citizenid AND vf.balance > 0 AND vf.financetime < 1', {license})
-end
-
----@param vehicleId integer
-function DeleteVehicleEntity(vehicleId)
-    exports.qbx_vehicles:DeleteEntityById(vehicleId)
 end
