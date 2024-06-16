@@ -107,7 +107,8 @@ lib.callback.register('qbx_vehicleshop:server:spawnVehicle', function(source, mo
     if vehicleId then Entity(veh).state:set('vehicleid', vehicleId, false) end
 
     SetVehicleNumberPlateText(veh, plate)
-    TriggerClientEvent('vehiclekeys:client:SetOwner', source, plate)
+    --- @old TriggerClientEvent('vehiclekeys:client:SetOwner', source, plate)
+    exports.mri_Qcarkeys:GiveKeyItem(source, plate)
     return netId
 end)
 
