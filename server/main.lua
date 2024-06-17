@@ -247,7 +247,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local plate = generateUniquePlate()
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
-        citizenId = player.PlayerData.citizenid,
+        citizenid = player.PlayerData.citizenid,
         props = {
             plate = plate
         }
@@ -351,7 +351,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
 
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
-        citizenId = cid,
+        citizenid = cid,
         props = {
             plate = plate
         }
