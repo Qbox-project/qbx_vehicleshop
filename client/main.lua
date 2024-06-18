@@ -657,6 +657,7 @@ RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, 
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
     TriggerServerEvent('qb-vehicletuning:server:SaveVehicleProps', props)
+    exports.mri_Qcarkeys:GiveKeyItem(plate)
 end)
 
 local function confirmTrade(confirmationText)
