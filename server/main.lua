@@ -511,3 +511,11 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
         exports.qbx_core:Notify(buyerId, buyerMessage, 'success')
     end, GetEntityModel(vehicle), sellAmount)
 end)
+
+---@param vehicleId integer
+---@return boolean
+local function isFinanced(vehicleId)
+    FetchIsFinanced(vehicleId)
+end
+
+exports('IsFinanced', isFinanced)
