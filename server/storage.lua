@@ -98,6 +98,14 @@ function FetchFinancedVehicleEntityById(id)
     return MySQL.single.await('SELECT * FROM vehicle_financing WHERE vehicleId = ? AND balance > 0 AND financetime < 1', {id})
 end
 
+---@param vehicleId integer
+---@return boolean
+function FetchIsFinanced(vehicleId)
+    return MySQL.scalar.await('SELECT 1 FROM vehicle_financing WHERE vehicleId = ? AND balance > 0', {
+        vehicleId
+    }) ~= nil
+end
+
 ---@param citizenId string
 ---@return VehicleFinancingEntity
 function FetchFinancedVehicleEntitiesByCitizenId(citizenId)
