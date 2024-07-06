@@ -70,13 +70,19 @@ end
 ---@param vehicleFinance VehicleFinanceServer
 ---@param plate string
 function UpdateVehicleFinance(vehicleFinance, plate)
-    MySQL.update('UPDATE vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON vf.vehicleId = pv.id SET vf.balance = ?, vf.paymentamount = ?, vf.paymentsleft = ?, vf.financetime = ? WHERE pv.plate = ?', {
-        vehicleFinance.balance,
-        vehicleFinance.payment,
-        vehicleFinance.paymentsLeft,
-        vehicleFinance.timer,
-        plate
-    })
+    if vehicleFinance.balance == 0 then
+        MySQL.query('DELETE FROM vehicle_financing WHERE plate = ?', {
+            plate
+        })
+    else
+        MySQL.update('UPDATE vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON vf.vehicleId = pv.id SET vf.balance = ?, vf.paymentamount = ?, vf.paymentsleft = ?, vf.financetime = ? WHERE pv.plate = ?', {
+            vehicleFinance.balance,
+            vehicleFinance.payment,
+            vehicleFinance.paymentsLeft,
+            vehicleFinance.timer,
+            plate
+        })
+    end
 end
 
 ---@param citizenId string
