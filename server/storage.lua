@@ -70,17 +70,18 @@ end
 ---@param vehicleFinance VehicleFinanceServer
 ---@param plate string
 function UpdateVehicleFinance(vehicleFinance, plate)
+    local vehicleId = exports.qbx_vehicles:GetVehicleIdByPlate(plate)
     if vehicleFinance.balance == 0 then
-        MySQL.query('DELETE FROM vehicle_financing WHERE plate = ?', {
-            plate
+        MySQL.query('DELETE FROM vehicle_financing WHERE vehicleId = ?', {
+            vehicleId
         })
     else
-        MySQL.update('UPDATE vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON vf.vehicleId = pv.id SET vf.balance = ?, vf.paymentamount = ?, vf.paymentsleft = ?, vf.financetime = ? WHERE pv.plate = ?', {
+        MySQL.update('UPDATE vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON vf.vehicleId = pv.id SET vf.balance = ?, vf.paymentamount = ?, vf.paymentsleft = ?, vf.financetime = ? WHERE pv.id = ?', {
             vehicleFinance.balance,
             vehicleFinance.payment,
             vehicleFinance.paymentsLeft,
             vehicleFinance.timer,
-            plate
+            vehicleId
         })
     end
 end
