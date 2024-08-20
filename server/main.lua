@@ -81,7 +81,7 @@ end
 
 local function generateUniquePlate()
     while true do
-        local plate = qbx.generateRandomPlate('11AAA111')
+        local plate = qbx.generateRandomPlate('111AA11A')
         if not DoesVehicleEntityExist(plate) and not exports.qbx_vehicles:DoesPlayerVehiclePlateExist(plate) then return plate end
         Wait(0)
     end
