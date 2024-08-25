@@ -56,7 +56,7 @@ end
 
 ---@param vehicleId integer
 ---@return VehicleEntity
-function FetchVehicleEntutyByVehicleId(vehicleId)
+function FetchVehicleEntityByVehicleId(vehicleId)
     return MySQL.single.await('SELECT * FROM player_vehicles WHERE vehicleId = ?', {vehicleId})
 end
 
