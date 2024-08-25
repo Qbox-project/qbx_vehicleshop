@@ -465,7 +465,7 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
 
     local player = exports.qbx_core:GetPlayer(src)
     local target = exports.qbx_core:GetPlayer(buyerId)
-    local row = FetchVehicleEntityByPlate(plate)
+    local row = FetchVehicleEntityByVehicleId(vehicleId)
     if config.finance.preventSelling then
         local financeRow = FetchFinancedVehicleEntityById(row.id)
         if financeRow and financeRow.balance > 0 then
