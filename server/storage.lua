@@ -54,13 +54,13 @@ function FetchVehicleEntityByPlate(plate)
     return MySQL.single.await('SELECT * FROM player_vehicles WHERE plate = ?', {plate})
 end
 
----@param vehicleId string
+---@param vehicleId integer
 ---@return VehicleEntity
 function FetchVehicleEntutyByVehicleId(vehicleId)
     return MySQL.single.await('SELECT * FROM player_vehicles WHERE vehicleId = ?', {vehicleId})
 end
 
----@param vehicle string
+---@param vehicle integer|string
 ---@return boolean
 function DoesVehicleEntityExist(vehicle)
     local count = MySQL.scalar.await('SELECT COUNT(*) FROM player_vehicles WHERE vehicleId = ? or plate = ?', {vehicle, vehicle})
