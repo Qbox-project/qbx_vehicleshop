@@ -94,6 +94,7 @@ local function showFinancedVehiclesMenu()
     local ownedVehicles = {}
 
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(locale('error.nofinanced'), 'error') end
+    
     for _, v in pairs(vehicles) do
         if v.balance and v.balance > 0 then
             local vehicle = VEHICLES[v.modelName]
@@ -428,6 +429,16 @@ local function openVehicleSellMenu(targetVehicle)
     lib.showContext('vehicleMenu')
 end
 
+--- End test drive
+local function endTestDrive()
+    TriggerServerEvent('qbx_vehicleshop:server:deleteVehicle', testDriveVeh)
+    testDriveVeh = 0
+    inTestDrive = false
+    LocalPlayer.state:set('isInTestDrive', false, true)
+    exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
+end
+
+
 --- Starts the test drive timer based on time and shop
 ---@param time number
 local function startTestDriveTimer(time)
@@ -439,10 +450,7 @@ local function startTestDriveTimer(time)
             local currentGameTime = GetGameTimer()
             local secondsLeft = currentGameTime - gameTimer
             if currentGameTime < gameTimer + timeMs and secondsLeft >= timeMs - 50 then
-                TriggerServerEvent('qbx_vehicleshop:server:deleteVehicle', testDriveVeh)
-                testDriveVeh = 0
-                inTestDrive = false
-                exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
+                endTestDrive()
             end
             qbx.drawText2d({ text = locale('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000), coords = vec2(1.0, 1.38), scale = 0.5})
             Wait(0)
@@ -600,9 +608,21 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
     if not args then return end
 
     inTestDrive = true
+    LocalPlayer.state:set('isInTestDrive', true, true)
     local testDrive = config.shops[insideShop].testDrive
     local plate = 'TEST'..lib.string.random('1111')
-    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, args.vehicle, testDrive.spawn, plate)
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, {
+        model = args.vehicle,
+        coords = testDrive.spawn,
+        plate = plate
+    })
+
+    lib.waitFor(function()
+        if NetworkDoesEntityExistWithNetworkId(netId) then
+            return true
+        end
+    end, 'netId not exist')
+
     testDriveVeh = netId
     exports.qbx_core:Notify(locale('general.testdrive_timenoti', testDrive.limit), 'inform')
     startTestDriveTimer(testDrive.limit * 60)
