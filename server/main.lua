@@ -36,7 +36,7 @@ AddEventHandler('playerDropped', function()
     if not license then return end
     local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(license)
     if not vehicles then return end
-    for _, v in pairs(vehicles) do
+    for _, v in ipairs(vehicles) do
         local playTime = financeTimer[v.citizenid]
         if v.balance >= 1 and playTime then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
@@ -63,7 +63,6 @@ local function calculateFinance(vehiclePrice, downPayment, paymentamount)
 end
 
 ---@class FinancedVehicle
----@field vehiclePlate string
 ---@field paymentAmount number
 ---@field balance number
 ---@field paymentsLeft integer
@@ -82,15 +81,15 @@ local function calculateNewFinance(paymentAmount, vehData)
 end
 
 local function generateUniquePlate()
-    while true do
-        local plate = qbx.generateRandomPlate('111AA11A')
-        if not DoesVehicleEntityExist(plate) and not exports.qbx_vehicles:DoesPlayerVehiclePlateExist(plate) then return plate end
+    local plate
+    repeat
+        plate = qbx.generateRandomPlate('111AA11A')
         Wait(0)
-    end
+    until not exports.qbx_vehicles:DoesPlayerVehiclePlateExist(plate)
+    return plate
 end
 
 -- Callbacks
-
 lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(source)
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
@@ -424,8 +423,6 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
 
     exports.qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
     Wait(config.finance.paymentWarning * 60000)
-    local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
-    for _, v in pairs(vehicles) do
     local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in ipairs(vehicles) do
         local plate = v.plate

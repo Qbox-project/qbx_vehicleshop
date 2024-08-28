@@ -11,6 +11,9 @@ local insideShop = nil
 ---@field balance number
 ---@field paymentsLeft integer
 ---@field paymentAmount number
+---@field brand string
+---@field name string
+---@field vehId number
 
 ---@param data VehicleFinanceClient
 local function financePayment(data)
@@ -24,7 +27,12 @@ local function financePayment(data)
     if not dialog then return end
 
     local paymentAmount = tonumber(dialog[1])
-    TriggerServerEvent('qbx_vehicleshop:server:financePayment', paymentAmount, data)
+    TriggerServerEvent('qbx_vehicleshop:server:financePayment', paymentAmount, {
+        vehId = data.vehId,
+        paymentAmount = data.paymentAmount,
+        balance = data.balance,
+        paymentsLeft = data.paymentsLeft
+    })
 end
 
 local function confirmationCheck()
@@ -43,7 +51,7 @@ end
 
 ---@param data VehicleFinanceClient
 local function showVehicleFinanceMenu(data)
-    local vehLabel = VEHICLES[data.vehicle].brand..' '..VEHICLES[data.vehicle].name
+    local vehLabel = data.brand..' '..data.name
     local vehFinance = {
         {
             title = 'Finance Information',
@@ -62,7 +70,7 @@ local function showVehicleFinanceMenu(data)
             onSelect = function()
                 local check = confirmationCheck()
                 if check == 'confirm' then
-                    TriggerServerEvent('qbx_vehicleshop:server:financePaymentFull', {vehBalance = data.balance, vehPlate = data.vehiclePlate})
+                    TriggerServerEvent('qbx_vehicleshop:server:financePaymentFull', {vehBalance = data.balance, vehId = data.vehId})
                 else
                     lib.showContext('vehicleFinance')
                 end
@@ -88,16 +96,18 @@ local function showFinancedVehiclesMenu()
     if vehicles == nil or #vehicles == 0 then return exports.qbx_core:Notify(locale('error.nofinanced'), 'error') end
     for _, v in pairs(vehicles) do
         if v.balance and v.balance > 0 then
-            local name = VEHICLES[v.vehicle].name
+            local vehicle = VEHICLES[v.modelName]
             local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
-                title = name,
+                title = vehicle.name,
                 description = locale('menus.veh_platetxt')..plate,
                 icon = 'fa-solid fa-car-side',
                 arrow = true,
                 onSelect = function()
                     showVehicleFinanceMenu({
-                        vehicle = v.vehicle,
+                        vehId = v.id,
+                        name = vehicle.name,
+                        brand = vehicle.brand,
                         vehiclePlate = plate,
                         balance = v.balance,
                         paymentsLeft = v.paymentsleft,
@@ -524,12 +534,6 @@ local shopVehs = {}
 
 local function init()
     CreateThread(function()
-        for name, shop in pairs(config.shops) do
-            createShop(shop.zone.shape, name)
-        end
-    end)
-
-    CreateThread(function()
         if config.finance.enable then
             lib.zones.box({
                 coords = config.finance.zone,
@@ -552,12 +556,14 @@ local function init()
     end)
 
     CreateThread(function()
-        for shopName in pairs(config.shops) do
+        for shopName, shop in pairs(config.shops) do
+            createShop(shop.zone.shape, shopName)
+
             local showroomVehicles = config.shops[shopName].showroomVehicles
             for i = 1, #showroomVehicles do
                 local showroomVehicle = showroomVehicles[i]
                 local veh = createShowroomVehicle(showroomVehicle.vehicle, showroomVehicle.coords)
-                shopVehs[#shopVehs + 1] = veh
+                shopVehs[i] = veh
                 if config.useTarget then
                     createVehicleTarget(shopName, veh, i)
                 else
@@ -634,7 +640,12 @@ end)
 ---@param plate string
 RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate, vehicleId)
     local tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, vehicle, config.shops[tempShop].vehicleSpawn, plate, vehicleId)
+    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, {
+        model = vehicle,
+        coords = config.shops[tempShop].vehicleSpawn,
+        plate = plate,
+        vehicleId = vehicleId
+    })
     local veh = NetToVeh(netId)
     local props = lib.getVehicleProperties(veh)
     props.plate = plate
@@ -695,6 +706,6 @@ end)
 
 AddEventHandler('onResourceStart', function(resource)
     if GetCurrentResourceName() == resource then
-        if LocalPlayer.state.isLoggedIn then init() end
+        init()
     end
 end)
