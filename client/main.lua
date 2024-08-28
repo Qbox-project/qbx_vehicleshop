@@ -438,6 +438,11 @@ local function endTestDrive()
     exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
 end
 
+RegisterCommand('endtestdrive', function()
+    if not inTestDrive then return end
+
+    endTestDrive()
+end, false)
 
 --- Starts the test drive timer based on time and shop
 ---@param time number
