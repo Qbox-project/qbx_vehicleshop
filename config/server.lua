@@ -5,5 +5,6 @@ return {
         paymentInterval = 24, -- time in hours between payment being due
         preventSelling = false, -- prevents players from using /transfervehicle if financed
     },
-    saleTimeout = 60000 -- Delay between attempts to sell/gift a vehicle. Prevents abuse
+    saleTimeout = 60000, -- Delay between attempts to sell/gift a vehicle. Prevents abuse
+    deleteUnpaidFinancedVehicle = false -- true to delete unpaid vehicles from database, otherwise it will edit citizenid to hide from db select
 }

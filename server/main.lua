@@ -424,8 +424,12 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local vehicles = FetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     for _, v in pairs(vehicles) do
         local plate = v.plate
-        exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
-        --MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE id = ?', {'REPO-'..v.citizenid, v.id}) -- Use this if you don't want them to be deleted
+        if config.deleteUnpaidFinancedVehicle then
+            exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
+        else
+            MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE id = ?', {'REPO-'..v.citizenid, v.id}) -- Use this if you don't want them to be deleted
+        end
+
         exports.qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
     end
 end)
