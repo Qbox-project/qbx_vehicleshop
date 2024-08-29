@@ -101,20 +101,6 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     return vehicles[1] and vehicles
 end)
 
-lib.callback.register('qbx_vehicleshop:server:spawnVehicle', function(source, data)
-    local model, coords, plate, vehicleId = data.model, data.coords, data.plate, data.vehicleId
-    local netId, veh = qbx.spawnVehicle({model = model, spawnSource = coords, warp = GetPlayerPed(source)})
-
-    if not netId or netId == 0 then return end
-
-    if not veh or veh == 0 then return end
-
-    if vehicleId then Entity(veh).state:set('vehicleid', vehicleId, false) end
-
-    SetVehicleNumberPlateText(veh, plate)
-    TriggerClientEvent('vehiclekeys:client:SetOwner', source, plate)
-    return netId
-end)
 
 -- Events
 
@@ -231,6 +217,26 @@ RegisterNetEvent('qbx_vehicleshop:server:financePaymentFull', function(data)
     }, vehId)
 end)
 
+local function spawnVehicle(src, data)
+    local coords, vehicleId = data.coords, data.vehicleId
+    local vehicle = vehicleId and exports.qbx_vehicles:GetPlayerVehicle(vehicleId) or data
+    if not vehicle then return end
+
+    local netId, veh = qbx.spawnVehicle({model = vehicle.modelName, spawnSource = coords, warp = GetPlayerPed(src)})
+
+    if not netId or netId == 0 then return end
+
+    if not veh or veh == 0 then return end
+
+    if vehicleId then Entity(veh).state:set('vehicleid', vehicleId, false) end
+
+    local plate = vehicle.plate or vehicle.props.plate
+    SetVehicleNumberPlateText(veh, plate)
+    TriggerClientEvent('vehiclekeys:client:SetOwner', src, plate)
+    return netId
+end
+lib.callback.register('qbx_vehicleshop:server:spawnVehicle', spawnVehicle)
+
 -- Buy public vehicle outright
 RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
@@ -247,7 +253,15 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
         citizenid = player.PlayerData.citizenid,
     })
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
-    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate, vehicleId)
+
+    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', src)
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    spawnVehicle(src, {
+        coords = shop.vehicleSpawn,
+        vehicleId = vehicleId
+    })
     player.Functions.RemoveMoney(currencyType, vehiclePrice, 'vehicle-bought-in-showroom')
 end)
 
@@ -293,6 +307,17 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
         }
     })
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
+
+    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', src)
+
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    spawnVehicle(src, {
+        coords = shop.vehicleSpawn,
+        vehicleId = vehicleId
+    })
+
     player.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 end)
 
@@ -342,12 +367,16 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
         citizenid = cid,
-        props = {
-            plate = plate
-        }
     })
 
+    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', target.PlayerData.source)
     local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    spawnVehicle(src, {
+        coords = shop.vehicleSpawn,
+        vehicleId = vehicleId
+    })
 end)
 
 -- Finance vehicle to customer
@@ -397,6 +426,14 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         }
     })
 
+    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', target.PlayerData.source)
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    spawnVehicle(src, {
+        coords = shop.vehicleSpawn,
+        vehicleId = vehicleId
+    })
 end)
 
 -- Check if payment is due

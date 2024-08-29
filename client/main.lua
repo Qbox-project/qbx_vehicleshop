@@ -664,6 +664,8 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     if config.useTarget then createVehicleTarget(shopName, veh, data.targetVehicle) end
 end)
 
+lib.callback.register('qbx_vehicleshop:client:getPlayerCurrentShop', function()
+    return insideShop
 end)
 
 local function confirmTrade(confirmationText)
