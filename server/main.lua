@@ -475,12 +475,9 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
 
     local player = exports.qbx_core:GetPlayer(src)
     local target = exports.qbx_core:GetPlayer(buyerId)
-    local row = exports.qbx_vehicles:GetPlayerVehicles({
-        vehicleId = vehicleId
-    })
+    local row = exports.qbx_vehicles:GetPlayerVehicle(vehicleId)
 
     if not row then return end
-    row = row[1]
 
     if config.finance.preventSelling then
         local financeRow = require 'server.finance'.fetchFinancedVehicleEntityById(row.id)
