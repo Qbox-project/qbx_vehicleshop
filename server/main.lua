@@ -80,15 +80,6 @@ local function calculateNewFinance(paymentAmount, vehData)
     return qbx.math.round(newBalance), qbx.math.round(newPayment), newPaymentsLeft
 end
 
-local function generateUniquePlate()
-    local plate
-    repeat
-        plate = qbx.generateRandomPlate('111AA11A')
-        Wait(0)
-    until not exports.qbx_vehicles:DoesPlayerVehiclePlateExist(plate)
-    return plate
-end
-
 -- Callbacks
 lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(source)
     local src = source
@@ -251,13 +242,9 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
         return exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
     end
 
-    local plate = generateUniquePlate()
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
         citizenid = player.PlayerData.citizenid,
-        props = {
-            plate = plate
-        }
     })
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
     TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate, vehicleId)
@@ -289,7 +276,6 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
         return exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
     end
 
-    local plate = generateUniquePlate()
     local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
     local cid = player.PlayerData.citizenid
     local timer = (config.finance.paymentInterval * 60)
@@ -298,7 +284,6 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
         insertVehicleEntityRequest = {
             citizenId = cid,
             model = vehicle,
-            plate = plate,
         },
         vehicleFinance = {
             balance = balance,
@@ -308,7 +293,6 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
         }
     })
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
-    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', src, vehicle, plate, vehicleId)
     player.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 end)
 
@@ -352,7 +336,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
     local vehicle = data
     local vehiclePrice = coreVehicles[vehicle].price
     local cid = target.PlayerData.citizenid
-    local plate = generateUniquePlate()
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, vehiclePrice) then return end
 
@@ -364,7 +347,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
         }
     })
 
-    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate, vehicleId)
     local shop = sharedConfig.shops[shopId]
 end)
 
@@ -398,7 +380,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
 
     local cid = target.PlayerData.citizenid
     local timer = (config.finance.paymentInterval * 60)
-    local plate = generateUniquePlate()
     local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, downPayment) then return end
@@ -407,7 +388,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         insertVehicleEntityRequest = {
             citizenId = cid,
             model = vehicle,
-            plate = plate,
         },
         vehicleFinance = {
             balance = balance,
@@ -417,7 +397,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         }
     })
 
-    TriggerClientEvent('qbx_vehicleshop:client:buyShowroomVehicle', target.PlayerData.source, vehicle, plate, vehicleId)
 end)
 
 -- Check if payment is due

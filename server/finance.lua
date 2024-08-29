@@ -1,7 +1,6 @@
 ---@class InsertVehicleEntityRequest
 ---@field citizenId string
 ---@field model string
----@field plate string
 
 ---@class VehicleFinanceServer
 ---@field balance number
@@ -28,9 +27,6 @@ function finance.insertVehicleEntityWithFinance(request)
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = insertVehicleEntityRequest.model,
         citizenid = insertVehicleEntityRequest.citizenId,
-        props = {
-            plate = insertVehicleEntityRequest.plate
-        }
     })
 
     local vehicleFinance = request.vehicleFinance

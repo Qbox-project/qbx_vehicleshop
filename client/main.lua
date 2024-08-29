@@ -97,8 +97,10 @@ local function showFinancedVehiclesMenu()
 
     for _, v in pairs(vehicles) do
         if v.balance and v.balance > 0 then
+            local plate = v.props.plate
+            plate = plate and plate:upper()
+
             local vehicle = VEHICLES[v.modelName]
-            local plate = v.plate:upper()
             ownedVehicles[#ownedVehicles + 1] = {
                 title = vehicle.name,
                 description = locale('menus.veh_platetxt')..plate,
@@ -619,7 +621,7 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
     local testDrive = sharedConfig.shops[insideShop].testDrive
     local plate = 'TEST'..lib.string.random('1111')
     local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, {
-        model = args.vehicle,
+        modelName = args.vehicle,
         coords = testDrive.spawn,
         plate = plate
     })
@@ -662,21 +664,6 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     if config.useTarget then createVehicleTarget(shopName, veh, data.targetVehicle) end
 end)
 
---- Buys the selected vehicle
----@param vehicle number
----@param plate string
-RegisterNetEvent('qbx_vehicleshop:client:buyShowroomVehicle', function(vehicle, plate, vehicleId)
-    local tempShop = insideShop -- temp hacky way of setting the shop because it changes after the callback has returned since you are outside the zone
-    local netId = lib.callback.await('qbx_vehicleshop:server:spawnVehicle', false, {
-        model = vehicle,
-        coords = config.shops[tempShop].vehicleSpawn,
-        plate = plate,
-        vehicleId = vehicleId
-    })
-    local veh = NetToVeh(netId)
-    local props = lib.getVehicleProperties(veh)
-    props.plate = plate
-    TriggerServerEvent('qb-vehicletuning:server:SaveVehicleProps', props)
 end)
 
 local function confirmTrade(confirmationText)
