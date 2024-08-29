@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "Voertuig is geen eigendom!",
         "testdrive_alreadyin": "Je bent al bezig met een testrit",
         "testdrive_return": "Dit is niet jouw testrit voertuig",
         "Invalid_ID": "Ongeldige speler ID",

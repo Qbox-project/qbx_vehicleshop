@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "Fahrzeug nicht im Besitz!",
         "testdrive_alreadyin": "Bereits in der Probefahrt",
         "testdrive_return": "Dies ist kein Fahrzeug für eine Probefahrt",
         "Invalid_ID": "Ungültige Bürger-ID angegeben",

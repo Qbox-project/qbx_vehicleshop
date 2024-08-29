@@ -502,7 +502,9 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
     end
 
     local vehicleId = Entity(vehicle).state.vehicleid or qbx_vehicles:GetVehicleIdByPlate(GetVehicleNumberPlateText(vehicle))
-    if not vehicleId then return end
+    if not vehicleId then
+        return qbx_core:Notify(src, locale('error.notowned'), 'error')
+    end
 
     local player = qbx_core:GetPlayer(src)
     local target = qbx_core:GetPlayer(buyerId)

@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "A jármű nincs a tulajdonában!",
         "testdrive_alreadyin": "Már próbaút alatt van",
         "testdrive_return": "Ez nem a te próbajárműved",
         "Invalid_ID": "Érvénytelen Játékos ID",
