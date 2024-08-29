@@ -546,7 +546,7 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
             target.Functions.RemoveMoney(currencyType, sellAmount)
         end
         qbx_vehicles:SetPlayerVehicleOwner(row.id, targetcid)
-        TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, row.plate)
+        TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, row.props.plate)
         local sellerMessage = sellAmount > 0 and locale('success.soldfor') .. lib.math.groupdigits(sellAmount) or locale('success.gifted')
         local buyerMessage = sellAmount > 0 and locale('success.boughtfor') .. lib.math.groupdigits(sellAmount) or locale('success.received_gift')
         qbx_core:Notify(src, sellerMessage, 'success')
