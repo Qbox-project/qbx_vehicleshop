@@ -219,7 +219,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financePaymentFull', function(data)
 end)
 
 ---@param src number
----@param data {coords: vector4, vehicleId: number, modelName: string, plate?: string}
+---@param data {coords: vector4, vehicleId?: number, modelName: string, plate?: string, props?: {plate: string}}
 ---@return number|nil
 local function spawnVehicle(src, data)
     local coords, vehicleId = data.coords, data.vehicleId
