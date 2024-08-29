@@ -18,7 +18,8 @@ RegisterNetEvent('qbx_vehicleshop:server:removePlayer', function(citizenid)
 
     local playTime = financeTimer[citizenid]
     local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(citizenid)
-    for _, v in ipairs(vehicles) do
+    for i = 1, #vehicles do
+        local v = vehicles[i]
         if v.balance >= 1 then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
             if newTime < 0 then newTime = 0 end
@@ -36,7 +37,8 @@ AddEventHandler('playerDropped', function()
     if not license then return end
     local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(license)
     if not vehicles then return end
-    for _, v in ipairs(vehicles) do
+    for i = 1, #vehicles do
+        local v = vehicles[i]
         local playTime = financeTimer[v.citizenid]
         if v.balance >= 1 and playTime then
             local newTime = math.floor(v.financetime - (((os.time() - playTime) / 1000) / 60))
@@ -91,7 +93,8 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     })
 
     local financeVehicles = require 'server.finance'.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
-    for _, v in ipairs(financeVehicles) do
+    for i = 1, #financeVehicles do
+        local v = financeVehicles[i]
         local vehicle = vehicles[v.vehicleId]
         vehicle.balance = v.balance
         vehicle.paymentamount = v.paymentamount
@@ -441,14 +444,13 @@ end)
 RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local src = source
     local player = exports.qbx_core:GetPlayer(src)
-    local finance = require 'server.finance'
-    local result = finance.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
-    if not result[1] then return end
 
     exports.qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
     Wait(config.finance.paymentWarning * 60000)
-    local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
-    for _, v in ipairs(vehicles) do
+
+    local vehicles = require 'server.finance'.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
+    for i = 1, #vehicles do
+        local v = vehicles[i]
         local plate = v.plate
         if config.deleteUnpaidFinancedVehicle then
             exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
