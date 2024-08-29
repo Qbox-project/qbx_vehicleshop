@@ -226,7 +226,16 @@ local function spawnVehicle(src, data)
     local vehicle = vehicleId and exports.qbx_vehicles:GetPlayerVehicle(vehicleId) or data
     if not vehicle then return end
 
-    local netId, veh = qbx.spawnVehicle({model = vehicle.modelName, spawnSource = coords, warp = GetPlayerPed(src)})
+    local plate = vehicle.plate or vehicle.props.plate
+
+    local netId, veh = qbx.spawnVehicle({
+        model = vehicle.modelName,
+        spawnSource = coords,
+        warp = GetPlayerPed(src),
+        props = {
+            plate
+        }
+    })
 
     if not netId or netId == 0 then return end
 
@@ -234,8 +243,6 @@ local function spawnVehicle(src, data)
 
     if vehicleId then Entity(veh).state:set('vehicleid', vehicleId, false) end
 
-    local plate = vehicle.plate or vehicle.props.plate
-    SetVehicleNumberPlateText(veh, plate)
     TriggerClientEvent('vehiclekeys:client:SetOwner', src, plate)
     return netId
 end
