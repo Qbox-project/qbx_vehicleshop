@@ -470,16 +470,15 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
         return exports.qbx_core:Notify(src, locale('error.notinveh'), 'error')
     end
 
-    local plate = qbx.string.trim(GetVehicleNumberPlateText(vehicle))
-    if not plate then
-        return exports.qbx_core:Notify(src, locale('error.vehinfo'), 'error')
-    end
+    local vehicleId = Entity(vehicle).state.vehicleid
+    if not vehicleId then return end
 
     local player = exports.qbx_core:GetPlayer(src)
     local target = exports.qbx_core:GetPlayer(buyerId)
     local row = exports.qbx_vehicles:GetPlayerVehicles({
-        plate = plate
+        vehicleId = vehicleId
     })
+
     if not row then return end
     row = row[1]
 
@@ -520,7 +519,7 @@ lib.addCommand('transfervehicle', {help = locale('general.command_transfervehicl
             target.Functions.RemoveMoney(currencyType, sellAmount)
         end
         exports.qbx_vehicles:SetPlayerVehicleOwner(row.id, targetcid)
-        TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, plate)
+        TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, row.plate)
         local sellerMessage = sellAmount > 0 and locale('success.soldfor') .. lib.math.groupdigits(sellAmount) or locale('success.gifted')
         local buyerMessage = sellAmount > 0 and locale('success.boughtfor') .. lib.math.groupdigits(sellAmount) or locale('success.received_gift')
         exports.qbx_core:Notify(src, sellerMessage, 'success')
