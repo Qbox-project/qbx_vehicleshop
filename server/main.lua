@@ -100,8 +100,6 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     end
     return vehicles[1] and vehicles
 end)
-
-
 -- Events
 
 -- Brute force vehicle deletion
@@ -217,6 +215,9 @@ RegisterNetEvent('qbx_vehicleshop:server:financePaymentFull', function(data)
     }, vehId)
 end)
 
+---@param src number
+---@param data {coords: vector4, vehicleId: number, modelName: string, plate?: string}
+---@return number|nil
 local function spawnVehicle(src, data)
     local coords, vehicleId = data.coords, data.vehicleId
     local vehicle = vehicleId and exports.qbx_vehicles:GetPlayerVehicle(vehicleId) or data
