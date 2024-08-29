@@ -3,7 +3,6 @@ local sharedConfig = require 'config.shared'
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
-local inTestDrive = false
 local insideShop = nil
 
 ---@class VehicleFinanceClient
@@ -435,17 +434,9 @@ end
 local function endTestDrive()
     TriggerServerEvent('qbx_vehicleshop:server:deleteVehicle', testDriveVeh)
     testDriveVeh = 0
-    inTestDrive = false
     LocalPlayer.state:set('isInTestDrive', false, true)
     exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
 end
-
-RegisterCommand('endtestdrive', function()
-    if not inTestDrive then return end
-
-    endTestDrive()
-end, false)
-
 --- Starts the test drive timer based on time and shop
 ---@param time number
 local function startTestDriveTimer(time)
@@ -453,7 +444,8 @@ local function startTestDriveTimer(time)
     local timeMs = time * 1000
 
     CreateThread(function()
-        while inTestDrive do
+        local playerState = LocalPlayer.state
+        while playerState.isInTestDrive do
             local currentGameTime = GetGameTimer()
             local secondsLeft = currentGameTime - gameTimer
             if currentGameTime < gameTimer + timeMs and secondsLeft >= timeMs - 50 then
@@ -609,14 +601,13 @@ end)
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
 --- @param args table
 RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
-    if inTestDrive then
+    if LocalPlayer.state.isInTestDrive then
         exports.qbx_core:Notify(locale('error.testdrive_alreadyin'), 'error')
         return
     end
 
     if not args then return end
 
-    inTestDrive = true
     LocalPlayer.state:set('isInTestDrive', true, true)
     local testDrive = sharedConfig.shops[insideShop].testDrive
     local plate = 'TEST'..lib.string.random('1111')
