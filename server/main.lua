@@ -450,9 +450,10 @@ end)
 -- Check if payment is due
 RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
     local src = source
-    local player = exports.qbx_core:GetPlayer(src)
+    local qbx_core = exports.qbx_core
+    local player = qbx_core:GetPlayer(src)
 
-    exports.qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
+    qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
     Wait(config.finance.paymentWarning * 60000)
 
     local vehicles = require 'server.finance'.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
@@ -462,10 +463,10 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
         if config.deleteUnpaidFinancedVehicle then
             exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
         else
-            MySQL.update('UPDATE player_vehicles SET citizenid = ? WHERE id = ?', {'REPO-'..v.citizenid, v.id}) -- Use this if you don't want them to be deleted
+            exports.qbx_vehicles:SetPlayerVehicleOwner(v.id, 'REPO-'..v.citizenid)
         end
 
-        exports.qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
+        qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
     end
 end)
 
