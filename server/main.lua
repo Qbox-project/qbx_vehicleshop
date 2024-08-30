@@ -463,7 +463,7 @@ RegisterNetEvent('qbx_vehicleshop:server:checkFinance', function()
         if config.deleteUnpaidFinancedVehicle then
             exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
         else
-            exports.qbx_vehicles:SetPlayerVehicleOwner(v.id, 'REPO-'..v.citizenid)
+            exports.qbx_vehicles:SetPlayerVehicleOwner(v.id, nil)
         end
 
         qbx_core:Notify(src, locale('error.repossessed', plate), 'error')
