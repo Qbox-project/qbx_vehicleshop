@@ -1,3 +1,6 @@
+lib.versionCheck('Qbox-project/qbx_vehicleshop')
+assert(lib.checkDependency('qbx_vehicles', '1.4.1'), 'qbx_vehicles v1.4.1 or higher is required')
+
 -- Variables
 local config = require 'config.server'
 local sharedConfig = require 'config.shared'
