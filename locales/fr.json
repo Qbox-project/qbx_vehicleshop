@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "Véhicule non possédé !",
         "testdrive_alreadyin": "Déjà dans le test",
         "testdrive_return": "Ce n'est pas votre véhicule de test",
         "Invalid_ID": "ID invalide",

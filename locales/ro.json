@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "Vehicul nu este deținut!",
         "testdrive_alreadyin": "Testezi deja un vehicul",
         "testdrive_return": "Acesta nu este vehiculul tau de test",
         "Invalid_ID": "S-a furnizat un ID invalid de jucator",

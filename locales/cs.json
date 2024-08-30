@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "Vozidlo nevlastní!",
         "testdrive_alreadyin": "Uz jsi v testovaci jizde!",
         "testdrive_return": "Toto neni vozidlo, ktere jsi testoval",
         "Invalid_ID": "Spatne ID",

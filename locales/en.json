@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "Vehicle not owned",
         "testdrive_alreadyin": "Already in test drive",
         "testdrive_return": "This is not your test drive vehicle",
         "Invalid_ID": "Invalid Player Id Supplied",
