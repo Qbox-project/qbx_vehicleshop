@@ -233,7 +233,7 @@ local function spawnVehicle(src, data)
         spawnSource = coords,
         warp = GetPlayerPed(src),
         props = {
-            plate
+            plate = plate
         }
     })
 
