@@ -84,11 +84,6 @@ local function calculateFinance(vehiclePrice, downPayment, paymentamount)
     return qbx.math.round(balance), qbx.math.round(vehPaymentAmount)
 end
 
----@class FinancedVehicle
----@field paymentAmount number
----@field balance number
----@field paymentsLeft integer
-
 ---@param paymentAmount number paid
 ---@param vehData FinancedVehicle
 ---@return integer newBalance

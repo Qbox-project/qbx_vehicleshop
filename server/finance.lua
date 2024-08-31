@@ -1,24 +1,3 @@
----@class InsertVehicleEntityRequest
----@field citizenId string
----@field model string
-
----@class VehicleFinanceServer
----@field balance number
----@field payment number
----@field paymentsLeft integer
----@field timer number
-
----@class InsertVehicleEntityWithFinanceRequest
----@field insertVehicleEntityRequest InsertVehicleEntityRequest
----@field vehicleFinance VehicleFinanceServer
-
----@class VehicleFinancingEntity
----@field vehicleId integer
----@field balance number
----@field paymentamount number
----@field paymentsleft integer
----@field financetime number
-
 ---@param request InsertVehicleEntityWithFinanceRequest
 local function insertVehicleEntityWithFinance(request)
     local insertVehicleEntityRequest = request.insertVehicleEntityRequest

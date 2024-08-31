@@ -5,15 +5,6 @@ local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
 local insideShop
 
----@class VehicleFinanceClient
----@field vehiclePlate string
----@field balance number
----@field paymentsLeft integer
----@field paymentAmount number
----@field brand string
----@field name string
----@field vehId number
-
 ---@param data VehicleFinanceClient
 local function financePayment(data)
     local dialog = lib.inputDialog(locale('menus.veh_finance'), {
@@ -219,7 +210,7 @@ local function openVehCatsMenu(category, targetVehicle)
                             args = {
                                 toVehicle = v.model,
                                 targetVehicle = targetVehicle,
-                                ClosestShop = insideShop
+                                closestShop = insideShop
                             }
                         }
                     end
@@ -232,7 +223,7 @@ local function openVehCatsMenu(category, targetVehicle)
                     args = {
                         toVehicle = v.model,
                         targetVehicle = targetVehicle,
-                        ClosestShop = insideShop
+                        closestShop = insideShop
                     }
                 }
             end
@@ -242,6 +233,7 @@ local function openVehCatsMenu(category, targetVehicle)
     table.sort(vehMenu, function(a, b)
         local _, aName = string.strsplit(' ', string.upper(a.title), 2)
         local _, bName = string.strsplit(' ', string.upper(b.title), 2)
+
         return aName < bName
     end)
 
@@ -659,9 +651,9 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
 end)
 
 --- Swaps the chosen vehicle with another one
----@param data {toVehicle: string, targetVehicle: integer, ClosestShop: string}
+---@param data {toVehicle: string, targetVehicle: integer, closestShop: string}
 RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
-    local shopName = data.ClosestShop
+    local shopName = data.closestShop
     local dataTargetVehicle = sharedConfig.shops[shopName].showroomVehicles[data.targetVehicle]
     if dataTargetVehicle.vehicle == data.toVehicle then return end
 
