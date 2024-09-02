@@ -729,15 +729,16 @@ end)
 --- Thread to create blips
 CreateThread(function()
     for _, v in pairs(sharedConfig.shops) do
-        if v.blip.show then
-            local dealer = AddBlipForCoord(v.blip.coords.x, v.blip.coords.y, v.blip.coords.z)
-            SetBlipSprite(dealer, v.blip.sprite)
+        local blip = v.blip
+        if blip.show then
+            local dealer = AddBlipForCoord(blip.coords.x, blip.coords.y, blip.coords.z)
+            SetBlipSprite(dealer, blip.sprite)
             SetBlipDisplay(dealer, 4)
             SetBlipScale(dealer, 0.70)
             SetBlipAsShortRange(dealer, true)
-            SetBlipColour(dealer, v.blip.color)
+            SetBlipColour(dealer, blip.color)
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(v.blip.label)
+            AddTextComponentSubstringPlayerName(blip.label)
             EndTextCommandSetBlipName(dealer)
         end
     end
