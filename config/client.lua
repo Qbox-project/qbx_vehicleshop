@@ -15,7 +15,6 @@ return {
     default = 'pdm',
 
     categories = {
-        coupes = 'pdm',
         boats = 'boats',
         air = 'air',
         -- super = {'pdm', 'luxury'},
