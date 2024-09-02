@@ -196,36 +196,32 @@ end
 local function openVehCatsMenu(category, targetVehicle)
     local vehMenu = {}
 
-    for k, v in pairs(VEHICLES) do
-        if VEHICLES[k].category == category then
-            if not config.vehicles[k] then
-                lib.print.debug('Vehicle not found in config.vehicles. Skipping: '..k)
-            elseif type(config.vehicles[k].shop) == 'table' then
-                for _, shop in pairs(config.vehicles[k].shop) do
-                    if shop == insideShop then
-                        vehMenu[#vehMenu + 1] = {
-                            title = ('%s %s'):format(v.brand, v.name),
-                            description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
-                            serverEvent = 'qbx_vehicleshop:server:swapVehicle',
-                            args = {
-                                toVehicle = v.model,
-                                targetVehicle = targetVehicle,
-                                closestShop = insideShop
-                            }
-                        }
+    local function insertVehicle(data)
+        vehMenu[#vehMenu + 1] = {
+            title = ('%s %s'):format(data.brand, data.name),
+            description = locale('menus.veh_price')..lib.math.groupdigits(data.price),
+            serverEvent = 'qbx_vehicleshop:server:swapVehicle',
+            args = {
+                toVehicle = data.model,
+                targetVehicle = targetVehicle,
+                closestShop = insideShop
+            }
+        }
+    end
+
+    for k, vehicle in pairs(VEHICLES) do
+        if vehicle.category == category then
+            local vehicleShop = config.models[k] or config.categories[vehicle.category] or config.default
+            if not vehicleShop then
+                lib.print.debug('Vehicle not found in config. Skipping: '..k)
+            elseif type(vehicleShop) == 'table' then
+                for i = 1, #vehicleShop do
+                    if vehicleShop[i] == insideShop then
+                        insertVehicle(vehicle)
                     end
                 end
-            elseif config.vehicles[k].shop == insideShop then
-                vehMenu[#vehMenu + 1] = {
-                    title = ('%s %s'):format(v.brand, v.name),
-                    description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
-                    serverEvent = 'qbx_vehicleshop:server:swapVehicle',
-                    args = {
-                        toVehicle = v.model,
-                        targetVehicle = targetVehicle,
-                        closestShop = insideShop
-                    }
-                }
+            elseif vehicleShop == insideShop then
+                insertVehicle(vehicle)
             end
         end
     end
