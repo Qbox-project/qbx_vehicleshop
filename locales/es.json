@@ -1,5 +1,6 @@
 {
     "error": {
+        "notowned": "¡Vehículo no propio!",
         "testdrive_alreadyin": "Ya se encuentra en prueba de manejo",
         "testdrive_return": "Este no es tu vehículo para prueba de manejo",
         "Invalid_ID": "ID de jugador inválida",
