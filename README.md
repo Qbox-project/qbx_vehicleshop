@@ -1,13 +1,14 @@
 # qbx_vehicleshop
 
 **Test Drives:**
-* Toggle test drive
+* Can be disabled in config
 * Configurable time
 * Returns player once time is up
 * Can't take out more than one vehicle
 
+
 **Financing:**
-* Toggle whether you can finance or not
+* Can be disabled in config
 * Configurable down payment
 * Configurable maximum payments
 * Configurable commission amount for private dealerships
@@ -20,16 +21,10 @@
 * Vehicle sale amount gets deposited into the cardealer society fund for private dealer
 
 **Vehicle Configuration System**
-* Model Check: The system first looks for the vehicle model in the models table. If a matching model is found, its will be displayed.
+* The system allows specifying default vehicle shops for all vehicles or categorizing them into specific shops, with the option to apply exceptions. This reduces configuration file sizes by minimizing repetitive entries.
 
-* Category Check: If the vehicle model is not found, the system then checks the categories table to see if a category matches the vehicle. Its will be displayed in menu if a match is found.
-
-* Default Settings: If neither the model nor the category is found, the system will use the default shop to ensure the vehicle is still displayed.
-
-**Planned Updates**
-* qbx_phone support to make payments
-
-**After pressing the focus key and selecting the preview header (default: E)**
+## Previews
+**Catalog Main Menu**
 
 ![image](https://github.com/user-attachments/assets/1c0181dc-0a23-4b24-ac5a-cb36b2eb5bf3)
 
