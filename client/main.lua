@@ -1,5 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
+local vehiclesMenu = require 'client.vehicles'
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
@@ -194,13 +195,22 @@ end
 ---@param category string
 ---@param targetVehicle number
 local function openVehCatsMenu(category, targetVehicle)
-    local vehMenu = require 'client.shop'.loadShop(category, insideShop, targetVehicle)
+
+    local categoryMenu = {}
+    for i = 1, #vehiclesMenu do
+        local vehicle = vehiclesMenu[i]
+        if vehicle.category == category and vehicle.shopType == insideShop then
+            vehicle.args.closestShop = insideShop
+            vehicle.args.targetVehicle = targetVehicle
+            categoryMenu[#categoryMenu + 1] = vehicle
+        end
+    end
 
     lib.registerContext({
         id = 'openVehCats',
         title = sharedConfig.shops[insideShop].categories[category],
         menu = 'vehicleCategories',
-        options = vehMenu
+        options = categoryMenu
     })
 
     lib.showContext('openVehCats')
@@ -496,7 +506,6 @@ local function createShop(shopShape, name)
             insideShop = self.name
         end,
         onExit = function()
-            require 'client.shop'.resetShop()
             insideShop = nil
         end,
     })

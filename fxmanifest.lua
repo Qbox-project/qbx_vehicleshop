@@ -24,7 +24,7 @@ server_scripts {
 }
 
 files {
-    'client/shop.lua',
+    'client/vehicles.lua',
     'config/client.lua',
     'config/shared.lua',
     'locales/*.json'
