@@ -104,20 +104,21 @@ lib.callback.register('qbx_vehicleshop:server:GetVehiclesByName', function(sourc
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
 
-    local vehicles = exports.qbx_vehicles:GetPlayerVehicles({
-        citizenid = player.PlayerData.citizenid
-    })
-
+    local qbx_vehicles = exports.qbx_vehicles
     local financeVehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
+    local vehicles = {}
 
     for i = 1, #financeVehicles do
         local v = financeVehicles[i]
-        local vehicle = vehicles[v.vehicleId]
+        local vehicle = qbx_vehicles:GetPlayerVehicle(v.vehicleId)
 
-        vehicle.balance = v.balance
-        vehicle.paymentamount = v.paymentamount
-        vehicle.paymentsleft = v.paymentsleft
-        vehicle.financetime = v.financetime
+        if vehicle then
+            vehicle.balance = v.balance
+            vehicle.paymentamount = v.paymentamount
+            vehicle.paymentsleft = v.paymentsleft
+            vehicle.financetime = v.financetime
+        end
+        vehicles[#vehicles+1] = vehicle
     end
 
     return vehicles[1] and vehicles

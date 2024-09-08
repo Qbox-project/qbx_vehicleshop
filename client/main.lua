@@ -1,5 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
+local vehiclesMenu = require 'client.vehicles'
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
@@ -194,54 +195,22 @@ end
 ---@param category string
 ---@param targetVehicle number
 local function openVehCatsMenu(category, targetVehicle)
-    local vehMenu = {}
 
-    for k, v in pairs(VEHICLES) do
-        if VEHICLES[k].category == category then
-            if not config.vehicles[k] then
-                lib.print.debug('Vehicle not found in config.vehicles. Skipping: '..k)
-            elseif type(config.vehicles[k].shop) == 'table' then
-                for _, shop in pairs(config.vehicles[k].shop) do
-                    if shop == insideShop then
-                        vehMenu[#vehMenu + 1] = {
-                            title = ('%s %s'):format(v.brand, v.name),
-                            description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
-                            serverEvent = 'qbx_vehicleshop:server:swapVehicle',
-                            args = {
-                                toVehicle = v.model,
-                                targetVehicle = targetVehicle,
-                                closestShop = insideShop
-                            }
-                        }
-                    end
-                end
-            elseif config.vehicles[k].shop == insideShop then
-                vehMenu[#vehMenu + 1] = {
-                    title = ('%s %s'):format(v.brand, v.name),
-                    description = locale('menus.veh_price')..lib.math.groupdigits(v.price),
-                    serverEvent = 'qbx_vehicleshop:server:swapVehicle',
-                    args = {
-                        toVehicle = v.model,
-                        targetVehicle = targetVehicle,
-                        closestShop = insideShop
-                    }
-                }
-            end
+    local categoryMenu = {}
+    for i = 1, #vehiclesMenu do
+        local vehicle = vehiclesMenu[i]
+        if vehicle.category == category and vehicle.shopType == insideShop then
+            vehicle.args.closestShop = insideShop
+            vehicle.args.targetVehicle = targetVehicle
+            categoryMenu[#categoryMenu + 1] = vehicle
         end
     end
-
-    table.sort(vehMenu, function(a, b)
-        local _, aName = string.strsplit(' ', string.upper(a.title), 2)
-        local _, bName = string.strsplit(' ', string.upper(b.title), 2)
-
-        return aName < bName
-    end)
 
     lib.registerContext({
         id = 'openVehCats',
         title = sharedConfig.shops[insideShop].categories[category],
         menu = 'vehicleCategories',
-        options = vehMenu
+        options = categoryMenu
     })
 
     lib.showContext('openVehCats')
@@ -642,7 +611,9 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
     })
 
     lib.waitFor(function()
-        return NetworkDoesEntityExistWithNetworkId(netId)
+        if NetworkDoesEntityExistWithNetworkId(netId) then
+            return true
+        end
     end, 'netId not exist')
 
     testDriveVeh = netId
@@ -727,15 +698,16 @@ end)
 --- Thread to create blips
 CreateThread(function()
     for _, v in pairs(sharedConfig.shops) do
-        if v.blip.show then
-            local dealer = AddBlipForCoord(v.blip.coords.x, v.blip.coords.y, v.blip.coords.z)
-            SetBlipSprite(dealer, v.blip.sprite)
+        local blip = v.blip
+        if blip.show then
+            local dealer = AddBlipForCoord(blip.coords.x, blip.coords.y, blip.coords.z)
+            SetBlipSprite(dealer, blip.sprite)
             SetBlipDisplay(dealer, 4)
             SetBlipScale(dealer, 0.70)
             SetBlipAsShortRange(dealer, true)
-            SetBlipColour(dealer, v.blip.color)
+            SetBlipColour(dealer, blip.color)
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(v.blip.label)
+            AddTextComponentSubstringPlayerName(blip.label)
             EndTextCommandSetBlipName(dealer)
         end
     end
