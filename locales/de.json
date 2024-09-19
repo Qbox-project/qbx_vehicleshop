@@ -75,6 +75,8 @@
         "command_transfervehicle": "Gift or sell your vehicle",
         "command_transfervehicle_help": "ID of buyer",
         "command_transfervehicle_amount": "Sell amount (optional)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "financed_vehicle_header": "Warning: This vehicle is financed!",
+        "financed_vehicle_warning": "Balance: %s, Remaining Payments: %s, Next Payment Due: %s minutes"
     }
 }

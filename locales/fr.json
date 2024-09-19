@@ -79,6 +79,8 @@
         "command_transfervehicle": "Donner / Vendre véhicule",
         "command_transfervehicle_help": "ID du joueur",
         "command_transfervehicle_amount": "Montant de vente (optionnel)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "financed_vehicle_header": "Warning: This vehicle is financed!",
+        "financed_vehicle_warning": "Balance: %s, Remaining Payments: %s, Next Payment Due: %s minutes"
     }
 }

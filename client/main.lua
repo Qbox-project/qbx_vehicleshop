@@ -18,12 +18,7 @@ local function financePayment(data)
     if not dialog then return end
 
     local paymentAmount = tonumber(dialog[1])
-    TriggerServerEvent('qbx_vehicleshop:server:financePayment', paymentAmount, {
-        vehId = data.vehId,
-        paymentAmount = data.paymentAmount,
-        balance = data.balance,
-        paymentsLeft = data.paymentsLeft
-    })
+    TriggerServerEvent('qbx_vehicleshop:server:financePayment', paymentAmount, data.vehId)
 end
 
 local function confirmationCheck()
@@ -63,7 +58,7 @@ local function showVehicleFinanceMenu(data)
                 local check = confirmationCheck()
 
                 if check == 'confirm' then
-                    TriggerServerEvent('qbx_vehicleshop:server:financePaymentFull', { vehBalance = data.balance, vehId = data.vehId })
+                    TriggerServerEvent('qbx_vehicleshop:server:financePaymentFull', data.vehId)
                 else
                     lib.showContext('vehicleFinance')
                 end
@@ -83,7 +78,7 @@ end
 
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
-    local vehicles = lib.callback.await('qbx_vehicleshop:server:GetVehiclesByName')
+    local vehicles = lib.callback.await('qbx_vehicleshop:server:GetFinancedVehicles')
     local ownedVehicles = {}
 
     if not vehicles or #vehicles == 0 then
@@ -91,30 +86,28 @@ local function showFinancedVehiclesMenu()
     end
 
     for _, v in pairs(vehicles) do
-        if v.balance and v.balance > 0 then
-            local plate = v.props.plate
-            local vehicle = VEHICLES[v.modelName]
+        local plate = v.props.plate
+        local vehicle = VEHICLES[v.modelName]
 
-            plate = plate and plate:upper()
+        plate = plate and plate:upper()
 
-            ownedVehicles[#ownedVehicles + 1] = {
-                title = vehicle.name,
-                description = locale('menus.veh_platetxt')..plate,
-                icon = 'fa-solid fa-car-side',
-                arrow = true,
-                onSelect = function()
-                    showVehicleFinanceMenu({
-                        vehId = v.id,
-                        name = vehicle.name,
-                        brand = vehicle.brand,
-                        vehiclePlate = plate,
-                        balance = v.balance,
-                        paymentsLeft = v.paymentsleft,
-                        paymentAmount = v.paymentamount
-                    })
-                end
-            }
-        end
+        ownedVehicles[#ownedVehicles + 1] = {
+            title = vehicle.name,
+            description = locale('menus.veh_platetxt')..plate,
+            icon = 'fa-solid fa-car-side',
+            arrow = true,
+            onSelect = function()
+                showVehicleFinanceMenu({
+                    vehId = v.id,
+                    name = vehicle.name,
+                    brand = vehicle.brand,
+                    vehiclePlate = plate,
+                    balance = v.balance,
+                    paymentsLeft = v.paymentsleft,
+                    paymentAmount = v.paymentamount
+                })
+            end
+        }
     end
 
     if #ownedVehicles == 0 then
@@ -129,11 +122,6 @@ local function showFinancedVehiclesMenu()
 
     lib.showContext('ownedVehicles')
 end
-
-RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    local citizenId = QBX.PlayerData.citizenid
-    TriggerServerEvent('qbx_vehicleshop:server:removePlayer', citizenId)
-end)
 
 --- Fetches the name of a vehicle from QB Shared
 ---@param closestVehicle integer
@@ -577,9 +565,6 @@ end
 
 --- Executes once player fully loads in
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-    local citizenId = QBX.PlayerData.citizenid
-    TriggerServerEvent('qbx_vehicleshop:server:addPlayer', citizenId)
-    TriggerServerEvent('qbx_vehicleshop:server:checkFinance')
     init()
 end)
 
@@ -678,6 +663,20 @@ local function confirmTrade(confirmationText)
 
     return accepted
 end
+
+lib.callback.register('qbx_vehicleshop:client:confirmFinance', function(financeData)
+    local alert = lib.alertDialog({
+        header = locale('general.financed_vehicle_header'),
+        content = locale('general.financed_vehicle_warning', lib.math.groupdigits(financeData.balance), lib.math.groupdigits(financeData.paymentamount), financeData.timer),
+        centered = true,
+        cancel = true,
+        labels = {
+            cancel = 'No',
+            confirm = 'Yes',
+        }
+    })
+    return alert
+end)
 
 lib.callback.register('qbx_vehicleshop:client:confirmTrade', function(vehicle, sellAmount)
     local confirmationText = locale('general.transfervehicle_confirm', VEHICLES_HASH[vehicle].brand, VEHICLES_HASH[vehicle].name, lib.math.groupdigits(sellAmount) or 0)

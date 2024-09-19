@@ -76,6 +76,8 @@
         "command_transfervehicle": "Regalar o vender tu vehículo",
         "command_transfervehicle_help": "ID del comprador",
         "command_transfervehicle_amount": "Monto de venta (opcional)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "financed_vehicle_header": "Warning: This vehicle is financed!",
+        "financed_vehicle_warning": "Balance: %s, Remaining Payments: %s, Next Payment Due: %s minutes"
     }
 }
