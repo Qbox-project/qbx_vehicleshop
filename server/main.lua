@@ -5,8 +5,10 @@ assert(lib.checkDependency('qbx_vehicles', '1.4.1'), 'qbx_vehicles v1.4.1 or hig
 local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 local finance = require 'server.finance'
+local allowedVehicles, allowedVehiclesCount = require 'server.vehicles'
 local financeTimer = {}
 local coreVehicles = exports.qbx_core:GetVehiclesByName()
+local shopZones = {}
 local saleTimeout = {}
 local qbx_vehicles = exports.qbx_vehicles
 
@@ -114,6 +116,36 @@ end)
 
 -- Functions
 
+
+---@param vehicle string Vehicle model name to check if allowed for purchase/testdrive/etc.
+---@param shop string? Shop name to check if vehicle is allowed in that shop
+---@return boolean
+local function checkVehicleList(vehicle, shop)
+    for i = 1, allowedVehiclesCount do
+        local allowedVeh = allowedVehicles[i]
+        if allowedVeh.model == vehicle then
+            if shop and allowedVeh.shopType == shop then
+                return true
+            elseif not shop then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+---@param source number
+---@return string?
+local function getShopZone(source)
+    local coords = GetEntityCoords(GetPlayerPed(source))
+    for i = 1, #shopZones do
+        local zone = shopZones[i]
+        if zone:contains(coords) then
+            return zone.name
+        end
+    end
+end
+
 ---@param vehiclePrice number
 ---@param downPayment number
 ---@param paymentamount number
@@ -123,7 +155,7 @@ local function calculateFinance(vehiclePrice, downPayment, paymentamount)
     local balance = vehiclePrice - downPayment
     local vehPaymentAmount = balance / paymentamount
 
-    return qbx.math.round(balance), qbx.math.round(vehPaymentAmount)
+    return lib.math.round(balance), lib.math.round(vehPaymentAmount)
 end
 
 ---@param paymentAmount number paid
@@ -137,7 +169,7 @@ local function calculateNewFinance(paymentAmount, vehData)
     local newPaymentsLeft = newBalance / minusPayment
     local newPayment = newBalance / newPaymentsLeft
 
-    return qbx.math.round(newBalance), qbx.math.round(newPayment), newPaymentsLeft
+    return lib.math.round(newBalance), lib.math.round(newPayment), newPaymentsLeft
 end
 
 -- Callbacks
@@ -287,6 +319,10 @@ local function spawnVehicle(src, data)
     local vehicle = vehicleId and qbx_vehicles:GetPlayerVehicle(vehicleId) or data
     if not vehicle then return end
 
+    if not checkVehicleList(vehicle.modelName) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
     local plate = vehicle.plate or vehicle.props.plate
 
     local netId, veh = qbx.spawnVehicle({
@@ -312,12 +348,21 @@ end
 lib.callback.register('qbx_vehicleshop:server:spawnVehicle', spawnVehicle)
 
 -- Buy public vehicle outright
-RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
+RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleData)
     local src = source
+
+    local shopId = getShopZone(src)
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    local vehicle = vehicleData.buyVehicle
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    if not checkVehicleList(vehicle, shopId) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
     local player = exports.qbx_core:GetPlayer(src)
-
-    vehicle = vehicle.buyVehicle
-
     local vehiclePrice = coreVehicles[vehicle].price
     local currencyType = findChargeableCurrencyType(vehiclePrice, player.PlayerData.money.cash, player.PlayerData.money.bank)
     if not currencyType then
@@ -331,9 +376,6 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
 
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
 
-    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', src)
-    local shop = sharedConfig.shops[shopId]
-    if not shop then return end
 
     spawnVehicle(src, {
         coords = shop.vehicleSpawn,
@@ -346,9 +388,20 @@ end)
 -- Finance public vehicle
 RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, paymentAmount, vehicle)
     local src = source
+
+    local shopId = getShopZone(src)
+
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    if not checkVehicleList(vehicle, shopId) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
     local player = exports.qbx_core:GetPlayer(src)
     local vehiclePrice = coreVehicles[vehicle].price
-    local minDown = tonumber(qbx.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
+    local minDown = tonumber(lib.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
@@ -391,11 +444,6 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
 
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
 
-    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', src)
-
-    local shop = sharedConfig.shops[shopId]
-    if not shop then return end
-
     spawnVehicle(src, {
         coords = shop.vehicleSpawn,
         vehicleId = vehicleId
@@ -421,8 +469,8 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
 
     target.Functions.RemoveMoney(currencyType, downPayment, 'vehicle-bought-in-showroom')
 
-    local commission = qbx.math.round(price * config.commissionRate)
-    player.Functions.AddMoney('bank', price * config.commissionRate)
+    local commission = lib.math.round(price * config.commissionRate)
+    player.Functions.AddMoney('bank', commission)
     exports.qbx_core:Notify(src, locale('success.earned_commission', lib.math.groupdigits(commission)), 'success')
 
     exports['Renewed-Banking']:addAccountMoney(player.PlayerData.job.name, price)
@@ -432,7 +480,7 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
 end
 
 -- Sell vehicle to customer
-RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, playerid)
+RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(vehicle, playerid)
     local src = source
     local target = exports.qbx_core:GetPlayer(tonumber(playerid))
 
@@ -444,7 +492,15 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
         return exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
     end
 
-    local vehicle = data
+    local shopId = getShopZone(target.PlayerData.source)
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    if not checkVehicleList(vehicle, shopId) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
     local vehiclePrice = coreVehicles[vehicle].price
     local cid = target.PlayerData.citizenid
 
@@ -454,10 +510,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(data, pl
         model = vehicle,
         citizenid = cid,
     })
-
-    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', target.PlayerData.source)
-    local shop = sharedConfig.shops[shopId]
-    if not shop then return end
 
     spawnVehicle(src, {
         coords = shop.vehicleSpawn,
@@ -478,11 +530,20 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         return exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
     end
 
+    local shopId = getShopZone(target.PlayerData.source)
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
+
+    ---@diagnostic disable-next-line: param-type-mismatch
+    if not checkVehicleList(vehicle, shopId) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
     local vehiclePrice = coreVehicles[vehicle].price
-    local minDown = tonumber(qbx.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
+    local minDown = tonumber(lib.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
         return exports.qbx_core:Notify(src, locale('error.notworth'), 'error')
@@ -515,10 +576,6 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
             timer = timer,
         }
     })
-
-    local shopId = lib.callback.await('qbx_vehicleshop:client:getPlayerCurrentShop', target.PlayerData.source)
-    local shop = sharedConfig.shops[shopId]
-    if not shop then return end
 
     spawnVehicle(src, {
         coords = shop.vehicleSpawn,
@@ -649,3 +706,18 @@ local function isFinanced(vehicleId)
 end
 
 exports('IsFinanced', isFinanced)
+
+local function createShop(shopShape, shopName)
+    return lib.zones.poly({
+        name = shopName,
+        shape = shopShape,
+        thickness = 5,
+    })
+end
+
+-- Create shop zones for point checking
+CreateThread(function()
+    for shopName, shop in pairs(sharedConfig.shops) do
+        shopZones[#shopZones + 1] = createShop(shop.shape, shopName)
+    end
+end)

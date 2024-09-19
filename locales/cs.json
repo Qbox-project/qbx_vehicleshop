@@ -20,7 +20,9 @@
         "buyertoopoor": "Kupujuci nema dostatek financi",
         "nofinanced": "Nemas zadne vozidlo na splatky",
         "buyerdeclined": "The player declined the transaction",
-        "sale_timeout": "Wait a while before trading your vehicle"
+        "selftransfer": "You can't transfer to yourself",
+        "sale_timeout": "Wait a while before trading your vehicle",
+        "notallowed": "You are not allowed to purchase this vehicle model"
     },
     "success": {
         "purchased": "Gratulujeme k vyberu! At slouzi!",

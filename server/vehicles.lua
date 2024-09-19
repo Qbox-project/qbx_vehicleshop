@@ -2,7 +2,6 @@ local vehicles = {}
 local blocklist = {}
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local sharedConfig = require 'config.shared'.vehicles
-local groupdigits = lib.math.groupdigits
 local count = 0
 
 local function insertVehicle(vehicleData, shopType)
@@ -10,13 +9,7 @@ local function insertVehicle(vehicleData, shopType)
     vehicles[count] = {
         shopType = shopType,
         category = vehicleData.category,
-
-        title = ('%s %s'):format(vehicleData.brand, vehicleData.name),
-        description = ('%s%s'):format(locale('menus.veh_price'), groupdigits(vehicleData.price)),
-        serverEvent = 'qbx_vehicleshop:server:swapVehicle',
-        args = {
-            toVehicle = vehicleData.model,
-        }
+        model = vehicleData.model,
     }
 end
 
@@ -42,12 +35,5 @@ for k, vehicle in pairs(VEHICLES) do
         end
     end
 end
-
-table.sort(vehicles, function(a, b)
-    local _, aName = string.strsplit(' ', string.upper(a.title), 2)
-    local _, bName = string.strsplit(' ', string.upper(b.title), 2)
-
-    return aName < bName
-end)
 
 return vehicles, count
