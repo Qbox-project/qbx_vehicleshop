@@ -710,7 +710,7 @@ exports('IsFinanced', isFinanced)
 local function createShop(shopShape, shopName)
     return lib.zones.poly({
         name = shopName,
-        shape = shopShape,
+        points = shopShape,
         thickness = 5,
     })
 end
@@ -718,6 +718,6 @@ end
 -- Create shop zones for point checking
 CreateThread(function()
     for shopName, shop in pairs(sharedConfig.shops) do
-        shopZones[#shopZones + 1] = createShop(shop.shape, shopName)
+        shopZones[#shopZones + 1] = createShop(shop.zone.shape, shopName)
     end
 end)
