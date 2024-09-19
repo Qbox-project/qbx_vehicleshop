@@ -76,13 +76,17 @@ end)
 
 
 ---@param vehicle string Vehicle model name to check if allowed for purchase/testdrive/etc.
----@param shop string Shop name to check if vehicle is allowed in that shop
+---@param shop string? Shop name to check if vehicle is allowed in that shop
 ---@return boolean
 local function checkVehicleList(vehicle, shop)
     for i = 1, allowedVehiclesCount do
         local allowedVeh = allowedVehicles[i]
-        if allowedVeh.model == vehicle and allowedVeh.shopType == shop then
-            return true
+        if allowedVeh.model == vehicle then
+            if shop and allowedVeh.shopType == shop then
+                return true
+            elseif not shop then
+                return true
+            end
         end
     end
     return false
@@ -279,6 +283,10 @@ local function spawnVehicle(src, data)
     local coords, vehicleId = data.coords, data.vehicleId
     local vehicle = vehicleId and exports.qbx_vehicles:GetPlayerVehicle(vehicleId) or data
     if not vehicle then return end
+
+    if not checkVehicleList(vehicle.modelName) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
 
     local plate = vehicle.plate or vehicle.props.plate
 

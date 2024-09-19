@@ -610,6 +610,8 @@ RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(args)
         plate = plate
     })
 
+    if not netId then return end
+
     lib.waitFor(function()
         if NetworkDoesEntityExistWithNetworkId(netId) then
             return true
