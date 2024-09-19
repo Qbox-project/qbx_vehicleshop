@@ -1,6 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
-local vehiclesMenu = require 'client.vehicles'
+local vehiclesMenu, vehiclesMenuCount = require 'client.vehicles'
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
@@ -197,7 +197,7 @@ end
 local function openVehCatsMenu(category, targetVehicle)
 
     local categoryMenu = {}
-    for i = 1, #vehiclesMenu do
+    for i = 1, vehiclesMenuCount do
         local vehicle = vehiclesMenu[i]
         if vehicle.category == category and vehicle.shopType == insideShop then
             vehicle.args.closestShop = insideShop
@@ -332,7 +332,7 @@ local function openVehicleSellMenu(targetVehicle)
     }
 
     if sharedConfig.shops[insideShop].type == 'free-use' then
-        if config.enableTestDrive then
+        if sharedConfig.enableTestDrive then
             options[#options + 1] = {
                 title = locale('menus.test_header'),
                 description = locale('menus.freeuse_test_txt'),
@@ -343,7 +343,7 @@ local function openVehicleSellMenu(targetVehicle)
             }
         end
 
-        if config.enableFreeUseBuy then
+        if sharedConfig.enableFreeUseBuy then
             options[#options + 1] = {
                 title = locale('menus.freeuse_buy_header'),
                 description = locale('menus.freeuse_buy_txt'),
@@ -354,7 +354,7 @@ local function openVehicleSellMenu(targetVehicle)
             }
         end
 
-        if config.finance.enable then
+        if sharedConfig.finance.enable then
             options[#options + 1] = {
                 title = locale('menus.finance_header'),
                 description = locale('menus.freeuse_finance_txt'),
@@ -374,7 +374,7 @@ local function openVehicleSellMenu(targetVehicle)
                 end,
         }
 
-        if config.enableTestDrive then
+        if sharedConfig.enableTestDrive then
             options[#options + 1] = {
                 title = locale('menus.test_header'),
                 description = locale('menus.managed_test_txt'),
@@ -384,7 +384,7 @@ local function openVehicleSellMenu(targetVehicle)
             }
         end
 
-        if config.finance.enable then
+        if sharedConfig.finance.enable then
             options[#options + 1] = {
                 title = locale('menus.finance_header'),
                 description = locale('menus.managed_finance_txt'),
@@ -533,9 +533,9 @@ local shopVehs = {}
 
 local function init()
     CreateThread(function()
-        if config.finance.enable then
+        if sharedConfig.finance.enable then
             lib.zones.box({
-                coords = config.finance.zone,
+                coords = sharedConfig.finance.zone,
                 size = vec3(2, 2, 4),
                 rotation = 0,
                 debug = config.debugPoly,
@@ -648,10 +648,6 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     if config.useTarget then
         createVehicleTarget(shopName, veh, data.targetVehicle)
     end
-end)
-
-lib.callback.register('qbx_vehicleshop:client:getPlayerCurrentShop', function()
-    return insideShop
 end)
 
 local function confirmTrade(confirmationText)

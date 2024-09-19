@@ -21,7 +21,9 @@
         "nofinanced": "Nincsen hitelezett járműved",
         "financed": "Ez a jármű hitelezett",
         "buyerdeclined": "The player declined the transaction",
-        "sale_timeout": "Wait a while before trading your vehicle"
+        "selftransfer": "You can't transfer to yourself",
+        "sale_timeout": "Wait a while before trading your vehicle",
+        "notallowed": "You are not allowed to purchase this vehicle model"
     },
     "success": {
         "purchased": "Gratulálunk a vásárláshoz!",

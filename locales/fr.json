@@ -22,7 +22,8 @@
         "financed": "Ce véhicule est financé",
         "buyerdeclined": "The player declined the transaction",
         "selftransfer": "Vous ne pouvez pas transférer à vous-même",
-        "sale_timeout": "Wait a while before trading your vehicle"
+        "sale_timeout": "Wait a while before trading your vehicle",
+        "notallowed": "You are not allowed to purchase this vehicle model"
     },
     "success": {
         "purchased": "Félicitations sur votre achat!",
