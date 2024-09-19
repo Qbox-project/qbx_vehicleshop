@@ -75,6 +75,8 @@
         "command_transfervehicle": "Daruj nebo prodej vozidlo",
         "command_transfervehicle_help": "ID kupujiciho",
         "command_transfervehicle_amount": "Prodejni castka (Na tobe)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "financed_vehicle_header": "Warning: This vehicle is financed!",
+        "financed_vehicle_warning": "Balance: %s, Remaining Payments: %s, Next Payment Due: %s minutes"
     }
 }

@@ -45,21 +45,27 @@ end
 ---@param id integer
 ---@return VehicleFinancingEntity
 local function fetchFinancedVehicleEntityById(id)
-    return MySQL.single.await('SELECT * FROM vehicle_financing WHERE vehicleId = ? AND balance > 0 AND financetime < 1', {id})
+    return MySQL.single.await('SELECT * FROM vehicle_financing WHERE vehicleId = ? AND balance > 0 AND financetime > 1 LIMIT 1', {id})
 end
 
 ---@param vehicleId integer
 ---@return boolean
 local function fetchIsFinanced(vehicleId)
-    return MySQL.scalar.await('SELECT 1 FROM vehicle_financing WHERE vehicleId = ? AND balance > 0', {
+    return MySQL.scalar.await('SELECT 1 FROM vehicle_financing WHERE vehicleId = ? AND balance > 0 LIMIT 1', {
         vehicleId
     }) ~= nil
 end
 
+---@param citizenid string
+---@return boolean
+local function hasFinancedVehicles(citizenid)
+    return MySQL.scalar.await('SELECT 1 FROM vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON pv.id = vf.vehicleId WHERE pv.citizenid = ? AND vf.balance > 0 LIMIT 1', {citizenid}) ~= nil
+end
+
 ---@param citizenId string
----@return VehicleFinancingEntity
+---@return VehicleFinancingEntity[]
 local function fetchFinancedVehicleEntitiesByCitizenId(citizenId)
-    return MySQL.query.await('SELECT vehicle_financing.* FROM vehicle_financing INNER JOIN player_vehicles ON player_vehicles.citizenid = ? WHERE vehicle_financing.vehicleId = player_vehicles.id AND vehicle_financing.balance > 0 AND vehicle_financing.financetime > 1', {citizenId})
+    return MySQL.query.await('SELECT vf.* FROM vehicle_financing AS vf INNER JOIN player_vehicles AS pv ON pv.citizenid = ? WHERE vf.vehicleId = pv.id AND vf.balance > 0', {citizenId})
 end
 
 return {
@@ -68,5 +74,6 @@ return {
     updateVehicleFinance = updateVehicleFinance,
     fetchFinancedVehicleEntityById = fetchFinancedVehicleEntityById,
     fetchIsFinanced = fetchIsFinanced,
+    hasFinancedVehicles = hasFinancedVehicles,
     fetchFinancedVehicleEntitiesByCitizenId = fetchFinancedVehicleEntitiesByCitizenId,
 }

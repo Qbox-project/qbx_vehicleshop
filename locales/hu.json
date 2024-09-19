@@ -78,6 +78,8 @@
         "command_transfervehicle": "Jármű eladása vagy elajándékozása",
         "command_transfervehicle_help": "Vásárló idéglenes aktív személyiszáma (ID)",
         "command_transfervehicle_amount": "Eladási ár (opcionális)",
-        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s"
+        "transfervehicle_confirm": "Confirm trade of %s %s for $ %s",
+        "financed_vehicle_header": "Warning: This vehicle is financed!",
+        "financed_vehicle_warning": "Balance: %s, Remaining Payments: %s, Next Payment Due: %s minutes"
     }
 }
