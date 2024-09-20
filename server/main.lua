@@ -121,7 +121,7 @@ end)
 ---@param shop string? Shop name to check if vehicle is allowed in that shop
 ---@return boolean
 local function checkVehicleList(vehicle, shop)
-    for i = 1, allowedVehiclesCount do
+    for i = 1, #allowedVehiclesCount do
         local allowedVeh = allowedVehicles[i]
         if allowedVeh.model == vehicle then
             if shop and allowedVeh.shopType == shop then
