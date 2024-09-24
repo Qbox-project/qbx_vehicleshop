@@ -5,6 +5,7 @@ local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
 local insideShop
+local showroomPoints = {}
 
 ---@param data VehicleFinanceClient
 local function financePayment(data)
@@ -551,6 +552,7 @@ local function createShowroomVehiclePoint(data)
         self.veh = nil
         self.boxZone = nil
     end
+    return vehPoint
 end
 
 --- Initial function to set things up. Creating vehicleshops defined in the config and spawns the sellable vehicles
@@ -599,11 +601,12 @@ local function init()
     CreateThread(function()
         for shopName, shop in pairs(sharedConfig.shops) do
             createShop(shop.zone.shape, shopName)
+            showroomPoints[shopName] = {}
 
             local showroomVehicles = sharedConfig.shops[shopName].showroomVehicles
             for i = 1, #showroomVehicles do
                 local showroomVehicle = showroomVehicles[i]
-                createShowroomVehiclePoint({
+                showroomPoints[shopName][i] = createShowroomVehiclePoint({
                     coords = showroomVehicle.coords,
                     shopName = shopName,
                     vehiclePos = i,
@@ -655,27 +658,15 @@ end)
 ---@param data {toVehicle: string, targetVehicle: integer, closestShop: string}
 RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     local shopName = data.closestShop
-    local dataTargetVehicle = sharedConfig.shops[shopName].showroomVehicles[data.targetVehicle]
-    if dataTargetVehicle.vehicle == data.toVehicle then return end
+    local vehPoint = showroomPoints[shopName][data.targetVehicle]
+
+    if not vehPoint or vehPoint.model == data.toVehicle then return end
 
     if not IsModelInCdimage(data.toVehicle) then
         lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
         return
     end
 
-    local points = lib.points.getAllPoints()
-    local vehPoint = nil
-    for i = 1, #points do
-        local point = points[i]
-        if point.coords == dataTargetVehicle.coords.xyz then
-            vehPoint = point
-            break
-        end
-    end
-
-    if not vehPoint then return end
-
-    dataTargetVehicle.vehicle = data.toVehicle
     vehPoint.model = data.toVehicle
     if vehPoint.currentDistance <= vehPoint.distance then
         vehPoint:onExit()
