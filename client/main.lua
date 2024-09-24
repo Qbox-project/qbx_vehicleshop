@@ -1,6 +1,6 @@
 local config = require 'config.client'
 local sharedConfig = require 'config.shared'
-local vehiclesMenu, vehiclesMenuCount = require 'client.vehicles'
+local vehiclesMenu = require 'client.vehicles'
 local VEHICLES = exports.qbx_core:GetVehiclesByName()
 local VEHICLES_HASH = exports.qbx_core:GetVehiclesByHash()
 local testDriveVeh = 0
@@ -185,8 +185,8 @@ end
 local function openVehCatsMenu(category, targetVehicle)
 
     local categoryMenu = {}
-    for i = 1, vehiclesMenuCount do
-        local vehicle = vehiclesMenu[i]
+    for i = 1, vehiclesMenu.count do
+        local vehicle = vehiclesMenu.vehicles[i]
         if vehicle.category == category and vehicle.shopType == insideShop then
             vehicle.args.closestShop = insideShop
             vehicle.args.targetVehicle = targetVehicle
