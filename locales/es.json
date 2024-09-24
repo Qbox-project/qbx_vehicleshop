@@ -67,7 +67,8 @@
         "managed_finance_txt": "Financiar vehículo a jugador",
         "submit_ID": "ID de servidor (#)",
         "keypress_showFinanceMenu": "[E] Abrir Menú Finanzas",
-        "keypress_vehicleViewMenu": "[E] Ver vehículo"
+        "keypress_vehicleViewMenu": "[E] Ver vehículo",
+        "target_showFinanceMenu": "Abrir Menú Finanzas"
     },
     "general": {
         "testdrive_timer": "Tiempo restante de prueba de manejo: ",

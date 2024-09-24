@@ -401,6 +401,7 @@ local function endTestDrive()
     LocalPlayer.state:set('isInTestDrive', false, true)
     exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
 end
+
 --- Starts the test drive timer based on time and shop
 ---@param time number
 local function startTestDriveTimer(time)
@@ -454,7 +455,7 @@ end
 local function createVehicleZone(shopName, coords, targetVehicle)
     local shop = sharedConfig.shops[shopName]
 
-    lib.zones.box({
+    local boxZone = lib.zones.box({
         coords = coords.xyz,
         size = shop.zone.size,
         rotation = coords.w,
@@ -479,6 +480,7 @@ local function createVehicleZone(shopName, coords, targetVehicle)
             lib.hideTextUI()
         end
     })
+    return boxZone
 end
 
 --- Creates a shop
@@ -504,41 +506,93 @@ end
 ---@return number vehicleEntity
 local function createShowroomVehicle(model, coords)
     lib.requestModel(model, 10000)
-    local veh = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, false, false)
+    local veh = CreateVehicle(model, coords.x, coords.y, coords.z, coords.w, false, true)
     SetModelAsNoLongerNeeded(model)
     SetVehicleOnGroundProperly(veh)
     SetEntityInvincible(veh, true)
     SetVehicleDirtLevel(veh, 0.0)
-    SetVehicleDoorsLocked(veh, 3)
+    SetVehicleDoorsLocked(veh, 10)
     FreezeEntityPosition(veh, true)
     SetVehicleNumberPlateText(veh, 'BUY ME')
 
     return veh
 end
 
---- Initial function to set things up. Creating vehicleshops defined in the config and spawns the sellable vehicles
-local shopVehs = {}
+local function createShowroomVehiclePoint(data)
+    local vehPoint = lib.points.new({
+        coords = data.coords,
+        heading = data.coords.w,
+        distance = 300,
+        shopName = data.shopName,
+        vehiclePos = data.vehiclePos,
+        model = data.model,
+        veh = nil,
+        boxZone = nil
+    })
 
+    function vehPoint:onEnter()
+        self.veh = createShowroomVehicle(self.model, vec4(self.coords.x, self.coords.y, self.coords.z, self.heading))
+        if config.useTarget then
+            createVehicleTarget(self.shopName, self.veh, self.vehiclePos)
+        else
+            self.boxZone = createVehicleZone(self.shopName, self.coords, self.vehiclePos)
+        end
+    end
+
+    function vehPoint:onExit()
+        if config.useTarget then
+            exports.ox_target:removeLocalEntity(self.veh, 'vehicleshop:showVehicleOptions')
+        else
+            self.boxZone:remove()
+        end
+        if DoesEntityExist(self.veh) then
+            DeleteEntity(self.veh)
+        end
+        self.veh = nil
+        self.boxZone = nil
+    end
+end
+
+--- Initial function to set things up. Creating vehicleshops defined in the config and spawns the sellable vehicles
 local function init()
     CreateThread(function()
         if sharedConfig.finance.enable then
-            lib.zones.box({
-                coords = sharedConfig.finance.zone,
-                size = vec3(2, 2, 4),
-                rotation = 0,
-                debug = config.debugPoly,
-                onEnter = function()
-                    lib.showTextUI(locale('menus.keypress_showFinanceMenu'))
-                end,
-                inside = function()
-                    if IsControlJustPressed(0, 38) then
-                        showFinancedVehiclesMenu()
+            if config.useTarget then
+                exports.ox_target:createBoxZone({
+                    coords = sharedConfig.finance.zone,
+                    size = vec3(2, 2, 4),
+                    rotation = 0,
+                    debug = config.debugPoly,
+                    options = {
+                        {
+                            name = 'vehicleshop:showFinanceMenu',
+                            icon = 'fas fa-money-check',
+                            label = locale('menus.finance_menu'),
+                            onSelect = function()
+                                showFinancedVehiclesMenu()
+                            end
+                        }
+                    }
+                })
+            else
+                lib.zones.box({
+                    coords = sharedConfig.finance.zone,
+                    size = vec3(2, 2, 4),
+                    rotation = 0,
+                    debug = config.debugPoly,
+                    onEnter = function()
+                        lib.showTextUI(locale('menus.keypress_showFinanceMenu'))
+                    end,
+                    inside = function()
+                        if IsControlJustPressed(0, 38) then
+                            showFinancedVehiclesMenu()
+                        end
+                    end,
+                    onExit = function()
+                        lib.hideTextUI()
                     end
-                end,
-                onExit = function()
-                    lib.hideTextUI()
-                end
-            })
+                })
+            end
         end
     end)
 
@@ -549,15 +603,12 @@ local function init()
             local showroomVehicles = sharedConfig.shops[shopName].showroomVehicles
             for i = 1, #showroomVehicles do
                 local showroomVehicle = showroomVehicles[i]
-                local veh = createShowroomVehicle(showroomVehicle.vehicle, showroomVehicle.coords)
-
-                shopVehs[i] = veh
-
-                if config.useTarget then
-                    createVehicleTarget(shopName, veh, i)
-                else
-                    createVehicleZone(shopName, showroomVehicle.coords, i)
-                end
+                createShowroomVehiclePoint({
+                    coords = showroomVehicle.coords,
+                    shopName = shopName,
+                    vehiclePos = i,
+                    model = showroomVehicle.vehicle
+                })
             end
         end
     end)
@@ -566,14 +617,6 @@ end
 --- Executes once player fully loads in
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
     init()
-end)
-
-AddEventHandler('QBCore:Client:OnPlayerUnload', function()
-    for i = 1, #shopVehs do
-        DeleteEntity(shopVehs[i])
-    end
-
-    shopVehs = {}
 end)
 
 --- Starts the test drive. If vehicle parameter is not provided then the test drive will start with the closest vehicle to the player.
@@ -615,26 +658,41 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     local dataTargetVehicle = sharedConfig.shops[shopName].showroomVehicles[data.targetVehicle]
     if dataTargetVehicle.vehicle == data.toVehicle then return end
 
-    local closestVehicle = lib.getClosestVehicle(dataTargetVehicle.coords.xyz, 5, false)
-    if not closestVehicle then return end
-
     if not IsModelInCdimage(data.toVehicle) then
         lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
         return
     end
 
-    DeleteEntity(closestVehicle)
-    while DoesEntityExist(closestVehicle) do
-        Wait(50)
+    local points = lib.points.getAllPoints()
+    local vehPoint = nil
+    for i = 1, #points do
+        local point = points[i]
+        if point.coords == dataTargetVehicle.coords.xyz then
+            vehPoint = point
+            break
+        end
     end
 
-    local veh = createShowroomVehicle(data.toVehicle, dataTargetVehicle.coords)
+    if not vehPoint then return end
 
-    dataTargetVehicle.vehicle = data.toVehicle
-
-    if config.useTarget then
-        createVehicleTarget(shopName, veh, data.targetVehicle)
+    if vehPoint.veh then
+        if DoesEntityExist(vehPoint.veh) then
+            DeleteEntity(vehPoint.veh)
+        end
+        if config.useTarget then
+            exports.ox_target:removeLocalEntity(vehPoint.veh, 'vehicleshop:showVehicleOptions')
+        else
+            vehPoint.boxZone:remove()
+        end
     end
+    vehPoint:remove()
+
+    createShowroomVehiclePoint({
+        coords = dataTargetVehicle.coords,
+        shopName = shopName,
+        vehiclePos = data.targetVehicle,
+        model = data.toVehicle
+    })
 end)
 
 local function confirmTrade(confirmationText)

@@ -66,7 +66,8 @@
         "managed_finance_txt": "Financovani vozidla",
         "submit_ID": "Server ID (#)",
         "keypress_showFinanceMenu": "[E] Otvoriť ponuku Financie",
-        "keypress_vehicleViewMenu": "[E] Zobraziť vozidlo"
+        "keypress_vehicleViewMenu": "[E] Zobraziť vozidlo",
+        "target_showFinanceMenu": "Otvoriť ponuku Financie"
     },
     "general": {
         "testdrive_timer": "Kolik zbyva do konce testovaci jizdy:",
