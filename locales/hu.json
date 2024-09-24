@@ -69,7 +69,8 @@
         "managed_finance_txt": "Kiválaszott jármű hitelezése a vásárlónak",
         "submit_ID": "Idéglenes aktív személyiszám (#)",
         "keypress_showFinanceMenu": "[E] Hitelezési menü megnyitása",
-        "keypress_vehicleViewMenu": "[E] Jármű megnézése"
+        "keypress_vehicleViewMenu": "[E] Jármű megnézése",
+        "target_showFinanceMenu": "Hitelezési menü megnyitása"
     },
     "general": {
         "testdrive_timer": "Teszt vezetésből hátramaradt idő:",

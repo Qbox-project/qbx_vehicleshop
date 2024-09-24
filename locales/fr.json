@@ -69,7 +69,8 @@
         "managed_finance_txt": "Faire financer ce véhicule",
         "submit_ID": "ID du joueur (#)",
         "keypress_showFinanceMenu": "[E] Ouvrir le menu Finance",
-        "keypress_vehicleViewMenu": "[E] Voir le véhicule"
+        "keypress_vehicleViewMenu": "[E] Voir le véhicule",
+        "target_showFinanceMenu": "Ouvrir le menu Finance"
     },
     "general": {
         "testdrive_timer": "Temps restant: ",

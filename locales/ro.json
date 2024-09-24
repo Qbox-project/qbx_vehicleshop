@@ -67,7 +67,8 @@
         "managed_finance_txt": "Vinde vehiculul in rate unui jucator",
         "submit_ID": "ID-ul serverului (#)",
         "keypress_showFinanceMenu": "[E] Deschideți meniul Finanțe",
-        "keypress_vehicleViewMenu": "[E] Vezi vehiculul"
+        "keypress_vehicleViewMenu": "[E] Vezi vehiculul",
+        "target_showFinanceMenu": "Deschideți meniul Finanțe"
     },
     "general": {
         "testdrive_timer": "Timp ramas pentru testare:",

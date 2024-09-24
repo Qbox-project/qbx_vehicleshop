@@ -67,7 +67,8 @@
         "managed_finance_txt": "Financier voertuig aan speler",
         "submit_ID": "Server ID (#)",
         "keypress_showFinanceMenu": "[E] Menu Financiën openen",
-        "keypress_vehicleViewMenu": "[E] Bekijk voertuig"
+        "keypress_vehicleViewMenu": "[E] Bekijk voertuig",
+        "target_showFinanceMenu": "Menu Financiën openen"
     },
     "general": {
         "testdrive_timer": "Testrit tijd resterent:",
