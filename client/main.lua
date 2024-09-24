@@ -658,15 +658,17 @@ end)
 ---@param data {toVehicle: string, targetVehicle: integer, closestShop: string}
 RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
     local shopName = data.closestShop
+    local dataTargetVehicle = sharedConfig.shops[shopName].showroomVehicles[data.targetVehicle]
     local vehPoint = showroomPoints[shopName][data.targetVehicle]
 
-    if not vehPoint or vehPoint.model == data.toVehicle then return end
+    if not vehPoint or dataTargetVehicle.vehicle == data.toVehicle then return end
 
     if not IsModelInCdimage(data.toVehicle) then
         lib.print.error(('Failed to find model for "%s". Vehicle might not be streamed?'):format(data.toVehicle))
         return
     end
 
+    dataTargetVehicle.vehicle = data.toVehicle
     vehPoint.model = data.toVehicle
     if vehPoint.currentDistance <= vehPoint.distance then
         vehPoint:onExit()
