@@ -69,7 +69,8 @@
         "managed_finance_txt": "Finance vehicle to Player",
         "submit_ID": "Server ID (#)",
         "keypress_showFinanceMenu": "[E] Open Finance Menu",
-        "keypress_vehicleViewMenu": "[E] View Vehicle"
+        "keypress_vehicleViewMenu": "[E] View Vehicle",
+        "target_showFinanceMenu": "Open Finance Menu"
     },
     "general": {
         "testdrive_timer": "Test Drive Time Remaining: ",
