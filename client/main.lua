@@ -675,24 +675,12 @@ RegisterNetEvent('qbx_vehicleshop:client:swapVehicle', function(data)
 
     if not vehPoint then return end
 
-    if vehPoint.veh then
-        if DoesEntityExist(vehPoint.veh) then
-            DeleteEntity(vehPoint.veh)
-        end
-        if config.useTarget then
-            exports.ox_target:removeLocalEntity(vehPoint.veh, 'vehicleshop:showVehicleOptions')
-        else
-            vehPoint.boxZone:remove()
-        end
+    dataTargetVehicle.vehicle = data.toVehicle
+    vehPoint.model = data.toVehicle
+    if vehPoint.currentDistance <= vehPoint.distance then
+        vehPoint:onExit()
+        vehPoint:onEnter()
     end
-    vehPoint:remove()
-
-    createShowroomVehiclePoint({
-        coords = dataTargetVehicle.coords,
-        shopName = shopName,
-        vehiclePos = data.targetVehicle,
-        model = data.toVehicle
-    })
 end)
 
 local function confirmTrade(confirmationText)
