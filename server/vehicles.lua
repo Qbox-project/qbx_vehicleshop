@@ -36,4 +36,7 @@ for k, vehicle in pairs(VEHICLES) do
     end
 end
 
-return vehicles, count
+return {
+    vehicles = vehicles,
+    count = count,
+}

@@ -5,7 +5,7 @@ assert(lib.checkDependency('qbx_vehicles', '1.4.1'), 'qbx_vehicles v1.4.1 or hig
 local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 local finance = require 'server.finance'
-local allowedVehicles, allowedVehiclesCount = require 'server.vehicles'
+local allowedVehicles = require 'server.vehicles'
 local financeTimer = {}
 local coreVehicles = exports.qbx_core:GetVehiclesByName()
 local shopZones = {}
@@ -121,8 +121,8 @@ end)
 ---@param shop string? Shop name to check if vehicle is allowed in that shop
 ---@return boolean
 local function checkVehicleList(vehicle, shop)
-    for i = 1, allowedVehiclesCount do
-        local allowedVeh = allowedVehicles[i]
+    for i = 1, allowedVehicles.count do
+        local allowedVeh = allowedVehicles.vehicles[i]
         if allowedVeh.model == vehicle then
             if shop and allowedVeh.shopType == shop then
                 return true

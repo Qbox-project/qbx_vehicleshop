@@ -50,4 +50,7 @@ table.sort(vehicles, function(a, b)
     return aName < bName
 end)
 
-return vehicles, count
+return {
+    vehicles = vehicles,
+    count = count,
+}
