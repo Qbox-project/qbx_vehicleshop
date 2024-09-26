@@ -123,7 +123,6 @@ local function showFinancedVehiclesMenu()
     lib.showContext('ownedVehicles')
 end
 
---- Fetches the name of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehName(closestVehicle)
@@ -132,7 +131,6 @@ local function getVehName(closestVehicle)
     return VEHICLES[vehicle].name
 end
 
---- Fetches the price of a vehicle from QB Shared then it formats it into a text
 ---@param closestVehicle integer
 ---@return string
 local function getVehPrice(closestVehicle)
@@ -141,7 +139,6 @@ local function getVehPrice(closestVehicle)
     return lib.math.groupdigits(VEHICLES[vehicle].price)
 end
 
---- Fetches the brand of a vehicle from QB Shared
 ---@param closestVehicle integer
 ---@return string
 local function getVehBrand(closestVehicle)
@@ -150,7 +147,7 @@ local function getVehBrand(closestVehicle)
     return VEHICLES[vehicle].brand
 end
 
----@param targetShowroomVehicle integer vehicleName
+---@param targetShowroomVehicle integer Showroom position index
 ---@param buyVehicle string model
 local function openFinance(targetShowroomVehicle, buyVehicle)
     local title = ('%s %s - $%s'):format(VEHICLES[buyVehicle].brand:upper(), VEHICLES[buyVehicle].name:upper(), getVehPrice(targetShowroomVehicle))
@@ -205,7 +202,7 @@ local function openVehCatsMenu(category, targetVehicle)
 end
 
 --- Opens a menu with list of vehicle categories
----@param args table<string, any>
+---@param args {targetVehicle: integer}
 local function openVehicleCategoryMenu(args)
     local categoryMenu = {}
     local sortedCategories = {}
@@ -242,7 +239,7 @@ local function openVehicleCategoryMenu(args)
     lib.showContext('vehicleCategories')
 end
 
----@param targetVehicle integer
+---@param targetVehicle integer Showroom position index
 local function openCustomFinance(targetVehicle)
     local vehicle = sharedConfig.shops[insideShop].showroomVehicles[targetVehicle].vehicle
     local title = ('%s %s - $%s'):format(getVehBrand(targetVehicle):upper(), vehicle:upper(), getVehPrice(targetVehicle))
