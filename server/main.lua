@@ -335,7 +335,10 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
     })
 
     testDrives[src] = netId
-    Player(src).state:set('isInTestDrive', true, true)
+    Player(src).state:set('isInTestDrive', testDrive.limit, true)
+    SetTimeout(testDrive.limit * 60000, function()
+        Player(src).state:set('isInTestDrive', nil, true)
+    end)
 end)
 
 ---@param vehicle string

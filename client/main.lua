@@ -518,25 +518,19 @@ end
 
 --- End test drive
 local function endTestDrive()
-    LocalPlayer.state:set('isInTestDrive', false, true)
-    exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
+    LocalPlayer.state:set('isInTestDrive', nil, true)
 end
 
 --- Starts the test drive timer based on time and shop
 ---@param time integer
 local function startTestDriveTimer(time)
     local gameTimer = GetGameTimer()
-    local timeMs = time * 1000
 
     CreateThread(function()
         local playerState = LocalPlayer.state
         while playerState.isInTestDrive do
             local currentGameTime = GetGameTimer()
             local secondsLeft = currentGameTime - gameTimer
-
-            if currentGameTime < gameTimer + timeMs and secondsLeft >= timeMs - 50 then
-                endTestDrive()
-            end
 
             qbx.drawText2d({
                 text = locale('general.testdrive_timer')..math.ceil(time - secondsLeft / 1000),
@@ -546,6 +540,7 @@ local function startTestDriveTimer(time)
 
             Wait(0)
         end
+        exports.qbx_core:Notify(locale('general.testdrive_complete'), 'success')
     end)
 end
 
@@ -556,9 +551,8 @@ AddStateBagChangeHandler('isInTestDrive', ('player:%s'):format(cache.serverId), 
         Wait(10)
     end
 
-    local testDrive = sharedConfig.shops[insideShop].testDrive
-    exports.qbx_core:Notify(locale('general.testdrive_timenoti', testDrive.limit), 'inform')
-    startTestDriveTimer(testDrive.limit * 60)
+    exports.qbx_core:Notify(locale('general.testdrive_timenoti', value), 'inform')
+    startTestDriveTimer(value * 60)
 end)
 
 --- Swaps the chosen vehicle with another one
