@@ -4,7 +4,7 @@ assert(lib.checkDependency('qbx_vehicles', '1.4.1'), 'qbx_vehicles v1.4.1 or hig
 -- Variables
 local config = require 'config.server'
 local sharedConfig = require 'config.shared'
-local finance = require 'server.finance'
+local financeStorage = require 'server.storage'
 local allowedVehicles = require 'server.vehicles'
 local financeTimer = {}
 local coreVehicles = exports.qbx_core:GetVehiclesByName()
@@ -17,7 +17,7 @@ local qbx_vehicles = exports.qbx_vehicles
 local function addPlayerToFinanceTimer(src, citizenid)
     citizenid = citizenid or exports.qbx_core:GetPlayer(src).PlayerData.citizenid
 
-    local hasFinanced = finance.hasFinancedVehicles(citizenid)
+    local hasFinanced = financeStorage.hasFinancedVehicles(citizenid)
     if hasFinanced then
         exports.qbx_core:Notify(src, locale('general.paymentduein', config.finance.paymentWarning))
     end
@@ -44,7 +44,7 @@ local function updatePlayerFinanceTime(src)
     local playerData = financeTimer[src]
     if not playerData then return end
 
-    local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(playerData.citizenid)
+    local vehicles = financeStorage.fetchFinancedVehicleEntitiesByCitizenId(playerData.citizenid)
 
     local playTime = math.floor((os.time() - playerData.time) / 60)
     for i = 1, #vehicles do
@@ -52,7 +52,7 @@ local function updatePlayerFinanceTime(src)
         local newTime = lib.math.clamp(v.financetime - playTime, 0, math.maxinteger)
 
         if v.balance >= 1 then
-            finance.updateVehicleEntityFinanceTime(newTime, v.vehicleId)
+            financeStorage.updateVehicleEntityFinanceTime(newTime, v.vehicleId)
         end
     end
 
@@ -66,7 +66,7 @@ local function checkFinancedVehicles(src)
 
     local citizenid = financeData.citizenid
     local time = math.floor((os.time() - financeData.time) / 60)
-    local vehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(citizenid)
+    local vehicles = financeStorage.fetchFinancedVehicleEntitiesByCitizenId(citizenid)
 
     if not vehicles then
         financeTimer[src].hasFinanced = false
@@ -178,7 +178,7 @@ lib.callback.register('qbx_vehicleshop:server:GetFinancedVehicles', function(sou
     local player = exports.qbx_core:GetPlayer(src)
     if not player then return end
 
-    local financeVehicles = finance.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
+    local financeVehicles = financeStorage.fetchFinancedVehicleEntitiesByCitizenId(player.PlayerData.citizenid)
     local vehicles = {}
 
     for i = 1, #financeVehicles do
@@ -267,7 +267,7 @@ end
 -- Make a finance payment
 RegisterNetEvent('qbx_vehicleshop:server:financePayment', function(paymentAmount, vehId)
     local src = source
-    local vehData = finance.fetchFinancedVehicleEntityById(vehId)
+    local vehData = financeStorage.fetchFinancedVehicleEntityById(vehId)
 
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
@@ -287,7 +287,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financePayment', function(paymentAmount
 
     if not removeMoney(src, paymentAmount) then return end
 
-    finance.updateVehicleFinance({
+    financeStorage.updateVehicleFinance({
         balance = newBalance,
         payment = newPayment,
         paymentsLeft = newPaymentsLeft,
@@ -299,11 +299,11 @@ end)
 -- Pay off vehice in full
 RegisterNetEvent('qbx_vehicleshop:server:financePaymentFull', function(vehId)
     local src = source
-    local vehData = finance.fetchFinancedVehicleEntityById(vehId)
+    local vehData = financeStorage.fetchFinancedVehicleEntityById(vehId)
 
     if not removeMoney(src, vehData.balance) then return end
 
-    finance.updateVehicleFinance({
+    financeStorage.updateVehicleFinance({
         balance = 0,
         payment = 0,
         paymentsLeft = 0,
@@ -563,7 +563,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
 
     if not sellShowroomVehicleTransact(src, target, vehiclePrice, downPayment) then return end
 
-    local vehicleId = finance.insertVehicleEntityWithFinance({
+    local vehicleId = financeStorage.insertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
             citizenId = cid,
             model = vehicle,
@@ -633,7 +633,7 @@ lib.addCommand('transfervehicle', {
     local player = exports.qbx_core:GetPlayer(source)
     local target = exports.qbx_core:GetPlayer(buyerId)
     local row = qbx_vehicles:GetPlayerVehicle(vehicleId)
-    local isFinanced = finance.fetchIsFinanced(vehicleId)
+    local isFinanced = financeStorage.fetchIsFinanced(vehicleId)
 
     if not row then return end
 
@@ -661,7 +661,7 @@ lib.addCommand('transfervehicle', {
     end)
 
     if isFinanced then
-        local financeData = finance.fetchFinancedVehicleEntityById(vehicleId)
+        local financeData = financeStorage.fetchFinancedVehicleEntityById(vehicleId)
         local confirmFinance = lib.callback.await('qbx_vehicleshop:client:confirmFinance', buyerId, financeData)
         if not confirmFinance then
             return exports.qbx_core:Notify(source, locale('error.buyerdeclined'), 'error')
@@ -702,7 +702,7 @@ end)
 ---@param vehicleId integer
 ---@return boolean
 local function isFinanced(vehicleId)
-    return finance.fetchIsFinanced(vehicleId)
+    return financeStorage.fetchIsFinanced(vehicleId)
 end
 
 exports('IsFinanced', isFinanced)
