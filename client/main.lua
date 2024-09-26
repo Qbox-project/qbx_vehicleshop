@@ -516,11 +516,6 @@ local function createShowroomVehiclePoint(data)
     return vehPoint
 end
 
---- End test drive
-local function endTestDrive()
-    LocalPlayer.state:set('isInTestDrive', nil, true)
-end
-
 --- Starts the test drive timer based on time and shop
 ---@param time integer
 local function startTestDriveTimer(time)
