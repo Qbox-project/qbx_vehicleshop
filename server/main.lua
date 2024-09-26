@@ -131,6 +131,12 @@ local function checkVehicleList(vehicle, shop)
     return false
 end
 
+---@param data {toVehicle: string}
+RegisterNetEvent('qbx_vehicleshop:server:swapVehicle', function(data)
+    if not checkVehicleList(data.toVehicle) then return end
+    TriggerClientEvent('qbx_vehicleshop:client:swapVehicle', -1, data)
+end)
+
 ---@param source number
 ---@return string?
 local function getShopZone(source)
