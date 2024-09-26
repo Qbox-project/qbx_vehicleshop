@@ -315,7 +315,7 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
     local src = source
 
     if Player(src).state.isInTestDrive then
-        return exports.qbx_core:Notify(src, locale('error.alreadytestdriving'), 'error')
+        return exports.qbx_core:Notify(src, locale('error.testdrive_alreadyin'), 'error')
     end
 
     local shopId = getShopZone(src)
