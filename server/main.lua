@@ -10,6 +10,7 @@ local financeTimer = {}
 local coreVehicles = exports.qbx_core:GetVehiclesByName()
 local shopZones = {}
 local saleTimeout = {}
+local testDrives = {}
 local qbx_vehicles = exports.qbx_vehicles
 
 
@@ -196,38 +197,6 @@ lib.callback.register('qbx_vehicleshop:server:GetFinancedVehicles', function(sou
 
     return vehicles[1] and vehicles
 end)
--- Events
-
--- Brute force vehicle deletion
----@param netId number
-RegisterNetEvent('qbx_vehicleshop:server:deleteVehicle', function(netId)
-    local vehicle = NetworkGetEntityFromNetworkId(netId)
-
-    DeleteEntity(vehicle)
-end)
-
--- Sync vehicle for other players
----@param data unknown
-RegisterNetEvent('qbx_vehicleshop:server:swapVehicle', function(data)
-    TriggerClientEvent('qbx_vehicleshop:client:swapVehicle', -1, data)
-end)
-
--- Send customer for test drive
-RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, playerId)
-    local src = source
-    local target = tonumber(playerId) --[[@as number]]
-
-    if not exports.qbx_core:GetPlayer(target) then
-        exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
-        return
-    end
-
-    if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target))) < 3 then
-        TriggerClientEvent('qbx_vehicleshop:client:testDrive', target, { vehicle = vehicle })
-    else
-        exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
-    end
-end)
 
 ---Checks if player has enough money, then returns a string based on the currency.
 ---@param price number
@@ -345,9 +314,61 @@ local function spawnVehicle(src, data)
     return netId
 end
 
-lib.callback.register('qbx_vehicleshop:server:spawnVehicle', spawnVehicle)
+---@param data {vehicle: string}
+RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
+    local src = source
 
--- Buy public vehicle outright
+    if Player(src).state.isInTestDrive then
+        return exports.qbx_core:Notify(src, locale('error.alreadytestdriving'), 'error')
+    end
+
+    local shopId = getShopZone(src)
+    if not shopId then return end
+
+    if not checkVehicleList(data.vehicle, shopId) then
+        return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
+    local testDrive = sharedConfig.shops[shopId].testDrive
+    local plate = 'TEST'..lib.string.random('1111')
+
+    local netId = spawnVehicle(src, {
+        modelName = data.vehicle,
+        coords = testDrive.spawn,
+        plate = plate
+    })
+
+    testDrives[src] = netId
+    Player(src).state:set('isInTestDrive', true, true)
+end)
+
+---@param vehicle string
+---@param playerId string|number
+RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, playerId)
+    local src = source
+    local target = tonumber(playerId) --[[@as number]]
+
+    if not exports.qbx_core:GetPlayer(target) then
+        exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
+        return
+    end
+
+    if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target))) < 3 then
+        TriggerClientEvent('qbx_vehicleshop:client:testDrive', target, { vehicle = vehicle })
+    else
+        exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
+    end
+end)
+
+AddStateBagChangeHandler('isInTestDrive', nil, function(_, _, value)
+    if value then return end
+    local vehicle = NetworkGetEntityFromNetworkId(testDrives[source])
+
+    DeleteEntity(vehicle)
+    testDrives[source] = nil
+end)
+
+---@param vehicleData {buyVehicle: string}
 RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleData)
     local src = source
 
