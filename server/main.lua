@@ -356,12 +356,20 @@ RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, pla
     end
 end)
 
-AddStateBagChangeHandler('isInTestDrive', nil, function(_, _, value)
+AddStateBagChangeHandler('isInTestDrive', nil, function(bagName, _, value)
     if value then return end
-    local vehicle = NetworkGetEntityFromNetworkId(testDrives[source])
 
-    DeleteEntity(vehicle)
-    testDrives[source] = nil
+    local plySrc = GetPlayerFromStateBagName(bagName)
+    if not plySrc then return end
+    local netId = testDrives[plySrc]
+    if not netId then return end
+
+    local vehicle = NetworkGetEntityFromNetworkId(testDrives[plySrc])
+
+    if DoesEntityExist(vehicle) then
+        DeleteEntity(vehicle)
+    end
+    testDrives[plySrc] = nil
 end)
 
 ---@param vehicleData {buyVehicle: string}
