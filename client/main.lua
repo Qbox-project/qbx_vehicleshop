@@ -631,7 +631,7 @@ end)
 CreateThread(function()
     if sharedConfig.finance.enable then
         if config.useTarget then
-            exports.ox_target:createBoxZone({
+            exports.ox_target:addBoxZone({
                 coords = sharedConfig.finance.zone,
                 size = vec3(2, 2, 4),
                 rotation = 0,
