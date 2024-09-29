@@ -21,6 +21,8 @@ client_scripts {
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
+    'server/utils.lua',
+    'server/finance.lua'
 }
 
 files {
@@ -30,6 +32,5 @@ files {
     'locales/*.json'
 }
 
-provide 'qb-vehicleshop'
 lua54 'yes'
 use_experimental_fxv2_oal 'yes'
