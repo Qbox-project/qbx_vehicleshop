@@ -7,5 +7,12 @@ return {
         preventSelling = false, -- prevents players from using /transfervehicle if financed
     },
     saleTimeout = 60000, -- Delay between attempts to sell/gift a vehicle. Prevents abuse
-    deleteUnpaidFinancedVehicle = false -- true to delete unpaid vehicles from database, otherwise it will edit citizenid to hide from db select
+    deleteUnpaidFinancedVehicle = false, -- true to delete unpaid vehicles from database, otherwise it will edit citizenid to hide from db select
+
+    ---@param src number Player Server ID
+    ---@param plate string Vehicle Plate
+    ---@param vehicle number Vehicle Entity ID
+    giveKeys = function(src, plate, vehicle)
+        exports.qbx_vehiclekeys:GiveKeys(src, vehicle)
+    end
 }

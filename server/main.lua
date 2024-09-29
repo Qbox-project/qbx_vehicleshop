@@ -285,13 +285,13 @@ end)
 ---@return number|nil
 local function spawnVehicle(src, data)
     local coords, vehicleId = data.coords, data.vehicleId
-    local vehicle = vehicleId and qbx_vehicles:GetPlayerVehicle(vehicleId) or data
-    if not vehicle then return end
+    local newVehicle = vehicleId and qbx_vehicles:GetPlayerVehicle(vehicleId) or data
+    if not newVehicle then return end
 
-    local plate = vehicle.plate or vehicle.props.plate
+    local plate = newVehicle.plate or newVehicle.props.plate
 
-    local netId, veh = qbx.spawnVehicle({
-        model = vehicle.modelName,
+    local netId, vehicle = qbx.spawnVehicle({
+        model = newVehicle.modelName,
         spawnSource = coords,
         warp = GetPlayerPed(src),
         props = {
@@ -301,11 +301,11 @@ local function spawnVehicle(src, data)
 
     if not netId or netId == 0 then return end
 
-    if not veh or veh == 0 then return end
+    if not vehicle or vehicle == 0 then return end
 
-    if vehicleId then Entity(veh).state:set('vehicleid', vehicleId, false) end
+    if vehicleId then Entity(vehicle).state:set('vehicleid', vehicleId, false) end
 
-    TriggerClientEvent('vehiclekeys:client:SetOwner', src, plate)
+    config.giveKeys(src, plate, vehicle)
 
     return netId
 end
@@ -707,7 +707,7 @@ lib.addCommand('transfervehicle', {
         end
 
         qbx_vehicles:SetPlayerVehicleOwner(row.id, targetcid)
-        TriggerClientEvent('vehiclekeys:client:SetOwner', buyerId, row.props.plate)
+        config.giveKeys(buyerId, row.plate, vehicle)
 
         local sellerMessage = sellAmount > 0 and locale('success.soldfor') .. lib.math.groupdigits(sellAmount) or locale('success.gifted')
         local buyerMessage = sellAmount > 0 and locale('success.boughtfor') .. lib.math.groupdigits(sellAmount) or locale('success.received_gift')
