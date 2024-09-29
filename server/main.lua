@@ -5,7 +5,7 @@ assert(lib.checkDependency('qbx_vehicles', '1.4.1'), 'qbx_vehicles v1.4.1 or hig
 local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 local financeStorage = require 'server.storage'
-local coreVehicles = exports.qbx_core:GetVehiclesByName()
+COREVEHICLES = exports.qbx_core:GetVehiclesByName()
 local saleTimeout = {}
 local testDrives = {}
 
@@ -95,7 +95,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleDa
     end
 
     local player = exports.qbx_core:GetPlayer(src)
-    local vehiclePrice = coreVehicles[vehicle].price
+    local vehiclePrice = COREVEHICLES[vehicle].price
     if not RemoveMoney(src, vehiclePrice, 'vehicle-bought-in-showroom') then
         return exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
     end
@@ -159,7 +159,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(vehicle,
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
-    local vehiclePrice = coreVehicles[vehicle].price
+    local vehiclePrice = COREVEHICLES[vehicle].price
     local cid = target.PlayerData.citizenid
 
     if not SellShowroomVehicleTransact(src, target, vehiclePrice, vehiclePrice) then return end

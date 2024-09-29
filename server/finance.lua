@@ -214,7 +214,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
-    local vehiclePrice = coreVehicles[vehicle].price
+    local vehiclePrice = COREVEHICLES[vehicle].price
     local minDown = tonumber(lib.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     if downPayment > vehiclePrice then
@@ -272,7 +272,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
     end
 
     local player = exports.qbx_core:GetPlayer(src)
-    local vehiclePrice = coreVehicles[vehicle].price
+    local vehiclePrice = COREVEHICLES[vehicle].price
     local minDown = tonumber(lib.math.round((sharedConfig.finance.minimumDown / 100) * vehiclePrice)) --[[@as number]]
 
     downPayment = tonumber(downPayment) --[[@as number]]
