@@ -229,7 +229,7 @@ local function removeMoney(src, amount, reason)
         return false
     end
 
-    return player.Functions.RemoveMoney(currencyType, amount, reason)
+    return config.removePlayerFunds(player, currencyType, amount, reason)
 end
 
 ---@param paymentAmount number
@@ -489,10 +489,10 @@ local function sellShowroomVehicleTransact(src, target, price, downPayment)
     end
 
     local commission = lib.math.round(price * config.commissionRate)
-    player.Functions.AddMoney('bank', commission)
+    config.addPlayerFunds(player, 'bank', commission, 'vehicle-commission')
     exports.qbx_core:Notify(src, locale('success.earned_commission', lib.math.groupdigits(commission)), 'success')
 
-    exports['Renewed-Banking']:addAccountMoney(player.PlayerData.job.name, price)
+    config.addSocietyFunds(player.player.PlayerData.job.name, price)
     exports.qbx_core:Notify(target.PlayerData.source, locale('success.purchased'), 'success')
 
     return true
@@ -702,8 +702,8 @@ lib.addCommand('transfervehicle', {
                 return exports.qbx_core:Notify(source, locale('error.buyertoopoor'), 'error')
             end
 
-            player.Functions.AddMoney(currencyType, sellAmount)
-            target.Functions.RemoveMoney(currencyType, sellAmount)
+            config.addPlayerFunds(player, currencyType, sellAmount, 'vehicle-sold-to-player')
+            config.removePlayerFunds(target, currencyType, sellAmount, 'vehicle-bought-from-player')
         end
 
         qbx_vehicles:SetPlayerVehicleOwner(row.id, targetcid)
