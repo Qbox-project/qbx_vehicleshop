@@ -294,6 +294,11 @@ local function startTestDrive(vehModel)
     TriggerServerEvent('qbx_vehicleshop:server:customTestDrive', vehModel, playerId)
 end
 
+lib.onCache('vehicle', function(value)
+    if value or not LocalPlayer.state.inTestDrive then return end
+    LocalPlayer.state:set('inTestDrive', nil, true)
+end)
+
 ---@param vehModel string
 local function sellVehicle(vehModel)
     local playerId = getPlayerIdInput(vehModel)
