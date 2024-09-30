@@ -222,50 +222,8 @@ return {
         }
     },
 
+    ---@type table<string, Dealership>
     shops = {
-        --[[shop = { -- Needs to be unique
-            type = '', -- If 'free-use', no player-to-player interaction required to purchase. If 'managed', caresalesman required for purchase
-            job = '', -- If shop is 'free-use', remove this option. If shop is 'managed', put required job
-            zone = {
-                shape = { -- Polygon that surrounds the shop
-                    vec3(0.0, 0.0, 0.0),
-                    vec3(0.0, 0.0, 0.0),
-                    vec3(0.0, 0.0, 0.0),
-                    vec3(0.0, 0.0, 0.0),
-                },
-                size = vec3(0.0, 0.0, 0.0), -- Size of the vehicles zones (x, y, z)
-                targetDistance = 1, -- Defines targeting distance. Only works if useTarget is enabled
-            },
-            blip = {
-                label = '', -- Blip label
-                coords = vec3(0.0, 0.0, 0.0), -- Blip coordinates
-                show = true, -- Enables/disables the blip being shown
-                sprite = 0, -- Blip sprite
-                color = 0, -- Blip color
-            },
-            categories = { -- Categories available to browse
-                sedans = 'Sedans',
-                coupes = 'Coupes',
-                suvs = 'SUVs',
-                offroad = 'Offroad',
-            },
-            testDrive = {
-                limit = 5.0, -- Time in minutes allotted for the test drive
-                spawn = vec4(0.0, 0.0, 0.0, 0.0), -- Spawn location for the test drive
-            },
-            returnLocation = vec3(0.0, -1082.58, 26.68), -- Location to return vehicle only if the vehicleshop is managed
-            vehicleSpawn = vec4(0.0, 0.0, 0.0, 0.0), -- Spawn location when vehicle is purchased
-            showroomVehicles = {
-                [1] = {
-                    coords = vec4(0.0, 0.0, 0.0, 0.0), -- where the vehicle will spawn on display
-                    vehicle = '', -- Model name of display vehicle. Is dynamically changed when swapping vehicles
-                },
-                [2] = {
-                    coords = vec4(0.0, 0.0, 0.0, 0.0), -- where the vehicle will spawn on display
-                    vehicle = '', -- Model name of display vehicle. Is dynamically changed when swapping vehicles
-                },
-            },
-        },]]--
         pdm = {
             type = 'free-use',
             zone = {
@@ -304,6 +262,7 @@ return {
             testDrive = {
                 limit = 5.0,
                 spawn = vec4(-7.84, -1081.35, 26.67, 121.83),
+                endBehavior = 'return'
             },
             returnLocation = vec3(-44.74, -1082.58, 26.68),
             vehicleSpawn = vec4(-31.69, -1090.78, 26.42, 328.79),
@@ -351,6 +310,7 @@ return {
             testDrive = {
                 limit = 5.0,
                 spawn = vec4(-1232.81, -347.99, 37.33, 23.28),
+                endBehavior = 'return'
             },
             returnLocation = vec3(-1231.46, -349.86, 37.33),
             vehicleSpawn = vec4(-1231.46, -349.86, 37.33, 26.61),
@@ -389,6 +349,7 @@ return {
             testDrive = {
                 limit = 5.0,
                 spawn = vec4(-722.23, -1351.98, 0.14, 135.33),
+                endBehavior = 'return'
             },
             returnLocation = vec3(-714.34, -1343.31, 0.0),
             vehicleSpawn = vec4(-727.87, -1353.1, -0.17, 137.09),
@@ -426,6 +387,7 @@ return {
             testDrive = {
                 limit = 5.0,
                 spawn = vec4(-1625.19, -3103.47, 13.94, 330.28),
+                endBehavior = 'return'
             },
             returnLocation = vec3(-1628.44, -3104.7, 13.94),
             vehicleSpawn = vec4(-1617.49, -3086.17, 13.94, 329.2),

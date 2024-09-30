@@ -34,3 +34,35 @@
 ---@field paymentamount number
 ---@field paymentsleft integer
 ---@field financetime number
+
+---@class DealershipZone -- Zone definition for dealership
+---@field shape vector3[] -- poly zone points. All Z values should be the same
+---@field size vector3 -- Size of the showroom zones
+---@field targetDistance number -- Distance for targets inside zone
+
+---@class DealershipBlip -- Blip definition for dealership
+---@field label string -- Blip label
+---@field coords vector3 -- Blip coordinates
+---@field show boolean -- Whether to show the blip
+---@field sprite integer -- Blip sprite
+---@field color integer -- Blip color
+
+---@class DealershipVehicle -- Showroom spot definition
+---@field coords vector4 -- coordinates to spawn showroom vehicle
+---@field vehicle string -- vehicle model
+
+---@class TestDriveConfig -- Test drive configuration
+---@field limit number -- Time for test drive in minutes
+---@field spawn vector4 -- Location to spawn test drive vehicle
+---@field endBehavior 'return'|'destroy'|'none' -- 'none' will not do anything, 'return' will return the player to the dealership and destroy the vehicle, 'destroy' will destroy the vehicle and leave player at current position
+
+---@class Dealership -- Dealership configuration
+---@field type 'free-use'|'managed' -- 'free-use' allows players to purchase vehicles without any restrictions, 'managed' requires a job to purchase vehicles
+---@field job string? -- Only required if type is 'managed'
+---@field zone DealershipZone
+---@field blip DealershipBlip
+---@field categories table<string, string> -- Key is the category name, value is the category label
+---@field showroomVehicles DealershipVehicle[]
+---@field testDrive TestDriveConfig
+---@field returnLocation vector3 -- Location to return the vehicle to for test drives
+---@field vehicleSpawn vector4 -- Location to spawn purchased vehicles

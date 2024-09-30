@@ -17,6 +17,7 @@ end)
 
 ---@param data {vehicle: string}
 RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
+    if not sharedConfig.enableTestDrive then return end
     local src = source
 
     if Player(src).state.isInTestDrive then
@@ -39,7 +40,12 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
         plate = plate
     })
 
-    testDrives[src] = netId
+    testDrives[src] = {
+        netId = netId,
+        endBehavior = testDrive.endBehavior,
+        returnLocation = sharedConfig.shops[shopId].returnLocation
+    }
+
     Player(src).state:set('isInTestDrive', testDrive.limit, true)
     SetTimeout(testDrive.limit * 60000, function()
         Player(src).state:set('isInTestDrive', nil, true)
@@ -69,13 +75,25 @@ AddStateBagChangeHandler('isInTestDrive', nil, function(bagName, _, value)
 
     local plySrc = GetPlayerFromStateBagName(bagName)
     if not plySrc then return end
-    local netId = testDrives[plySrc]
-    if not netId then return end
+    local netId = testDrives[plySrc].netId
+    local endBehavior = testDrives[plySrc].endBehavior
+    if not netId or endBehavior == 'none' then return end
 
-    local vehicle = NetworkGetEntityFromNetworkId(testDrives[plySrc])
+    local vehicle = NetworkGetEntityFromNetworkId(netId)
 
-    if DoesEntityExist(vehicle) then
-        DeleteEntity(vehicle)
+    if endBehavior == 'return' then
+        local coords = testDrives[plySrc].returnLocation
+        local plyPed = GetPlayerPed(plySrc)
+        if #(GetEntityCoords(plyPed) - coords) > 10 then -- don't teleport if they are standing near the spot
+            SetEntityCoords(plyPed, coords.x, coords.y, coords.z, false, false, false, false)
+        end
+        if DoesEntityExist(vehicle) then
+            DeleteEntity(vehicle)
+        end
+    elseif endBehavior == 'destroy' then
+        if DoesEntityExist(vehicle) then
+            DeleteEntity(vehicle)
+        end
     end
     testDrives[plySrc] = nil
 end)
