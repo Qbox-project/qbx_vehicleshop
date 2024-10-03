@@ -295,7 +295,7 @@ local function startTestDrive(vehModel)
 end
 
 lib.onCache('vehicle', function(value)
-    if value or not LocalPlayer.state.isInTestDrive then return end    
+    if value or not LocalPlayer.state.isInTestDrive then return end
     LocalPlayer.state:set('isInTestDrive', nil, true)
 end)
 
