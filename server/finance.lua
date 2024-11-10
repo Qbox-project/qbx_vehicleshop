@@ -1,7 +1,7 @@
 local config = require 'config.server'
 local sharedConfig = require 'config.shared'
 
-if not sharedConfig.enableFinance then return end
+if not sharedConfig.finance.enable then return end
 
 local financeStorage = require 'server.storage'
 local financeTimer = {}
