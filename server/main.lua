@@ -149,7 +149,7 @@ function SellShowroomVehicleTransact(src, target, price, downPayment)
     config.addPlayerFunds(player, 'bank', commission, 'vehicle-commission')
     exports.qbx_core:Notify(src, locale('success.earned_commission', lib.math.groupdigits(commission)), 'success')
 
-    config.addSocietyFunds(player.player.PlayerData.job.name, price)
+    config.addSocietyFunds(player.PlayerData.job.name, price)
     exports.qbx_core:Notify(target.PlayerData.source, locale('success.purchased'), 'success')
 
     return true
