@@ -20,7 +20,12 @@ return {
     ---@param amount number Amount to add
     ---@return boolean
     addSocietyFunds = function(society, amount) -- function to add funds to society
-        return exports['Renewed-Banking']:addAccountMoney(society, amount)
+        if GetResourceState('Renewed-Banking'):find('started') then
+            return exports['Renewed-Banking']:addAccountMoney(society, amount)
+        else
+            lib.print.error(('Renewed-Banking is needed for Society Funds and it\'s currently %s'):format(GetResourceState('Renewed-Banking')))
+            return false
+        end
     end,
 
     ---@param player any QBX Player object
