@@ -47,6 +47,14 @@ end
 CreateThread(function()
     for shopName, shop in pairs(shops) do
         shopZones[#shopZones + 1] = createShop(shop.zone.shape, shopName)
+
+        for i = 1, #shop.showroomVehicles do
+            local vehicle = shop.showroomVehicles[i]
+
+            if not CheckVehicleList(vehicle.vehicle, shopName) then
+                lib.print.warn(('Vehicle "%s" is a showroom vehicle for shop "%s" but is not allowed to be bought there'):format(vehicle.vehicle, shopName))
+            end
+        end
     end
 end)
 
