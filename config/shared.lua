@@ -264,7 +264,7 @@ return {
                 spawn = vec4(-7.84, -1081.35, 26.67, 121.83),
                 endBehavior = 'return'
             },
-            returnLocation = vec3(-44.74, -1082.58, 26.68),
+            returnLocation = vec3(-32.77, -1095.75, 26.42),
             vehicleSpawn = vec4(-31.69, -1090.78, 26.42, 328.79),
             showroomVehicles = {
                 [1] = {coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'asbo'},
