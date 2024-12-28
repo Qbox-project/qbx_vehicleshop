@@ -25,25 +25,31 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
     end
 
     local shopId = GetShopZone(src)
-    if not shopId then return end
+    local shop = sharedConfig.shops[shopId]
+    if not shop then return end
 
     if not CheckVehicleList(data.vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
-    local testDrive = sharedConfig.shops[shopId].testDrive
+    local coords = GetClearSpawnArea(shop.vehicleSpawns)
+    if not coords then
+        return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
+    end
+
+    local testDrive = shop.testDrive
     local plate = 'TEST'..lib.string.random('1111')
 
     local netId = SpawnVehicle(src, {
         modelName = data.vehicle,
-        coords = testDrive.spawn,
+        coords = coords,
         plate = plate
     })
 
     testDrives[src] = {
         netId = netId,
         endBehavior = testDrive.endBehavior,
-        returnLocation = sharedConfig.shops[shopId].returnLocation
+        returnLocation = shop.returnLocation
     }
 
     Player(src).state:set('isInTestDrive', testDrive.limit, true)
@@ -122,6 +128,11 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleDa
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
+    local coords = GetClearSpawnArea(shop.vehicleSpawns)
+    if not coords then
+        return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
+    end
+
     local player = exports.qbx_core:GetPlayer(src)
     local vehiclePrice = COREVEHICLES[vehicle].price
     if not RemoveMoney(src, vehiclePrice, 'vehicle-bought-in-showroom') then
@@ -135,9 +146,8 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleDa
 
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
 
-
     SpawnVehicle(src, {
-        coords = shop.vehicleSpawn,
+        coords = coords,
         vehicleId = vehicleId
     })
 end)
@@ -187,6 +197,11 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(vehicle,
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
+    local coords = GetClearSpawnArea(shop.vehicleSpawns)
+    if not coords then
+        return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
+    end
+
     local vehiclePrice = COREVEHICLES[vehicle].price
     local cid = target.PlayerData.citizenid
 
@@ -198,7 +213,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(vehicle,
     })
 
     SpawnVehicle(src, {
-        coords = shop.vehicleSpawn,
+        coords = coords,
         vehicleId = vehicleId
     })
 end)

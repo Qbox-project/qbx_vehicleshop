@@ -23,7 +23,8 @@
         "buyerdeclined": "O jogador recusou a transação",
         "selftransfer": "Não podes transferir para ti próprio",
         "sale_timeout": "Espera um bocado antes de trocar o teu veículo",
-        "notallowed": "Não tens permissão para comprar este modelo"
+        "notallowed": "Não tens permissão para comprar este modelo",
+        "no_clear_spawn": "No spawn area found for vehicle."
     },
     "success": {
         "purchased": "Parabéns pela tua compra!",
