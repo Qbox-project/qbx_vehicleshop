@@ -23,7 +23,8 @@
         "buyerdeclined": "Jucătorul a refuzat tranzacția",
         "selftransfer": "Nu poți transfera către tine însuți",
         "sale_timeout": "Așteaptă un timp înainte de a tranzacționa vehiculul",
-        "notallowed": "Nu ai voie să achiziționezi acest model de vehicul"
+        "notallowed": "Nu ai voie să achiziționezi acest model de vehicul",
+        "no_clear_spawn": "No spawn area found for vehicle."
     },
     "success": {
         "purchased": "Felicitări pentru achiziția ta!",

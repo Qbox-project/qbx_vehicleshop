@@ -22,7 +22,8 @@
       "buyerdeclined": "Der Spieler hat die Transaktion abgelehnt",
       "selftransfer": "Du kannst das Fahrzeug nicht an dich selbst übertragen",
       "sale_timeout": "Warte eine Weile, bevor du dein Fahrzeug handelst",
-      "notallowed": "Du darfst dieses Fahrzeugmodell nicht kaufen"
+      "notallowed": "Du darfst dieses Fahrzeugmodell nicht kaufen",
+      "no_clear_spawn": "No spawn area found for vehicle."
     },
     "success": {
       "purchased": "Herzlichen Glückwunsch zu deinem Kauf!",

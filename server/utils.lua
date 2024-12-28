@@ -90,6 +90,18 @@ function RemoveMoney(src, amount, reason)
     return config.removePlayerFunds(player, currencyType, amount, reason)
 end
 
+---@param spawns vector4[]
+---@return vector4 | nil
+function GetClearSpawnArea(spawns)
+    for i = 1, #spawns do
+        local spawn = spawns[i]
+
+        if #lib.getNearbyVehicles(spawn.xyz) == 0 then
+            return spawn
+        end
+    end
+end
+
 ---@param src number
 ---@param data {coords: vector4, vehicleId?: number, modelName: string, plate?: string, props?: {plate: string}}
 ---@return number|nil

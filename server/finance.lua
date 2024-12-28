@@ -211,6 +211,11 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
+    local coords = GetClearSpawnArea(shop.vehicleSpawns)
+    if not coords then
+        return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
+    end
+
     downPayment = tonumber(downPayment) --[[@as number]]
     paymentAmount = tonumber(paymentAmount) --[[@as number]]
 
@@ -250,7 +255,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
     })
 
     SpawnVehicle(src, {
-        coords = shop.vehicleSpawn,
+        coords = coords,
         vehicleId = vehicleId
     })
     financeTimer[target.PlayerData.source].hasFinanced = true
@@ -269,6 +274,11 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
 
     if not CheckVehicleList(vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
+    end
+
+    local coords = GetClearSpawnArea(shop.vehicleSpawns)
+    if not coords then
+        return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
     end
 
     local player = exports.qbx_core:GetPlayer(src)
@@ -315,7 +325,7 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
 
     SpawnVehicle(src, {
-        coords = shop.vehicleSpawn,
+        coords = coords,
         vehicleId = vehicleId
     })
 
