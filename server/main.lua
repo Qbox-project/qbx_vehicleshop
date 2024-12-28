@@ -75,14 +75,16 @@ AddStateBagChangeHandler('isInTestDrive', nil, function(bagName, _, value)
 
     local plySrc = GetPlayerFromStateBagName(bagName)
     if not plySrc then return end
-    local netId = testDrives[plySrc].netId
-    local endBehavior = testDrives[plySrc].endBehavior
+    local testDrive = testDrives[plySrc]
+    if not testDrive then return end
+    local netId = testDrive.netId
+    local endBehavior = testDrive.endBehavior
     if not netId or endBehavior == 'none' then return end
 
     local vehicle = NetworkGetEntityFromNetworkId(netId)
 
     if endBehavior == 'return' then
-        local coords = testDrives[plySrc].returnLocation
+        local coords = testDrive.returnLocation
         local plyPed = GetPlayerPed(plySrc)
         if #(GetEntityCoords(plyPed) - coords) > 10 then -- don't teleport if they are standing near the spot
             SetEntityCoords(plyPed, coords.x, coords.y, coords.z, false, false, false, false)
