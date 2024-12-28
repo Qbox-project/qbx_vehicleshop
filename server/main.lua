@@ -100,6 +100,14 @@ AddStateBagChangeHandler('isInTestDrive', nil, function(bagName, _, value)
     testDrives[plySrc] = nil
 end)
 
+AddEventHandler('onResourceStop', function (resourceName)
+    if cache.resource ~= resourceName then return end
+
+    for player, _ in pairs(testDrives) do
+        Player(player).state:set('isInTestDrive', nil, true)
+    end
+end)
+
 ---@param vehicleData {buyVehicle: string}
 RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleData)
     local src = source
