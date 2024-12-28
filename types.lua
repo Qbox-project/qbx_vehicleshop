@@ -35,6 +35,11 @@
 ---@field paymentsleft integer
 ---@field financetime number
 
+---A `vehicle_financing` row joined with its corresponding `player_vehicles` row.
+---@class JoinedVehicleFinancingEntity : VehicleFinancingEntity
+---@field id integer
+---@field plate string
+
 ---@class DealershipZone -- Zone definition for dealership
 ---@field shape vector3[] -- poly zone points. All Z values should be the same
 ---@field size vector3 -- Size of the showroom zones
