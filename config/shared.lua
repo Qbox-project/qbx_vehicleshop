@@ -267,11 +267,11 @@ return {
             returnLocation = vec3(-44.74, -1082.58, 26.68),
             vehicleSpawn = vec4(-31.69, -1090.78, 26.42, 328.79),
             showroomVehicles = {
-                [1] = {coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'adder'},
+                [1] = {coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'asbo'},
                 [2] = {coords = vec4(-48.27, -1101.86, 25.44, 294.5), vehicle = 'schafter2'},
-                [3] = {coords = vec4(-39.6, -1096.01, 25.44, 66.5), vehicle = 'comet2'},
+                [3] = {coords = vec4(-39.6, -1096.01, 25.44, 66.5), vehicle = 'greenwood'},
                 [4] = {coords = vec4(-51.21, -1096.77, 25.44, 254.5), vehicle = 'vigero'},
-                [5] = {coords = vec4(-40.18, -1104.13, 25.44, 338.5), vehicle = 't20'},
+                [5] = {coords = vec4(-40.18, -1104.13, 25.44, 338.5), vehicle = 'impaler'},
                 [6] = {coords = vec4(-43.31, -1099.02, 25.44, 52.5), vehicle = 'bati'},
                 [7] = {coords = vec4(-50.66, -1093.05, 25.44, 222.5), vehicle = 'bati'},
                 [8] = {coords = vec4(-44.28, -1102.47, 25.44, 298.5), vehicle = 'bati'}
@@ -318,9 +318,9 @@ return {
                 [1] = {coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx'},
                 [2] = {coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb'},
                 [3] = {coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero'},
-                [4] = {coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'bati'},
-                [5] = {coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'carbonrs'},
-                [6] = {coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'hexer'},
+                [4] = {coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2'},
+                [5] = {coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris'},
+                [6] = {coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator'},
             }
         },
 
