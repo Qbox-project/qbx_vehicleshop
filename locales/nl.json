@@ -23,7 +23,8 @@
         "buyerdeclined": "The player declined the transaction",
         "selftransfer": "You can't transfer to yourself",
         "sale_timeout": "Wait a while before trading your vehicle",
-        "notallowed": "You are not allowed to purchase this vehicle model"
+        "notallowed": "You are not allowed to purchase this vehicle model",
+        "no_clear_spawn": "No spawn area found for vehicle."
     },
     "success": {
         "purchased": "Gefeliciteerd met je nieuwe voertuig!",

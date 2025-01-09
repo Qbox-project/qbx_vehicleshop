@@ -20,11 +20,11 @@ return {
         categories = {
             boats = 'boats',
             air = 'air',
-            -- super = {'pdm', 'luxury'},
+            -- super = { 'pdm', 'luxury' },
         },
 
         models = {
-            -- zentorno = {'pdm', 'luxury'},
+            -- zentorno = { 'pdm', 'luxury' },
 
             oppressor = 'luxury',
             --- Sports
@@ -261,20 +261,26 @@ return {
             },
             testDrive = {
                 limit = 5.0,
-                spawn = vec4(-7.84, -1081.35, 26.67, 121.83),
                 endBehavior = 'return'
             },
             returnLocation = vec3(-32.77, -1095.75, 26.42),
-            vehicleSpawn = vec4(-31.69, -1090.78, 26.42, 328.79),
+            vehicleSpawns = {
+                vec4(-61.35, -1110.31, 25.86, 71.01),
+                vec4(-59.61, -1104.74, 25.85, 70.13),
+                vec4(-52.96, -1113.49, 25.87, 71.53),
+                vec4(-52.34, -1107.93, 25.87, 71.63),
+                vec4(-44.27, -1116.36, 25.87, 71.7),
+                vec4(-41.75, -1111.49, 25.87, 71.5),
+            },
             showroomVehicles = {
-                [1] = {coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'asbo'},
-                [2] = {coords = vec4(-48.27, -1101.86, 25.44, 294.5), vehicle = 'schafter2'},
-                [3] = {coords = vec4(-39.6, -1096.01, 25.44, 66.5), vehicle = 'greenwood'},
-                [4] = {coords = vec4(-51.21, -1096.77, 25.44, 254.5), vehicle = 'vigero'},
-                [5] = {coords = vec4(-40.18, -1104.13, 25.44, 338.5), vehicle = 'impaler'},
-                [6] = {coords = vec4(-43.31, -1099.02, 25.44, 52.5), vehicle = 'bati'},
-                [7] = {coords = vec4(-50.66, -1093.05, 25.44, 222.5), vehicle = 'bati'},
-                [8] = {coords = vec4(-44.28, -1102.47, 25.44, 298.5), vehicle = 'bati'}
+                { coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'asbo' },
+                { coords = vec4(-48.27, -1101.86, 25.44, 294.5), vehicle = 'schafter2' },
+                { coords = vec4(-39.6, -1096.01, 25.44, 66.5), vehicle = 'greenwood' },
+                { coords = vec4(-51.21, -1096.77, 25.44, 254.5), vehicle = 'vigero' },
+                { coords = vec4(-40.18, -1104.13, 25.44, 338.5), vehicle = 'impaler' },
+                { coords = vec4(-43.31, -1099.02, 25.44, 52.5), vehicle = 'bati' },
+                { coords = vec4(-50.66, -1093.05, 25.44, 222.5), vehicle = 'bati' },
+                { coords = vec4(-44.28, -1102.47, 25.44, 298.5), vehicle = 'bati' },
             },
         },
 
@@ -309,18 +315,19 @@ return {
             },
             testDrive = {
                 limit = 5.0,
-                spawn = vec4(-1232.81, -347.99, 37.33, 23.28),
                 endBehavior = 'return'
             },
             returnLocation = vec3(-1231.46, -349.86, 37.33),
-            vehicleSpawn = vec4(-1231.46, -349.86, 37.33, 26.61),
+            vehicleSpawns = {
+                vec4(-1231.46, -349.86, 37.33, 26.61),
+            },
             showroomVehicles = {
-                [1] = {coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx'},
-                [2] = {coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb'},
-                [3] = {coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero'},
-                [4] = {coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2'},
-                [5] = {coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris'},
-                [6] = {coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator'},
+                { coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx' },
+                { coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb' },
+                { coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero' },
+                { coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2' },
+                { coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris' },
+                { coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator' },
             }
         },
 
@@ -348,16 +355,17 @@ return {
             },
             testDrive = {
                 limit = 5.0,
-                spawn = vec4(-722.23, -1351.98, 0.14, 135.33),
                 endBehavior = 'return'
             },
             returnLocation = vec3(-714.34, -1343.31, 0.0),
-            vehicleSpawn = vec4(-727.87, -1353.1, -0.17, 137.09),
+            vehicleSpawns = {
+                vec4(-727.87, -1353.1, -0.17, 137.09),
+            },
             showroomVehicles = {
-                [1] = {coords = vec4(-727.05, -1326.59, -0.50, 229.5), vehicle = 'seashark'},
-                [2] = {coords = vec4(-732.84, -1333.5, -0.50, 229.5), vehicle = 'dinghy'},
-                [3] = {coords = vec4(-737.84, -1340.83, -0.50, 229.5), vehicle = 'speeder'},
-                [4] = {coords = vec4(-741.53, -1349.7, -0.50, 229.5), vehicle = 'marquis'},
+                { coords = vec4(-727.05, -1326.59, -0.50, 229.5), vehicle = 'seashark' },
+                { coords = vec4(-732.84, -1333.5, -0.50, 229.5), vehicle = 'dinghy' },
+                { coords = vec4(-737.84, -1340.83, -0.50, 229.5), vehicle = 'speeder' },
+                { coords = vec4(-741.53, -1349.7, -0.50, 229.5), vehicle = 'marquis' },
             },
         },
 
@@ -386,16 +394,17 @@ return {
             },
             testDrive = {
                 limit = 5.0,
-                spawn = vec4(-1625.19, -3103.47, 13.94, 330.28),
                 endBehavior = 'return'
             },
             returnLocation = vec3(-1628.44, -3104.7, 13.94),
-            vehicleSpawn = vec4(-1617.49, -3086.17, 13.94, 329.2),
+            vehicleSpawns = {
+                vec4(-1617.49, -3086.17, 13.94, 329.2),
+            },
             showroomVehicles = {
-                [1] = {coords = vec4(-1651.36, -3162.66, 12.99, 346.89), vehicle = 'volatus'},
-                [2] = {coords = vec4(-1668.53, -3152.56, 12.99, 303.22), vehicle = 'luxor2'},
-                [3] = {coords = vec4(-1632.02, -3144.48, 12.99, 31.08), vehicle = 'nimbus'},
-                [4] = {coords = vec4(-1663.74, -3126.32, 12.99, 275.03), vehicle = 'frogger'},
+                { coords = vec4(-1651.36, -3162.66, 12.99, 346.89), vehicle = 'volatus' },
+                { coords = vec4(-1668.53, -3152.56, 12.99, 303.22), vehicle = 'luxor2' },
+                { coords = vec4(-1632.02, -3144.48, 12.99, 31.08), vehicle = 'nimbus' },
+                { coords = vec4(-1663.74, -3126.32, 12.99, 275.03), vehicle = 'frogger' },
             },
         },
     },

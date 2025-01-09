@@ -58,7 +58,6 @@
 
 ---@class TestDriveConfig -- Test drive configuration
 ---@field limit number -- Time for test drive in minutes
----@field spawn vector4 -- Location to spawn test drive vehicle
 ---@field endBehavior 'return'|'destroy'|'none' -- 'none' will not do anything, 'return' will return the player to the dealership and destroy the vehicle, 'destroy' will destroy the vehicle and leave player at current position
 
 ---@class Dealership -- Dealership configuration
@@ -70,4 +69,4 @@
 ---@field showroomVehicles DealershipVehicle[]
 ---@field testDrive TestDriveConfig
 ---@field returnLocation vector3 -- Location to return the vehicle to for test drives
----@field vehicleSpawn vector4 -- Location to spawn purchased vehicles
+---@field vehicleSpawns vector4[] -- Locations to spawn purchased vehicles
