@@ -234,7 +234,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         return exports.qbx_core:Notify(src, locale('error.exceededmax'), 'error')
     end
 
-    local cid = target.PlayerData.citizenid
+    local citizenId = target.PlayerData.citizenid
     local timer = (config.finance.paymentInterval * 60) + (math.floor((os.time() - financeTimer[src].time) / 60))
     local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
 
@@ -242,7 +242,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
 
     local vehicleId = financeStorage.insertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
-            citizenId = cid,
+            citizenId = citizenId,
             model = vehicle,
         },
 
@@ -305,12 +305,12 @@ RegisterNetEvent('qbx_vehicleshop:server:financeVehicle', function(downPayment, 
     end
 
     local balance, vehPaymentAmount = calculateFinance(vehiclePrice, downPayment, paymentAmount)
-    local cid = player.PlayerData.citizenid
+    local citizenId = player.PlayerData.citizenid
     local timer = (config.finance.paymentInterval * 60) + (math.floor((os.time() - financeTimer[src].time) / 60))
 
     local vehicleId = financeStorage.insertVehicleEntityWithFinance({
         insertVehicleEntityRequest = {
-            citizenId = cid,
+            citizenId = citizenId,
             model = vehicle,
         },
 
@@ -351,7 +351,7 @@ lib.callback.register('qbx_vehicleshop:server:GetFinancedVehicles', function(sou
             vehicle.paymentsleft = v.paymentsleft
             vehicle.financetime = v.financetime
         end
-        vehicles[#vehicles+1] = vehicle
+        vehicles[#vehicles + 1] = vehicle
     end
 
     return vehicles[1] and vehicles

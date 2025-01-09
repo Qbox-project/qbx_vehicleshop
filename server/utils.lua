@@ -7,14 +7,11 @@ local allowedVehicles = require 'server.vehicles'
 function CheckVehicleList(vehicle, shop)
     for i = 1, allowedVehicles.count do
         local allowedVeh = allowedVehicles.vehicles[i]
-        if allowedVeh.model == vehicle then
-            if shop and allowedVeh.shopType == shop then
-                return true
-            elseif not shop then
-                return true
-            end
+        if allowedVeh.model == vehicle and (not shop or allowedVeh.shopType == shop) then
+            return true
         end
     end
+
     return false
 end
 
@@ -33,20 +30,14 @@ function GetShopZone(source)
     end
 end
 
----@param shopShape vector3[]
----@param shopName string
-local function createShop(shopShape, shopName)
-    return lib.zones.poly({
-        name = shopName,
-        points = shopShape,
-        thickness = 5,
-    })
-end
-
 -- Create shop zones for point checking
 CreateThread(function()
     for shopName, shop in pairs(shops) do
-        shopZones[#shopZones + 1] = createShop(shop.zone.shape, shopName)
+        shopZones[#shopZones + 1] = lib.zones.poly({
+            name = shopName,
+            points = shop.zone.shape,
+            thickness = 5,
+        })
 
         for i = 1, #shop.showroomVehicles do
             local vehicle = shop.showroomVehicles[i]
@@ -121,11 +112,11 @@ function SpawnVehicle(src, data)
         }
     })
 
-    if not netId or netId == 0 then return end
+    if not netId or netId == 0 or not vehicle or vehicle == 0 then return end
 
-    if not vehicle or vehicle == 0 then return end
-
-    if vehicleId then Entity(vehicle).state:set('vehicleid', vehicleId, false) end
+    if vehicleId then
+        Entity(vehicle).state:set('vehicleid', vehicleId, false)
+    end
 
     config.giveKeys(src, plate, vehicle)
 
