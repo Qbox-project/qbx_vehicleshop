@@ -20,11 +20,11 @@ return {
         categories = {
             boats = 'boats',
             air = 'air',
-            -- super = {'pdm', 'luxury'},
+            -- super = { 'pdm', 'luxury' },
         },
 
         models = {
-            -- zentorno = {'pdm', 'luxury'},
+            -- zentorno = { 'pdm', 'luxury' },
 
             oppressor = 'luxury',
             --- Sports
@@ -273,14 +273,14 @@ return {
                 vec4(-41.75, -1111.49, 25.87, 71.5),
             },
             showroomVehicles = {
-                [1] = {coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'asbo'},
-                [2] = {coords = vec4(-48.27, -1101.86, 25.44, 294.5), vehicle = 'schafter2'},
-                [3] = {coords = vec4(-39.6, -1096.01, 25.44, 66.5), vehicle = 'greenwood'},
-                [4] = {coords = vec4(-51.21, -1096.77, 25.44, 254.5), vehicle = 'vigero'},
-                [5] = {coords = vec4(-40.18, -1104.13, 25.44, 338.5), vehicle = 'impaler'},
-                [6] = {coords = vec4(-43.31, -1099.02, 25.44, 52.5), vehicle = 'bati'},
-                [7] = {coords = vec4(-50.66, -1093.05, 25.44, 222.5), vehicle = 'bati'},
-                [8] = {coords = vec4(-44.28, -1102.47, 25.44, 298.5), vehicle = 'bati'}
+                { coords = vec4(-45.65, -1093.66, 25.44, 69.5), vehicle = 'asbo' },
+                { coords = vec4(-48.27, -1101.86, 25.44, 294.5), vehicle = 'schafter2' },
+                { coords = vec4(-39.6, -1096.01, 25.44, 66.5), vehicle = 'greenwood' },
+                { coords = vec4(-51.21, -1096.77, 25.44, 254.5), vehicle = 'vigero' },
+                { coords = vec4(-40.18, -1104.13, 25.44, 338.5), vehicle = 'impaler' },
+                { coords = vec4(-43.31, -1099.02, 25.44, 52.5), vehicle = 'bati' },
+                { coords = vec4(-50.66, -1093.05, 25.44, 222.5), vehicle = 'bati' },
+                { coords = vec4(-44.28, -1102.47, 25.44, 298.5), vehicle = 'bati' },
             },
         },
 
@@ -322,12 +322,12 @@ return {
                 vec4(-1231.46, -349.86, 37.33, 26.61),
             },
             showroomVehicles = {
-                [1] = {coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx'},
-                [2] = {coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb'},
-                [3] = {coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero'},
-                [4] = {coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2'},
-                [5] = {coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris'},
-                [6] = {coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator'},
+                { coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx' },
+                { coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb' },
+                { coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero' },
+                { coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2' },
+                { coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris' },
+                { coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator' },
             }
         },
 
@@ -362,10 +362,10 @@ return {
                 vec4(-727.87, -1353.1, -0.17, 137.09),
             },
             showroomVehicles = {
-                [1] = {coords = vec4(-727.05, -1326.59, -0.50, 229.5), vehicle = 'seashark'},
-                [2] = {coords = vec4(-732.84, -1333.5, -0.50, 229.5), vehicle = 'dinghy'},
-                [3] = {coords = vec4(-737.84, -1340.83, -0.50, 229.5), vehicle = 'speeder'},
-                [4] = {coords = vec4(-741.53, -1349.7, -0.50, 229.5), vehicle = 'marquis'},
+                { coords = vec4(-727.05, -1326.59, -0.50, 229.5), vehicle = 'seashark' },
+                { coords = vec4(-732.84, -1333.5, -0.50, 229.5), vehicle = 'dinghy' },
+                { coords = vec4(-737.84, -1340.83, -0.50, 229.5), vehicle = 'speeder' },
+                { coords = vec4(-741.53, -1349.7, -0.50, 229.5), vehicle = 'marquis' },
             },
         },
 
@@ -401,10 +401,10 @@ return {
                 vec4(-1617.49, -3086.17, 13.94, 329.2),
             },
             showroomVehicles = {
-                [1] = {coords = vec4(-1651.36, -3162.66, 12.99, 346.89), vehicle = 'volatus'},
-                [2] = {coords = vec4(-1668.53, -3152.56, 12.99, 303.22), vehicle = 'luxor2'},
-                [3] = {coords = vec4(-1632.02, -3144.48, 12.99, 31.08), vehicle = 'nimbus'},
-                [4] = {coords = vec4(-1663.74, -3126.32, 12.99, 275.03), vehicle = 'frogger'},
+                { coords = vec4(-1651.36, -3162.66, 12.99, 346.89), vehicle = 'volatus' },
+                { coords = vec4(-1668.53, -3152.56, 12.99, 303.22), vehicle = 'luxor2' },
+                { coords = vec4(-1632.02, -3144.48, 12.99, 31.08), vehicle = 'nimbus' },
+                { coords = vec4(-1663.74, -3126.32, 12.99, 275.03), vehicle = 'frogger' },
             },
         },
     },

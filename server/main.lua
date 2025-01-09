@@ -15,8 +15,8 @@ RegisterNetEvent('qbx_vehicleshop:server:swapVehicle', function(data)
     TriggerClientEvent('qbx_vehicleshop:client:swapVehicle', -1, data)
 end)
 
----@param data {vehicle: string}
-RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
+---@param vehicle string
+RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(vehicle)
     if not sharedConfig.enableTestDrive then return end
     local src = source
 
@@ -28,7 +28,7 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
     local shop = sharedConfig.shops[shopId]
     if not shop then return end
 
-    if not CheckVehicleList(data.vehicle, shopId) then
+    if not CheckVehicleList(vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
@@ -41,7 +41,7 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(data)
     local plate = 'TEST'..lib.string.random('1111')
 
     local netId = SpawnVehicle(src, {
-        modelName = data.vehicle,
+        modelName = vehicle,
         coords = coords,
         plate = plate
     })
@@ -114,15 +114,13 @@ AddEventHandler('onResourceStop', function (resourceName)
     end
 end)
 
----@param vehicleData {buyVehicle: string}
-RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicleData)
+---@param vehicle string
+RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
 
     local shopId = GetShopZone(src)
     local shop = sharedConfig.shops[shopId]
     if not shop then return end
-
-    local vehicle = vehicleData.buyVehicle
 
     if not CheckVehicleList(vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
