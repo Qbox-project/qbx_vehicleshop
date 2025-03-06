@@ -132,8 +132,6 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle, 
         return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
     end
 
-    -- Verificar si se paga en efectivo o cuenta bancaria
-    -- Verificar si se paga en efectivo o cuenta bancaria
     local success = false
     if paymentMethod == 'cash' then
         success = player.Functions.RemoveMoney('cash', vehiclePrice, 'Compra de vehículo')
@@ -144,7 +142,6 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle, 
     end
 
 
-    -- Crear el vehículo
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
         citizenid = player.PlayerData.citizenid,
@@ -152,7 +149,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle, 
 
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
 
-    -- Spawnear el vehículo
+
     SpawnVehicle(src, {
         coords = coords,
         vehicleId = vehicleId

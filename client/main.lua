@@ -81,19 +81,19 @@ local function openPaymentMethodMenu(vehicleModel)
 
     lib.registerContext({
         id = 'paymentMethodMenu',
-        title = 'Selecciona un Método de Pago',
+        title = locale('menus.payment_method'),
         options = {
             {
-                title = '💵 Pagar en Efectivo',
-                description = ('Precio: $%s'):format(lib.math.groupdigits(vehiclePrice)),
+                title = locale('menus.pay_cash'),
+                description = locale('menus.price_txt'):format(lib.math.groupdigits(vehiclePrice)),
                 icon = 'fa-solid fa-money-bill',
                 onSelect = function()
                     TriggerServerEvent('qbx_vehicleshop:server:buyShowroomVehicle', vehicleModel, 'cash')
                 end
             },
             {
-                title = '🏦 Pagar con Cuenta Bancaria',
-                description = ('Precio: $%s'):format(lib.math.groupdigits(vehiclePrice)),
+                title = locale('menus.pay_bank'),
+                description = locale('menus.price_txt'):format(lib.math.groupdigits(vehiclePrice)),
                 icon = 'fa-solid fa-building-columns',
                 onSelect = function()
                     TriggerServerEvent('qbx_vehicleshop:server:buyShowroomVehicle', vehicleModel, 'bank')
@@ -103,6 +103,7 @@ local function openPaymentMethodMenu(vehicleModel)
     })
     lib.showContext('paymentMethodMenu')
 end
+
 --- Gets the owned vehicles based on financing then opens a menu
 local function showFinancedVehiclesMenu()
     local vehicles = lib.callback.await('qbx_vehicleshop:server:GetFinancedVehicles')
@@ -179,15 +180,16 @@ end
 local function openFinance(targetShowroomVehicle, buyVehicle)
     local shopName = insideShop
     if not shopName then
-        return exports.qbx_core:Notify('No estás en un concesionario.', 'error')
+        return exports.qbx_core:Notify(locale('menus.not_in_dealership'), 'error')
     end
 
-    -- Si targetShowroomVehicle es un número, convertirlo en una tabla con "id"
+
+
     if type(targetShowroomVehicle) == "number" then
         targetShowroomVehicle = { id = targetShowroomVehicle }
     end
 
-    -- Si no tiene "id", buscar el más cercano
+
     if not targetShowroomVehicle or not targetShowroomVehicle.id then
         local playerCoords = GetEntityCoords(PlayerPedId())
         local closestShowroom = nil
@@ -199,23 +201,25 @@ local function openFinance(targetShowroomVehicle, buyVehicle)
 
             if distance < minDistance then
                 minDistance = distance
-                closestShowroom = { id = i } -- 🔵 Ahora guardamos correctamente la estructura
+                closestShowroom = { id = i } 
             end
         end
 
         targetShowroomVehicle = closestShowroom
     end
 
-    -- Verificar si finalmente tenemos un showroom válido
-    if not targetShowroomVehicle or not targetShowroomVehicle.id then
-        return exports.qbx_core:Notify('No se encontró un vehículo en el showroom.', 'error')
-    end
 
-    -- Obtener precio correctamente sin error
+    if not targetShowroomVehicle or not targetShowroomVehicle.id then
+        return exports.qbx_core:Notify(locale('menus.no_showroom_vehicle'), 'error')
+    end
+    
+
+
     local price = getVehPrice(targetShowroomVehicle.id)
     if not price then
-        return exports.qbx_core:Notify('Error al obtener el precio del vehículo.', 'error')
+        return exports.qbx_core:Notify(locale('menus.vehicle_price_error'), 'error')
     end
+    
 
     local title = ('%s %s - $%s'):format(VEHICLES[buyVehicle].brand:upper(), VEHICLES[buyVehicle].name:upper(), price)
 
@@ -272,33 +276,32 @@ end
 
 --- Opens a menu with list of vehicle categories
 ---@param targetVehicle integer
---- Abre un buscador de vehículos por nombre
 local function openVehicleSearchMenu()
-    local dialog = lib.inputDialog('Buscar Vehículo', {
+    local dialog = lib.inputDialog(locale('menus.search_vehicle_title'), {
         {
             type = 'input',
-            label = 'Nombre del Vehículo',
-            placeholder = 'Ejemplo: Sultan, Dominator...',
+            label = locale('menus.search_vehicle_label'),
+            placeholder = locale('menus.search_vehicle_placeholder'),
         }
     })
 
-    if not dialog or not dialog[1] then return end -- Si el jugador cancela, salimos
 
-    local searchQuery = dialog[1]:lower() -- Convertimos el texto a minúsculas para búsqueda flexible
+    if not dialog or not dialog[1] then return end 
+
+    local searchQuery = dialog[1]:lower()
     local options = {}
-
-    -- Verificar que estamos dentro de una tienda
     local shopName = insideShop
     if not shopName then
-        return exports.qbx_core:Notify('No estás en un concesionario.', 'error')
+        return exports.qbx_core:Notify(locale('menus.not_in_dealership'), 'error')
     end
+    
 
-    -- Obtener el vehículo más cercano dentro del showroom
+
     local targetShowroomVehicle
-    local playerCoords = GetEntityCoords(PlayerPedId()) -- Obtener posición del jugador
+    local playerCoords = GetEntityCoords(PlayerPedId()) 
 
     for i, vehicleData in pairs(sharedConfig.shops[shopName].showroomVehicles) do
-        local vehCoords = vehicleData.coords.xyz -- Posición del vehículo en showroom
+        local vehCoords = vehicleData.coords.xyz 
         local distance = #(playerCoords - vehCoords)
 
         if not targetShowroomVehicle or distance < targetShowroomVehicle.distance then
@@ -307,66 +310,65 @@ local function openVehicleSearchMenu()
     end
 
     if not targetShowroomVehicle then
-        return exports.qbx_core:Notify('No se encontró un vehículo cercano para cambiar.', 'error')
+        return exports.qbx_core:Notify(locale('menus.no_nearby_vehicle'), 'error')
     end
+    
+for model, vehicle in pairs(VEHICLES) do
+    if vehicle.name:lower():find(searchQuery) or vehicle.brand:lower():find(searchQuery) then
+        options[#options + 1] = {
+            title = ('%s %s'):format(vehicle.brand, vehicle.name),
+            description = locale('menus.price'):format(lib.math.groupdigits(vehicle.price)), 
+            icon = 'fa-solid fa-car',
+            arrow = true,
+            onSelect = function()
+            
+                TriggerServerEvent('qbx_vehicleshop:server:swapVehicle', {
+                    toVehicle = model,
+                    targetVehicle = targetShowroomVehicle.id,
+                    closestShop = shopName
+                })
 
-    -- Buscar vehículos que coincidan con la búsqueda
-    for model, vehicle in pairs(VEHICLES) do
-        if vehicle.name:lower():find(searchQuery) or vehicle.brand:lower():find(searchQuery) then
-            options[#options + 1] = {
-                title = ('%s %s'):format(vehicle.brand, vehicle.name),
-                description = ('Precio: $%s'):format(lib.math.groupdigits(vehicle.price)),
-                icon = 'fa-solid fa-car',
-                arrow = true,
-                onSelect = function()
-                    -- Enviar evento para cambiar el vehículo correcto en el showroom
-                    TriggerServerEvent('qbx_vehicleshop:server:swapVehicle', {
-                        toVehicle = model,
-                        targetVehicle = targetShowroomVehicle.id,
-                        closestShop = shopName
-                    })
 
-                    -- Mostrar el menú de opciones de compra o financiamiento
-                    lib.registerContext({
-                        id = 'vehicleOptions_' .. model,
-                        title = ('%s %s'):format(vehicle.brand, vehicle.name),
-                        options = {
-                            {
-                                title = '💰 Comprar',
-                                description = ('Precio: $%s'):format(lib.math.groupdigits(vehicle.price)),
-                                icon = 'fa-solid fa-money-bill',
-                                onSelect = function()
-                                    openPaymentMethodMenu(model) -- ✅ Esto abrirá el menú para seleccionar el método de pago
-                                end
-                            },
-                            {
-                                title = '🏦 Financiar',
-                                description = 'Pagar en cuotas mensuales',
-                                icon = 'fa-solid fa-hand-holding-dollar',
-                                onSelect = function()
-                                    openFinance(nil, model)
-                                end
-                            }
+                lib.registerContext({
+                    id = 'vehicleOptions_' .. model,
+                    title = ('%s %s'):format(vehicle.brand, vehicle.name),
+                    options = {
+                        {
+                            title = locale('menus.buy'), 
+                            description = locale('menus.price'):format(lib.math.groupdigits(vehicle.price)),
+                            icon = 'fa-solid fa-money-bill',
+                            onSelect = function()
+                                openPaymentMethodMenu(model) 
+                            end
+                        },
+                        {
+                            title = locale('menus.finance'), 
+                            description = locale('menus.finance_desc'), 
+                            icon = 'fa-solid fa-hand-holding-dollar',
+                            onSelect = function()
+                                openFinance(nil, model)
+                            end
                         }
-                    })
-                    lib.showContext('vehicleOptions_' .. model)
-                end
-            }
-        end
+                    }
+                })
+                lib.showContext('vehicleOptions_' .. model)
+            end
+        }
     end
+end
 
-    if #options == 0 then
-        return exports.qbx_core:Notify('No se encontraron vehículos con ese nombre.', 'error')
-    end
 
-    -- Mostrar menú con resultados de búsqueda
-    lib.registerContext({
-        id = 'searchResults',
-        title = 'Resultados de Búsqueda',
-        options = options
-    })
+if #options == 0 then
+    return exports.qbx_core:Notify(locale('menus.no_vehicle_found'), 'error')
+end
 
-    lib.showContext('searchResults')
+lib.registerContext({
+    id = 'searchResults',
+    title = locale('menus.search_results'),
+    options = options
+})
+
+lib.showContext('searchResults')
 end
 
 
@@ -374,18 +376,17 @@ local function openVehicleCategoryMenu(targetVehicle)
     local categoryMenu = {}
     local sortedCategories = {}
     local categories = sharedConfig.shops[insideShop].categories
-
-    -- 📌 Primero agregamos el botón de búsqueda para que quede arriba
     categoryMenu[#categoryMenu + 1] = {
-        title = '🔍 Buscar Vehículo',
-        description = 'Escribe el nombre de un vehículo para buscarlo',
+        title = locale('menus.search_vehicle'),
+        description = locale('menus.search_vehicle_desc'),
         icon = 'fa-solid fa-magnifying-glass',
         onSelect = function()
             openVehicleSearchMenu()
         end
     }
+    
+    
 
-    -- Ordenamos las categorías antes de agregarlas
     for k, v in pairs(categories) do
         sortedCategories[#sortedCategories + 1] = {
             category = k,
@@ -397,7 +398,6 @@ local function openVehicleCategoryMenu(targetVehicle)
         return a.label:upper() < b.label:upper()
     end)
 
-    -- Agregamos las categorías después del botón de búsqueda
     for i = 1, #sortedCategories do
         categoryMenu[#categoryMenu + 1] = {
             title = sortedCategories[i].label,
@@ -669,19 +669,19 @@ local function openPaymentMethodMenu(vehicleModel)
 
     lib.registerContext({
         id = 'paymentMethodMenu',
-        title = 'Selecciona un Método de Pago',
+        title = locale('menus.payment_method'),
         options = {
             {
-                title = '💵 Pagar en Efectivo',
-                description = ('Precio: $%s'):format(lib.math.groupdigits(vehiclePrice)),
+                title = locale('menus.pay_cash'),
+                description = locale('menus.price_txt'):format(lib.math.groupdigits(vehiclePrice)),
                 icon = 'fa-solid fa-money-bill',
                 onSelect = function()
                     TriggerServerEvent('qbx_vehicleshop:server:buyShowroomVehicle', vehicleModel, 'cash')
                 end
             },
             {
-                title = '🏦 Pagar con Cuenta Bancaria',
-                description = ('Precio: $%s'):format(lib.math.groupdigits(vehiclePrice)),
+                title = locale('menus.pay_bank'),
+                description = locale('menus.price_txt'):format(lib.math.groupdigits(vehiclePrice)),
                 icon = 'fa-solid fa-building-columns',
                 onSelect = function()
                     TriggerServerEvent('qbx_vehicleshop:server:buyShowroomVehicle', vehicleModel, 'bank')
@@ -691,6 +691,7 @@ local function openPaymentMethodMenu(vehicleModel)
     })
     lib.showContext('paymentMethodMenu')
 end
+
 
 local function createShowroomVehiclePoint(data)
     local vehPoint = lib.points.new({
