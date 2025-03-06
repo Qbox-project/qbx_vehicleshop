@@ -24,6 +24,8 @@
         "selftransfer": "You can't transfer to yourself",
         "sale_timeout": "Wait a while before trading your vehicle",
         "notallowed": "You are not allowed to purchase this vehicle model",
+        "search_vehicle": "🔍 Search Vehicle",
+        "target_showFinanceMenu": "Open Finance Menu",
         "no_clear_spawn": "No spawn area found for vehicle."
     },
     "success": {
@@ -32,6 +34,7 @@
         "gifted": "You gifted your vehicle",
         "received_gift": "You were gifted a vehicle",
         "soldfor": "You sold your vehicle for $",
+        "target_showFinanceMenu": "Open Finance Menu",
         "boughtfor": "You bought a vehicle for $"
     },
     "menus": {
@@ -71,6 +74,26 @@
         "submit_ID": "Server ID (#)",
         "keypress_showFinanceMenu": "[E] Open Finance Menu",
         "keypress_vehicleViewMenu": "[E] View Vehicle",
+        "price": "Price: $%s",
+        "no_vehicle_found": "No vehicles found with that name.",
+        "search_vehicle": "Search Vehicle",
+        "search_vehicle_desc": "Enter the name of a vehicle to search for it",
+        "search_desc": "Enter the name of a vehicle to search",
+        "search_vehicle_title": "Search Vehicle",
+        "search_vehicle_label": "Vehicle Name",
+        "search_vehicle_placeholder": "Example: Sultan, Dominator...",
+        "payment_method": "Select a Payment Method",
+        "pay_cash": "Pay with Cash",
+        "pay_bank": "Pay with Bank Account",
+        "price_txt": "Price: $%s",
+        "search_results": "Search Results",
+        "not_in_dealership": "You are not in a dealership.",
+        "buy": "Buy",
+        "no_showroom_vehicle": "No showroom vehicle found.",
+        "vehicle_price_error": "Error getting vehicle price.",
+        "finance": "Finance",
+        "finance_desc": "Pay in monthly installments",
+        "no_nearby_vehicle": "No nearby vehicle found to swap.",
         "target_showFinanceMenu": "Open Finance Menu"
     },
     "general": {
