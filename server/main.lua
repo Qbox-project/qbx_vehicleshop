@@ -115,9 +115,9 @@ AddEventHandler('onResourceStop', function (resourceName)
 end)
 
 ---@param vehicle string
-RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
+RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle, paymentMethod)
     local src = source
-
+    local player = exports.qbx_core:GetPlayer(src)
     local shopId = GetShopZone(src)
     local shop = sharedConfig.shops[shopId]
     if not shop then return end
@@ -126,16 +126,21 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
     end
 
+    local vehiclePrice = COREVEHICLES[vehicle].price
     local coords = GetClearSpawnArea(shop.vehicleSpawns)
     if not coords then
         return exports.qbx_core:Notify(src, locale('error.no_clear_spawn'), 'error')
     end
 
-    local player = exports.qbx_core:GetPlayer(src)
-    local vehiclePrice = COREVEHICLES[vehicle].price
-    if not RemoveMoney(src, vehiclePrice, 'vehicle-bought-in-showroom') then
-        return exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
+    local success = false
+    if paymentMethod == 'cash' then
+        success = player.Functions.RemoveMoney('cash', vehiclePrice, 'Compra de vehículo')
+    elseif paymentMethod == 'bank' then
+        success = player.Functions.RemoveMoney('bank', vehiclePrice, 'Compra de vehículo')
+    else
+        return exports.qbx_core:Notify(src, 'Método de pago no válido.', 'error')
     end
+
 
     local vehicleId = exports.qbx_vehicles:CreatePlayerVehicle({
         model = vehicle,
@@ -144,11 +149,13 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
 
     exports.qbx_core:Notify(src, locale('success.purchased'), 'success')
 
+
     SpawnVehicle(src, {
         coords = coords,
         vehicleId = vehicleId
     })
 end)
+
 
 ---@param src number
 ---@param target table
