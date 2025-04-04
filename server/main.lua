@@ -210,7 +210,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(vehicle,
         citizenid = cid,
     })
 
-    SpawnVehicle(src, {
+    SpawnVehicle(playerId, {
         coords = coords,
         vehicleId = vehicleId
     })

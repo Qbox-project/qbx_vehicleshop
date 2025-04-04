@@ -254,7 +254,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellfinanceVehicle', function(downPayme
         }
     })
 
-    SpawnVehicle(src, {
+    SpawnVehicle(playerId, {
         coords = coords,
         vehicleId = vehicleId
     })
