@@ -284,52 +284,54 @@ return {
             },
         },
 
-        luxury = {
-            type = 'managed',
-            job = 'cardealer',
-            zone = {
-                shape = {
-                    vec3(-1260.6973876953, -349.21334838867, 36.91),
-                    vec3(-1268.6248779297, -352.87365722656, 36.91),
-                    vec3(-1274.1533203125, -358.29794311523, 36.91),
-                    vec3(-1273.8425292969, -362.73715209961, 36.91),
-                    vec3(-1270.5701904297, -368.6716003418, 36.91),
-                    vec3(-1266.0561523438, -375.14080810547, 36.91),
-                    vec3(-1244.3684082031, -362.70278930664, 36.91),
-                    vec3(-1249.8704833984, -352.03326416016, 36.91),
-                    vec3(-1252.9503173828, -345.85726928711, 36.91)
-                },
-                size = vec3(3, 3, 4),
-                targetDistance = 1,
-            },
-            blip = {
-                label = 'Luxury Vehicle Shop',
-                coords = vec3(-1255.6, -361.16, 36.91),
-                show = true,
-                sprite = 326,
-                color = 3,
-            },
-            categories = {
-                super = 'Super',
-                sports = 'Sports'
-            },
-            testDrive = {
-                limit = 5.0,
-                endBehavior = 'return'
-            },
-            returnLocation = vec3(-1231.46, -349.86, 37.33),
-            vehicleSpawns = {
-                vec4(-1231.46, -349.86, 37.33, 26.61),
-            },
-            showroomVehicles = {
-                { coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx' },
-                { coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb' },
-                { coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero' },
-                { coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2' },
-                { coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris' },
-                { coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator' },
-            }
-        },
+        -- an example of a managed dealership. You can only buy vehicles here if someone with the job "cardealer" is operating it.
+        -- Coordinates are perfectly setup for https://forum.cfx.re/t/mlo-car-dealer/1983229
+        -- luxury = {
+        --     type = 'managed',
+        --     job = 'cardealer',
+        --     zone = {
+        --         shape = {
+        --             vec3(-1260.6973876953, -349.21334838867, 36.91),
+        --             vec3(-1268.6248779297, -352.87365722656, 36.91),
+        --             vec3(-1274.1533203125, -358.29794311523, 36.91),
+        --             vec3(-1273.8425292969, -362.73715209961, 36.91),
+        --             vec3(-1270.5701904297, -368.6716003418, 36.91),
+        --             vec3(-1266.0561523438, -375.14080810547, 36.91),
+        --             vec3(-1244.3684082031, -362.70278930664, 36.91),
+        --             vec3(-1249.8704833984, -352.03326416016, 36.91),
+        --             vec3(-1252.9503173828, -345.85726928711, 36.91)
+        --         },
+        --         size = vec3(3, 3, 4),
+        --         targetDistance = 1,
+        --     },
+        --     blip = {
+        --         label = 'Luxury Vehicle Shop',
+        --         coords = vec3(-1255.6, -361.16, 36.91),
+        --         show = true,
+        --         sprite = 326,
+        --         color = 3,
+        --     },
+        --     categories = {
+        --         super = 'Super',
+        --         sports = 'Sports'
+        --     },
+        --     testDrive = {
+        --         limit = 5.0,
+        --         endBehavior = 'return'
+        --     },
+        --     returnLocation = vec3(-1231.46, -349.86, 37.33),
+        --     vehicleSpawns = {
+        --         vec4(-1231.46, -349.86, 37.33, 26.61),
+        --     },
+        --     showroomVehicles = {
+        --         { coords = vec4(-1265.31, -354.44, 35.91, 205.08), vehicle = 'italirsx' },
+        --         { coords = vec4(-1270.06, -358.55, 35.91, 247.08), vehicle = 'italigtb' },
+        --         { coords = vec4(-1269.21, -365.03, 35.91, 297.12), vehicle = 'nero' },
+        --         { coords = vec4(-1252.07, -364.2, 35.91, 56.44), vehicle = 'nero2' },
+        --         { coords = vec4(-1255.49, -365.91, 35.91, 55.63), vehicle = 'osiris' },
+        --         { coords = vec4(-1249.21, -362.97, 35.91, 53.24), vehicle = 'penetrator' },
+        --     }
+        -- },
 
         boats = {
             type = 'free-use',
