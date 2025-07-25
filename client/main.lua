@@ -703,3 +703,10 @@ CreateThread(function()
         end
     end
 end)
+
+--- Handles test drive requests from cardealer employees
+---@param data {vehicle: string}
+RegisterNetEvent('qbx_vehicleshop:client:testDrive', function(data)
+    if not data or not data.vehicle then return end
+    TriggerServerEvent('qbx_vehicleshop:server:testDrive', data.vehicle)
+end)
