@@ -76,9 +76,9 @@ local function checkFinancedVehicles(src)
         local timeLeft = v.financetime - time
         if timeLeft <= 0 then
             if config.deleteUnpaidFinancedVehicle then
-                exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.id)
+                exports.qbx_vehicles:DeletePlayerVehicles('vehicleId', v.vehicleId)
             else
-                exports.qbx_vehicles:SetPlayerVehicleOwner(v.id, nil)
+                exports.qbx_vehicles:SetPlayerVehicleOwner(v.vehicleId, nil)
             end
             exports.qbx_core:Notify(src, locale('error.repossessed', v.plate), 'error')
         elseif timeLeft <= config.finance.paymentWarning then
