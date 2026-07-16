@@ -8,11 +8,30 @@ local financeStorage = require 'server.storage'
 COREVEHICLES = exports.qbx_core:GetVehiclesByName()
 local saleTimeout = {}
 local testDrives = {}
+local managedTestDriveAuthorizations = {}
 
----@param data {toVehicle: string}
+local function isAuthorizedSalesperson(source, shop)
+    if not shop or shop.type ~= 'managed' or not shop.job then return false end
+    local player = exports.qbx_core:GetPlayer(source)
+    return player and player.PlayerData.job.name == shop.job
+end
+
+---@param data {toVehicle: string, targetVehicle: integer, closestShop: string}
 RegisterNetEvent('qbx_vehicleshop:server:swapVehicle', function(data)
-    if not CheckVehicleList(data.toVehicle) then return end
-    TriggerClientEvent('qbx_vehicleshop:client:swapVehicle', -1, data)
+    local src = source
+    if type(data) ~= 'table' or type(data.toVehicle) ~= 'string' or type(data.closestShop) ~= 'string' or math.type(data.targetVehicle) ~= 'integer' then return end
+
+    local shopId = GetShopZone(src)
+    local shop = sharedConfig.shops[shopId]
+    if not shop or shopId ~= data.closestShop or not shop.showroomVehicles[data.targetVehicle] then return end
+    if shop.type == 'managed' and not isAuthorizedSalesperson(src, shop) then return end
+    if not CheckVehicleList(data.toVehicle, shopId) then return end
+
+    TriggerClientEvent('qbx_vehicleshop:client:swapVehicle', -1, {
+        toVehicle = data.toVehicle,
+        closestShop = shopId,
+        targetVehicle = data.targetVehicle,
+    })
 end)
 
 ---@param vehicle string
@@ -27,6 +46,11 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(vehicle)
     local shopId = GetShopZone(src)
     local shop = sharedConfig.shops[shopId]
     if not shop then return end
+    if shop.type == 'managed' and not isAuthorizedSalesperson(src, shop) then
+        local authorization = managedTestDriveAuthorizations[src]
+        managedTestDriveAuthorizations[src] = nil
+        if not authorization or authorization.shopId ~= shopId or authorization.vehicle ~= vehicle or authorization.expiresAt < os.time() then return end
+    end
 
     if not CheckVehicleList(vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
@@ -45,15 +69,18 @@ RegisterNetEvent('qbx_vehicleshop:server:testDrive', function(vehicle)
         coords = coords,
         plate = plate
     })
+    if not netId then return end
 
-    testDrives[src] = {
+    local session = {
         netId = netId,
         endBehavior = testDrive.endBehavior,
         returnLocation = shop.returnLocation
     }
+    testDrives[src] = session
 
     Player(src).state:set('isInTestDrive', testDrive.limit, true)
     SetTimeout(testDrive.limit * 60000, function()
+        if testDrives[src] ~= session then return end
         Player(src).state:set('isInTestDrive', nil, true)
     end)
 end)
@@ -63,6 +90,9 @@ end)
 RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, playerId)
     local src = source
     local target = tonumber(playerId) --[[@as number]]
+    local shopId = GetShopZone(src)
+    local shop = sharedConfig.shops[shopId]
+    if not isAuthorizedSalesperson(src, shop) or not CheckVehicleList(vehicle, shopId) then return end
 
     if not exports.qbx_core:GetPlayer(target) then
         exports.qbx_core:Notify(src, locale('error.Invalid_ID'), 'error')
@@ -70,6 +100,11 @@ RegisterNetEvent('qbx_vehicleshop:server:customTestDrive', function(vehicle, pla
     end
 
     if #(GetEntityCoords(GetPlayerPed(src)) - GetEntityCoords(GetPlayerPed(target))) < 3 then
+        managedTestDriveAuthorizations[target] = {
+            shopId = shopId,
+            vehicle = vehicle,
+            expiresAt = os.time() + 10,
+        }
         TriggerClientEvent('qbx_vehicleshop:client:testDrive', target, { vehicle = vehicle })
     else
         exports.qbx_core:Notify(src, locale('error.playertoofar'), 'error')
@@ -85,7 +120,10 @@ AddStateBagChangeHandler('isInTestDrive', nil, function(bagName, _, value)
     if not testDrive then return end
     local netId = testDrive.netId
     local endBehavior = testDrive.endBehavior
-    if not netId or endBehavior == 'none' then return end
+    if not netId or endBehavior == 'none' then
+        testDrives[plySrc] = nil
+        return
+    end
 
     local vehicle = NetworkGetEntityFromNetworkId(netId)
 
@@ -114,6 +152,14 @@ AddEventHandler('onResourceStop', function (resourceName)
     end
 end)
 
+AddEventHandler('playerDropped', function()
+    managedTestDriveAuthorizations[source] = nil
+    local testDrive = testDrives[source]
+    local vehicle = testDrive and testDrive.netId and NetworkGetEntityFromNetworkId(testDrive.netId)
+    if vehicle and DoesEntityExist(vehicle) then DeleteEntity(vehicle) end
+    testDrives[source] = nil
+end)
+
 ---@param vehicle string
 RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local src = source
@@ -121,6 +167,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     local shopId = GetShopZone(src)
     local shop = sharedConfig.shops[shopId]
     if not shop then return end
+    if shop.type ~= 'free-use' or not sharedConfig.enableFreeUseBuy then return end
 
     if not CheckVehicleList(vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
@@ -132,6 +179,7 @@ RegisterNetEvent('qbx_vehicleshop:server:buyShowroomVehicle', function(vehicle)
     end
 
     local player = exports.qbx_core:GetPlayer(src)
+    if not player then return end
     local vehiclePrice = COREVEHICLES[vehicle].price
     if not RemoveMoney(src, vehiclePrice, 'vehicle-bought-in-showroom') then
         return exports.qbx_core:Notify(src, locale('error.notenoughmoney'), 'error')
@@ -189,7 +237,7 @@ RegisterNetEvent('qbx_vehicleshop:server:sellShowroomVehicle', function(vehicle,
 
     local shopId = GetShopZone(target.PlayerData.source)
     local shop = sharedConfig.shops[shopId]
-    if not shop then return end
+    if not shop or not isAuthorizedSalesperson(src, shop) then return end
 
     if not CheckVehicleList(vehicle, shopId) then
         return exports.qbx_core:Notify(src, locale('error.notallowed'), 'error')
@@ -236,6 +284,8 @@ lib.addCommand('transfervehicle', {
     local buyerId = args.id
     local sellAmount = args.amount or 0
 
+    if math.type(sellAmount) ~= 'integer' or sellAmount < 0 then return end
+
     if source == buyerId then
         return exports.qbx_core:Notify(source, locale('error.selftransfer'), 'error')
     end
@@ -264,6 +314,10 @@ lib.addCommand('transfervehicle', {
 
     local player = exports.qbx_core:GetPlayer(source)
     local target = exports.qbx_core:GetPlayer(buyerId)
+    if not player or not target then
+        return exports.qbx_core:Notify(source, locale('error.buyerinfo'), 'error')
+    end
+
     local row = exports.qbx_vehicles:GetPlayerVehicle(vehicleId)
     local isFinanced = sharedConfig.finance.enable and financeStorage.fetchIsFinanced(vehicleId)
 
@@ -282,9 +336,6 @@ lib.addCommand('transfervehicle', {
     end
 
     local targetcid = target.PlayerData.citizenid
-    if not target then
-        return exports.qbx_core:Notify(source, locale('error.buyerinfo'), 'error')
-    end
 
     saleTimeout[source] = true
 
@@ -313,8 +364,10 @@ lib.addCommand('transfervehicle', {
                 return exports.qbx_core:Notify(source, locale('error.buyertoopoor'), 'error')
             end
 
+            if not config.removePlayerFunds(target, currencyType, sellAmount, 'vehicle-bought-from-player') then
+                return exports.qbx_core:Notify(source, locale('error.buyertoopoor'), 'error')
+            end
             config.addPlayerFunds(player, currencyType, sellAmount, 'vehicle-sold-to-player')
-            config.removePlayerFunds(target, currencyType, sellAmount, 'vehicle-bought-from-player')
         end
 
         exports.qbx_vehicles:SetPlayerVehicleOwner(row.id, targetcid)
